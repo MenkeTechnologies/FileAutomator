@@ -1,4 +1,4 @@
-package sample;
+package mainPackage;
 
 import com.apple.eio.FileManager;
 import javafx.beans.binding.Bindings;
@@ -8,14 +8,14 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import org.apache.commons.io.FileUtils;
 
-import javax.naming.Binding;
 import java.awt.*;
-import java.awt.Button;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 /**
@@ -24,12 +24,23 @@ import java.util.Optional;
 public class Utilities {
     public static Integer index = 0;
 
+    public static String formatDate(LocalDateTime localDateTime) {
+
+        return localDateTime.format(DateTimeFormatter.ISO_DATE) + " " + localDateTime.format(DateTimeFormatter.ISO_TIME);
+    }
+
     public static String quote(String s) {
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("\"").append(s).append("\"");
         return sb.toString();
+    }
+
+    public static void copyToClipboard(String outputText) {
+        StringSelection stringSelection = new StringSelection(outputText);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, stringSelection);
     }
 
     public static ContextMenu createContextMenu(FileInfo fileInfo, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
@@ -44,7 +55,39 @@ public class Utilities {
         MenuItem secureDeleteItem = new Menu("Secure Delete");
         MenuItem renameItem = new MenuItem("Rename");
         MenuItem copyItem = new MenuItem("Copy");
-        rowContextMenu.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem);
+        MenuItem createNewFile = new MenuItem("Create New File");
+        MenuItem copyAbsolutePathItem = new MenuItem("Copy Absolute Path");
+
+        rowContextMenu.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem, copyAbsolutePathItem);
+
+        if (fileInfo.isDirectory()) {
+            rowContextMenu.getItems().add(createNewFile);
+        }
+
+        copyAbsolutePathItem.setOnAction(e-> {
+                    copyToClipboard(fileInfo.getAbsolutePath());
+
+                });
+
+
+        createNewFile.setOnAction(e -> {
+
+            TextInputDialog textInputDialog = new TextInputDialog("");
+            textInputDialog.setHeaderText("Create New File");
+
+            Optional<String> result = textInputDialog.showAndWait();
+            if (result.isPresent()) {
+                try {
+                    String path = fileInfo + File.separator + result.get();
+                    File newFile = new File(path);
+                    System.out.println(path);
+                    newFile.createNewFile();
+                    mainController.searchAndRefresh();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
 
         copyItem.setOnAction(e -> {
 
@@ -122,6 +165,7 @@ public class Utilities {
             try {
                 Desktop.getDesktop().open(fileInfo);
             } catch (IOException e1) {
+                Utilities.showErrorAlert("The file could not be opened.");
                 e1.printStackTrace();
             }
         });
@@ -153,8 +197,7 @@ public class Utilities {
 
                 fileInfo.renameTo(new File(newFilePath));
 
-
-                if (oldFile.isDirectory()){
+                if (oldFile.isDirectory()) {
                     System.out.println("here in change dir");
                     mainController.searchAndRefresh();
                 } else {
@@ -173,6 +216,13 @@ public class Utilities {
         return rowContextMenu;
     }
 
+    public static void showErrorAlert(String error){
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText(error);
+        alert.showAndWait();
+    }
+
     private static void invokeCommandLine(String... command) throws IOException {
 
         ProcessBuilder pb = new ProcessBuilder();
@@ -180,4 +230,6 @@ public class Utilities {
 
         pb.start();
     }
+
+
 }
