@@ -179,10 +179,10 @@ public class MainController implements Initializable {
 
                     if (selectInTreeViewCheckBox.isSelected()) {
 
-                        Platform.runLater(()->{
+                        Platform.runLater(() -> {
                             FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(fileInfo.getAbsolutePath()), MainController.this);
 
-                            selectTreeItemRecursively(Paths.get(fileInfo.getAbsolutePath()));
+                            selectTreeItemRecursively(Paths.get(fileInfo.getAbsolutePath()), false);
                         });
                     }
 
@@ -207,7 +207,7 @@ public class MainController implements Initializable {
         initCheckBoxes();
     }
 
-    private void selectTreeItemRecursively(Path path) {
+    private void selectTreeItemRecursively(Path path, boolean checkForExpanded) {
         fileBrowserTreeTable.getRoot().setExpanded(true);
 
         root = (TreeItem) fileBrowserTreeTable.getRoot().getChildren().get(0);
@@ -215,14 +215,15 @@ public class MainController implements Initializable {
         root.getChildren().clear();
 
         FilePathTreeItem filePathTreeItem = (FilePathTreeItem) root;
-        filePathTreeItem.populateSourceAndImmediateChildrenSameThread(filePathTreeItem);
-
-            recurseAndSelectTreeItems(filePathTreeItem, path.iterator());
-
-
+        if (!checkForExpanded) {
+            filePathTreeItem.populateSourceAndImmediateChildrenSameThread(filePathTreeItem);
+        } else {
+            filePathTreeItem.populateSourceAndImmediateChildrenSameThreadCheckingForExpanded(filePathTreeItem);
+        }
+        recurseAndSelectTreeItems(filePathTreeItem, path.iterator(), checkForExpanded);
     }
 
-    public void recurseAndSelectTreeItems(FilePathTreeItem filePathTreeItem, Iterator pathIterator) {
+    public void recurseAndSelectTreeItems(FilePathTreeItem filePathTreeItem, Iterator pathIterator, boolean checkForExpanded) {
         Path nextPath = (Path) pathIterator.next();
         System.out.println("next path is " + nextPath);
         System.out.println("original tree item is " + filePathTreeItem.getFullPath());
@@ -236,16 +237,19 @@ public class MainController implements Initializable {
 
                 FilePathTreeItem filePathTreeItem1 = (FilePathTreeItem) child;
                 child.setExpanded(true);
-                filePathTreeItem.populateSourceAndImmediateChildrenSameThread(filePathTreeItem1);
-
+                if (!checkForExpanded) {
+                    filePathTreeItem1.populateSourceAndImmediateChildrenSameThread(filePathTreeItem1);
+                } else {
+                    filePathTreeItem1.populateSourceAndImmediateChildrenSameThreadCheckingForExpanded(filePathTreeItem1);
+                }
                 if (pathIterator.hasNext()) {
 
-                    recurseAndSelectTreeItems(filePathTreeItem1, pathIterator);
+                    recurseAndSelectTreeItems(filePathTreeItem1, pathIterator, checkForExpanded);
                     break;
                 } else {
 
                     fileBrowserTreeTable.getSelectionModel().select(child);
-                    fileBrowserTreeTable.scrollTo(fileBrowserTreeTable.getSelectionModel().getSelectedIndex()-10);
+                    fileBrowserTreeTable.scrollTo(fileBrowserTreeTable.getSelectionModel().getSelectedIndex() - 10);
                     System.out.println("Selecting..." + child);
                     break;
                 }
@@ -369,22 +373,19 @@ public class MainController implements Initializable {
     }
 
     public void findDirectoryInTree(ActionEvent actionEvent) {
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
 
+            if (!directoryToSearchTextField.getText().equals("")) {
+                FileInfo fileInfo = new FileInfo(directoryToSearchTextField.getText());
 
-           if (!directoryToSearchTextField.getText().equals("")){
-               FileInfo fileInfo = new FileInfo(directoryToSearchTextField.getText());
+                if (fileInfo.exists()) {
+                    FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(fileInfo.getAbsolutePath()), MainController.this);
 
-               if (fileInfo.exists()){
-                   FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(fileInfo.getAbsolutePath()), MainController.this);
-
-                   selectTreeItemRecursively(Paths.get(fileInfo.getAbsolutePath()));
-               } else {
-                   String error = "Not A Valid File or Folder.";
-                   Utilities.showErrorAlert(error);
-               }
-
-
+                    selectTreeItemRecursively(Paths.get(fileInfo.getAbsolutePath()), false);
+                } else {
+                    String error = "Not A Valid File or Folder.";
+                    Utilities.showErrorAlert(error);
+                }
             }
         });
     }
@@ -393,8 +394,6 @@ public class MainController implements Initializable {
 
         String home = System.getProperty("user.home");
 
-        selectTreeItemRecursively(Paths.get(home));
-
-
+        selectTreeItemRecursively(Paths.get(home), true);
     }
 }
