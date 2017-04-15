@@ -1,4 +1,4 @@
-package sample;
+package mainPackage;
 
 import javafx.beans.property.*;
 
@@ -13,7 +13,19 @@ public class FileInfo extends File {
     private SimpleBooleanProperty directoryProperty;
     private SimpleLongProperty fileSize;
 
+    public boolean isHiddenProperty() {
+        return hiddenProperty.get();
+    }
 
+    public SimpleBooleanProperty hiddenPropertyProperty() {
+        return hiddenProperty;
+    }
+
+    public void setHiddenProperty(boolean hiddenProperty) {
+        this.hiddenProperty.set(hiddenProperty);
+    }
+
+    private SimpleBooleanProperty hiddenProperty;
 
     public boolean getDirectoryProperty() {
         return directoryProperty.get();
@@ -39,12 +51,16 @@ public class FileInfo extends File {
         this.directoryProperty.set(directoryProperty);
     }
 
+
+
     public FileInfo(String name) {
         super(name);
         fileName = new SimpleStringProperty(getName());
         filePath = new SimpleStringProperty(getAbsolutePath());
         directoryProperty = new SimpleBooleanProperty(isDirectory());
         fileSize = new SimpleLongProperty(length());
+        hiddenProperty = new SimpleBooleanProperty(isHidden());
+
 
     }
 
