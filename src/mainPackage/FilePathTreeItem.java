@@ -170,6 +170,32 @@ public class FilePathTreeItem extends TreeItem<String> {
         }
     }
 
+    public void populateSourceAndImmediateChildrenSameThreadCheckingForExpanded(FilePathTreeItem source) {
+
+
+        try {
+            if (!source.isExpanded()){
+                source.getChildren().clear();
+            }
+            try {
+                if (!source.isExpanded()) {
+                    populateTreeItem(source);
+                    source.getChildren().forEach(item -> {
+                        try {
+                            populateTreeItem((FilePathTreeItem) item);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void populateTreeItem(FilePathTreeItem source) throws java.io.IOException {
         Path path = Paths.get(source.getFullPath());
         BasicFileAttributes attribs = Files.readAttributes(path, BasicFileAttributes.class);
