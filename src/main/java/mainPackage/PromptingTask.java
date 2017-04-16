@@ -1,8 +1,11 @@
 package mainPackage;
 
 import java.util.concurrent.*;
+
 import javafx.application.Application;
+
 import static javafx.application.Application.launch;
+
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.concurrent.Task;
@@ -18,7 +21,8 @@ public class PromptingTask extends Application {
             "MISSING Lorem ipsum dolor sit amet MISSING consectetur adipisicing elit sed do eiusmod tempor incididunt MISSING ut labore et dolore magna aliqua"
                     .split(" ");
 
-    @Override public void start(Stage primaryStage) {
+    @Override
+    public void start(Stage primaryStage) {
         Label status = new Label();
         ProgressBar progress = new ProgressBar();
 
@@ -42,7 +46,9 @@ public class PromptingTask extends Application {
         taskThread.start();
     }
 
-    public static void main(String[] args) { launch(args); }
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
 
 class LoadTextTask extends Task<Void> {
@@ -55,7 +61,8 @@ class LoadTextTask extends Task<Void> {
         this.container = container;
     }
 
-    @Override protected Void call() throws Exception {
+    @Override
+    protected Void call() throws Exception {
         try {
             updateProgress(0, lines.length);
 
@@ -78,7 +85,7 @@ class LoadTextTask extends Task<Void> {
                     nextLabel.setStyle("-fx-background-color: palegreen;");
                 }
                 nextLabel.setText(nextText);
-
+                System.out.println("addign");
                 Platform.runLater(
                         new AddNodeLater(
                                 container,
@@ -107,7 +114,8 @@ class LoadTextTask extends Task<Void> {
             this.owner = owner;
         }
 
-        @Override public String call() throws Exception {
+        @Override
+        public String call() throws Exception {
             final Stage dialog = new Stage();
             dialog.setTitle("Enter Missing Text");
             dialog.initOwner(owner);
@@ -118,7 +126,8 @@ class LoadTextTask extends Task<Void> {
             final Button submitButton = new Button("Submit");
             submitButton.setDefaultButton(true);
             submitButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override public void handle(ActionEvent t) {
+                @Override
+                public void handle(ActionEvent t) {
                     dialog.close();
                 }
             });
@@ -146,7 +155,8 @@ class LoadTextTask extends Task<Void> {
             this.idx = idx;
         }
 
-        @Override public void run() {
+        @Override
+        public void run() {
             container.getChildren().add(idx, node);
         }
     }
