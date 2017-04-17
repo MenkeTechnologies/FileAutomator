@@ -85,7 +85,7 @@ class LoadTextTask extends Task<Void> {
                     nextLabel.setStyle("-fx-background-color: palegreen;");
                 }
                 nextLabel.setText(nextText);
-                System.out.println("addign");
+
                 Platform.runLater(
                         new AddNodeLater(
                                 container,
