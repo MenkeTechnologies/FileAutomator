@@ -2,6 +2,7 @@ package mainPackage;
 
 import javafx.application.Platform;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -13,8 +14,7 @@ import java.util.regex.Pattern;
  */
 public class RegexUtilities {
     public static void searchAndRefresh(MainController mainController) {
-
-        Platform.runLater(() -> {
+        mainController.runInBackgroundThread(()->{
             String fileToSearch = mainController.mainTextField.getText();
             String directory = mainController.directoryToSearchTextField.getText();
             mainController.files.clear();
@@ -23,9 +23,15 @@ public class RegexUtilities {
 
             mainController.mainTableView.refresh();
         });
+
+
     }
 
     public static void findFilesWithRegex(MainController mainController, String fileToSearch, String directory) {
+
+        Integer numberOfFiles = new File(directory).list().length;
+        System.out.println("number of files is " + numberOfFiles);
+
         try {
             Files.walk(Paths.get(directory)).forEach(file -> {
                 String fileName;
