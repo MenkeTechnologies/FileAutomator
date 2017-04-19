@@ -1,8 +1,7 @@
 package mainPackage;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -16,23 +15,28 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.*;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
-import javafx.stage.FileChooser;
+import javafx.scene.text.*;
+import javafx.stage.*;
 
-import javax.naming.Binding;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
+import java.util.prefs.Preferences;
+
+import javafx.scene.text.Font;
 
 public class MainController implements Initializable {
     public TableView mainTableView;
@@ -69,7 +73,6 @@ public class MainController implements Initializable {
     public Button searchButton;
     public ProgressBar progressIndicator;
     public Slider playPositionSlider;
-    static MediaPlayer mediaPlayer = new MediaPlayer(new Media(new File("src/main/resources/ClosedHH.wav").toURI().toString()));
     public CheckBox autoplayCheckbox;
     public HBox mediaPlayerControls;
     public Button play2XSlowerButton;
@@ -82,14 +85,25 @@ public class MainController implements Initializable {
     public Label currentTimeLabel;
     public Label totalTimeLabel;
     public ToggleButton loopButton;
+    public HBox sliderHbox;
+    public Button fullScreenMediaButton;
+    public HBox topHBox;
+    public HBox bottomHBox;
+    static MediaPlayer mediaPlayer = new MediaPlayer(new Media(new File("src/main/resources/ClosedHH.wav").toURI().toString()));
+    public VBox rightSidePaneTextVBox;
+    public HBox topSecondHBox;
+    public ToggleButton lockMediaView;
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
     boolean hidden = false;
-    static CustomTask<String> backgroundTask;
+    static CustomTask<String> searchingTask;
+    static CustomTask<String> loadingTask;
+
     public DoubleProperty mediaPlayerRateProperty = new SimpleDoubleProperty(1);
     public DoubleProperty mediaPlayerVolumeProperty = new SimpleDoubleProperty(1);
-
+    Double[] dividerPositions = {0d, 0d};
+    FilePathTreeItem currentlySelectedFilePathTreeItem = null;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -112,41 +126,51 @@ public class MainController implements Initializable {
 
         TableViewUtilities.initTableViewColumns(mainTableView);
 
-        mainTableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                if (newValue instanceof FileInfo) {
-                    FileInfo fileInfo = (FileInfo) newValue;
-                    FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(fileInfo.getAbsolutePath()), MainController.this);
-                    ;
+        mainTableView.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            if (e.isSecondaryButtonDown()) {
+                e.consume();
+            }
+        });
 
-                    if (selectInTreeViewCheckBox.isSelected()) {
+        fileBrowserTreeTable.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            if (e.isSecondaryButtonDown()) {
+                e.consume();
+            }
+        });
 
-                        runInBackgroundThreadSecondary(() -> {
-                            FilePathTreeItem.selectTreeItemRecursively(MainController.this, Paths.get(fileInfo.getAbsolutePath()), true);
-                        });
-                    }
+        mainTableView.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.PRIMARY) {
 
-                    updateRightSidePane(fileInfo);
+                Object item = mainTableView.getSelectionModel().getSelectedItem();
 
-                    runInBackgroundThreadSecondary(() -> {
-                        Utilities.updateThumbnailRightSidePane(MainController.this, filePathTreeItem);
-                    });
+                if (lockMediaView.isSelected()) {
+                    startPlayingMedia(item, false);
+                } else {
+                    startPlayingMedia(item, true);
                 }
             }
         });
 
-        fileBrowserTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                if (newValue instanceof FilePathTreeItem) {
-                    FilePathTreeItem filePathTreeItem = (FilePathTreeItem) newValue;
+        mainTableView.setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
+                Object item = mainTableView.getSelectionModel().getSelectedItem();
 
-                    updateRightSidePane(new FileInfo(filePathTreeItem.getPathString()));
+                if (lockMediaView.isSelected()) {
+                    startPlayingMedia(item, false);
+                } else {
+                    startPlayingMedia(item, true);
+                }
+            }
+        });
 
-                    runInBackgroundThreadSecondary(() -> {
-                        Utilities.updateThumbnailRightSidePane(MainController.this, filePathTreeItem);
-                    });
+        fileBrowserTreeTable.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.PRIMARY) {
+
+                Object item = fileBrowserTreeTable.getSelectionModel().getSelectedItem();
+
+                if (!lockMediaView.isSelected()) {
+
+                    startPlayingMediaFromTree(item);
                 }
             }
         });
@@ -158,8 +182,43 @@ public class MainController implements Initializable {
         initTasks();
     }
 
+    private void startPlayingMediaFromTree(Object item) {
+        FilePathTreeItem filePathTreeItem = (FilePathTreeItem) item;
+
+        currentlySelectedFilePathTreeItem = filePathTreeItem;
+
+        updateRightSidePane(new FileInfo(filePathTreeItem.getPathString()));
+
+        runInBackgroundThread(() -> {
+            Utilities.updateThumbnailRightSidePane(MainController.this, filePathTreeItem);
+        }, searchingTask);
+    }
+
+    public void startPlayingMedia(Object item, boolean openInRightPane) {
+        FileInfo fileInfo = (FileInfo) item;
+
+        FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(fileInfo.getAbsolutePath()), MainController.this);
+
+        currentlySelectedFilePathTreeItem = filePathTreeItem;
+
+        if (selectInTreeViewCheckBox.isSelected()) {
+
+            runInBackgroundThread(() -> {
+                FilePathTreeItem.selectTreeItemRecursively(MainController.this, Paths.get(fileInfo.getAbsolutePath()), true);
+            }, searchingTask);
+        }
+
+        if (openInRightPane) {
+            updateRightSidePane(fileInfo);
+
+            runInBackgroundThread(() -> {
+                Utilities.updateThumbnailRightSidePane(MainController.this, filePathTreeItem);
+            }, searchingTask);
+        }
+    }
+
     private void initTasks() {
-        backgroundTask = new CustomTask<>(this);
+        searchingTask = new CustomTask<>(this);
     }
 
     public void searchForFile(ActionEvent actionEvent) {
@@ -198,20 +257,37 @@ public class MainController implements Initializable {
 
     public void initBindings() {
 
-        mainTextField.setText("png");
+        mainTextField.setText("mp4");
         RegexUtilities.searchAndRefresh(this);
         rightPaneMediaView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
         rightPaneImageView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
-//        thinkingIndicator.progressProperty().bind(backgroundTask.progressProperty());
+//        thinkingIndicator.progressProperty().bind(searchingTask.progressProperty());
         stopCurrentSearchAction.visibleProperty().bind(thinkingIndicator.visibleProperty());
         searchButton.disableProperty().bind(thinkingIndicator.visibleProperty());
-        activityIndicatorLabel.textProperty().bind(backgroundTask.messageProperty());
+        activityIndicatorLabel.textProperty().bind(searchingTask.messageProperty());
         stopCurrentSearchAction.setOnAction(e -> {
-            backgroundTask.getFuture().cancel(true);
+            searchingTask.getFuture().cancel(true);
+        });
+        currentTimeLabel.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(0.15));
+
+        ObjectProperty<Font> fontObjectProperty = new SimpleObjectProperty<Font>(Font.font("Helvetica", FontWeight.BOLD, 10));
+
+        currentTimeLabel.fontProperty().bind(fontObjectProperty);
+        totalTimeLabel.fontProperty().bind(fontObjectProperty);
+        mediaPlayerRateLabel.fontProperty().bind(fontObjectProperty);
+
+        rightPaneScrollPane.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                Double scalingFactor = 0.03;
+                Integer startingValue = 5;
+
+                fontObjectProperty.set(Font.font("Arial", FontWeight.BOLD, newValue.doubleValue() * scalingFactor + startingValue));
+            }
         });
 
+        totalTimeLabel.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(0.15));
         playPositionSlider.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(0.7));
-
 
 //        initMediaPlayerBindings();
 
@@ -224,43 +300,41 @@ public class MainController implements Initializable {
         volumeSlider.valueProperty().bindBidirectional(mediaPlayerVolumeProperty);
         mediaPlayer.volumeProperty().bind(mediaPlayerVolumeProperty);
 
-        playMediaButton.textProperty().bind(Bindings.when(mediaPlayer.
-                statusProperty().isEqualTo(MediaPlayer.Status.PLAYING)).then("Pause").otherwise("Play"));
-
-
+        playMediaButton.graphicProperty().bind(Bindings.when(mediaPlayer.statusProperty().isEqualTo(MediaPlayer.Status.PLAYING))
+                .then(new ImageView(new Image("file:src/main/resources/png/pause.png"))).otherwise(new ImageView(new Image("file:src/main/resources/png/play.png"))));
         play2XFasterButton.setOnAction(e -> {
-           if (mediaPlayerRateProperty.get() < 8){
-               mediaPlayerRateProperty.set(mediaPlayerRateProperty.get() + 0.5);
-               mediaPlayerRateLabel.setText(Bindings.format("%3.2fx", mediaPlayerRateProperty.get()).getValue());
-           }
+            if (mediaPlayerRateProperty.get() < 8) {
+                mediaPlayerRateProperty.set(mediaPlayerRateProperty.get() + 0.5);
+                mediaPlayerRateLabel.setText(Bindings.format("%3.2fx", mediaPlayerRateProperty.get()).getValue());
+            }
         });
 
         play2XSlowerButton.setOnAction(e -> {
-            if (mediaPlayerRateProperty.get() > 0){
+            if (mediaPlayerRateProperty.get() > 0) {
                 mediaPlayerRateProperty.set(mediaPlayerRateProperty.get() - 0.25);
                 mediaPlayerRateLabel.setText(Bindings.format("%3.2fx", mediaPlayerRateProperty.get()).getValue());
             }
         });
 
         mediaStackPane.setOnMouseEntered(e -> {
-            mediaPlayerControls.setVisible(true);
+            if (currentlySelectedFilePathTreeItem != null && currentlySelectedFilePathTreeItem.getType().equals("music") || currentlySelectedFilePathTreeItem.getType().equals("video")) {
+                mediaPlayerControls.setVisible(true);
+            }
         });
 
         mediaStackPane.setOnMouseExited(e -> {
-            mediaPlayerControls.setVisible(false);
+            if (currentlySelectedFilePathTreeItem != null && currentlySelectedFilePathTreeItem.getType().equals("music") || currentlySelectedFilePathTreeItem.getType().equals("video")) {
+                mediaPlayerControls.setVisible(false);
+            }
         });
 
-
-
         playMediaButton.setOnAction(ez -> {
-            if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING){
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
                 mediaPlayer.pause();
-
             } else {
 
                 mediaPlayer.play();
             }
-
         });
     }
 
@@ -330,7 +404,7 @@ public class MainController implements Initializable {
                     collapseNodesRecursive((TreeItem) node);
                 });
             }
-        });
+        },loadingTask);
     }
 
     public void findDirectoryInTree(ActionEvent actionEvent) {
@@ -348,25 +422,17 @@ public class MainController implements Initializable {
                     CommonUtilities.showErrorAlert(error);
                 }
             }
-        });
+        }, searchingTask);
     }
 
-    public void runInBackgroundThread(Runnable r) {
+    public void runInBackgroundThread(Runnable r, CustomTask<String> mytask) {
         thinkingIndicator.setVisible(true);
 
-        backgroundTask = new CustomTask<>(this);
+        mytask = new CustomTask<>(this);
 
-        backgroundTask.setRunnable(r);
+        mytask.setRunnable(r);
 
-        Thread thread = new Thread(backgroundTask);
-
-        thread.start();
-    }
-
-    public void runInBackgroundThreadSecondary(Runnable r) {
-        System.out.println("secondary background");
-
-        Thread thread = new Thread(r);
+        Thread thread = new Thread(mytask);
 
         thread.start();
     }
@@ -377,7 +443,7 @@ public class MainController implements Initializable {
 
         runInBackgroundThread(() -> {
             FilePathTreeItem.selectTreeItemRecursively(this, Paths.get(home), true);
-        });
+        }, searchingTask);
     }
 
     public void copyAllButtonAction(ActionEvent actionEvent) {
@@ -411,7 +477,7 @@ public class MainController implements Initializable {
 
         runInBackgroundThread(() -> {
             FilePathTreeItem.selectTreeItemRecursively(this, Paths.get(home), true);
-        });
+        }, searchingTask);
     }
 
     public void openDestinationFolder(ActionEvent actionEvent) {
@@ -426,5 +492,31 @@ public class MainController implements Initializable {
         } else {
             CommonUtilities.showErrorAlert("Destination directory does not exist.");
         }
+    }
+
+    public void maximizeVideo(ActionEvent actionEvent) {
+
+        Preferences.userRoot().putDouble("dividerPos0", mainSplitPane.getDividerPositions()[0]);
+        Preferences.userRoot().putDouble("dividerPos1", mainSplitPane.getDividerPositions()[1]);
+
+        Utilities.removeFromView(rightSidePaneTextVBox);
+        Utilities.removeFromView(topHBox);
+        Utilities.removeFromView(bottomHBox);
+        Utilities.removeFromView(topSecondHBox);
+
+        mainSplitPane.setDividerPositions(0, 0);
+    }
+
+    public void returnToOldDividers(ActionEvent actionEvent) {
+
+        Double sp = Preferences.userRoot().getDouble("dividerPos0", 0.2);
+        Double sp2 = Preferences.userRoot().getDouble("dividerPos1", 0.8);
+
+        Utilities.addToView(rightSidePaneTextVBox);
+        Utilities.addToView(topHBox);
+        Utilities.addToView(bottomHBox);
+        Utilities.addToView(topSecondHBox);
+
+        mainSplitPane.setDividerPositions(sp, sp2);
     }
 }
