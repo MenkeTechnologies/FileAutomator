@@ -58,9 +58,8 @@ public class CustomTask<T> extends Task<String> {
         System.out.println("called and submitting to executor");
 
         try {
-
+            System.out.println("waiting on future");
             future.get();
-            System.out.println(mainController.mainTableView.getItems().size());
 
             CommonUtilities.FILE_COUNTER.set(0);
 
@@ -74,6 +73,7 @@ public class CustomTask<T> extends Task<String> {
             Platform.runLater(() -> mainController.thinkingIndicator.setVisible(false));
         }
 
+//        executorService.shutdownNow();
 
         return "Completed";
     }
@@ -81,4 +81,10 @@ public class CustomTask<T> extends Task<String> {
     public CustomTask(MainController mainController) {
         this.mainController = mainController;
     }
+
+    public CustomTask(MainController mainController, Runnable r) {
+        this.mainController = mainController;
+        this.r = r;
+    }
+
 }

@@ -31,67 +31,81 @@
                     <content>
                         <VBox fx:id="rightSidePaneVBox" prefHeight="200.0" prefWidth="100.0" spacing="10">
                             <children>
-                                <TextFlow fx:id="textFlowRightPane">
+                                <VBox fx:id="rightSidePaneTextVBox" spacing="8">
                                     <children>
-                                        <Text fx:id="fileNamDetailLabel" styleClass="detailLabels" text="File: "/>
-                                        <Text fx:id="fileNamDetailLabelContent"/>
-                                    </children>
-                                </TextFlow>
-                                <TextFlow>
-                                    <children>
-                                        <Text fx:id="sizeLabel" styleClass="detailLabels" text="Size: "/>
-                                        <Text fx:id="sizeDetailLabelContent"/>
-                                    </children>
-                                </TextFlow>
+                                        <TextFlow fx:id="textFlowRightPane">
+                                            <children>
+                                                <Text fx:id="fileNamDetailLabel" styleClass="detailLabels"
+                                                      text="File: "/>
+                                                <Text fx:id="fileNamDetailLabelContent"/>
+                                            </children>
+                                        </TextFlow>
+                                        <TextFlow>
+                                            <children>
+                                                <Text fx:id="sizeLabel" styleClass="detailLabels" text="Size: "/>
+                                                <Text fx:id="sizeDetailLabelContent"/>
+                                            </children>
+                                        </TextFlow>
 
-                                <TextFlow>
-                                    <children>
-                                        <Text fx:id="pathLabel" styleClass="detailLabels" text="Path: "/>
-                                        <Text fx:id="pathLabelContent"/>
-                                    </children>
-                                </TextFlow>
+                                        <TextFlow>
+                                            <children>
+                                                <Text fx:id="pathLabel" styleClass="detailLabels" text="Path: "/>
+                                                <Text fx:id="pathLabelContent"/>
+                                            </children>
+                                        </TextFlow>
 
-                                <TextFlow>
-                                    <children>
-                                        <Text fx:id="lastModifiedLabel" styleClass="detailLabels"
-                                              text="Last Modified: "/>
-                                        <Text fx:id="lastModifiedLabelContent"/>
-                                    </children>
-                                </TextFlow>
+                                        <TextFlow>
+                                            <children>
+                                                <Text fx:id="lastModifiedLabel" styleClass="detailLabels"
+                                                      text="Last Modified: "/>
+                                                <Text fx:id="lastModifiedLabelContent"/>
+                                            </children>
+                                        </TextFlow>
 
-                                <TextFlow>
-                                    <children>
-                                        <Text fx:id="textLabel" styleClass="detailLabels"/>
-                                        <Text fx:id="textContent"/>
+                                        <TextFlow>
+                                            <children>
+                                                <Text fx:id="textLabel" styleClass="detailLabels"/>
+                                                <Text fx:id="textContent"/>
+                                            </children>
+                                        </TextFlow>
                                     </children>
-                                </TextFlow>
+                                </VBox>
+
 
                                 <StackPane fx:id="mediaStackPane">
                                     <children>
                                         <ImageView fx:id="rightPaneImageView" pickOnBounds="true" preserveRatio="true"/>
 
                                         <MediaView fx:id="rightPaneMediaView" preserveRatio="true"/>
-                                        <HBox prefHeight="100.0" prefWidth="200.0" fx:id="mediaPlayerControls"
+                                        <HBox fx:id="mediaPlayerControls" prefHeight="100.0" prefWidth="200.0"
                                               visible="false">
                                             <children>
-                                                <Button mnemonicParsing="false" text="Play 2x Slower"
-                                                        fx:id="play2XSlowerButton"/>
-                                                <Label fx:id="mediaPlayerRateLabel" text="1x"/>
-                                                <Button mnemonicParsing="false" text="Play 2x Faster"
-                                                        fx:id="play2XFasterButton"/>
+                                                <Button fx:id="play2XSlowerButton" mnemonicParsing="false" id="2xslower"
+                                                        styleClass="mediaButtons"/>
+                                                <Label fx:id="mediaPlayerRateLabel" text="1x" styleClass="rateLabel"/>
+                                                <Button fx:id="play2XFasterButton" mnemonicParsing="false" id="2xfaster"
+                                                        styleClass="mediaButtons"/>
                                                 <Slider fx:id="volumeSlider" max="1" orientation="HORIZONTAL"/>
-                                                <Button fx:id="playMediaButton" text="Play"/>
-                                                <ToggleButton fx:id="loopButton" text="Loop"/>
+                                                <Button fx:id="playMediaButton" id="playMedia"
+                                                        styleClass="mediaButtons"/>
+                                                <ToggleButton fx:id="loopButton" id="loopMedia"
+                                                              styleClass="mediaButtons"/>
+                                                <Button fx:id="fullScreenMediaButton" onAction="#maximizeVideo"
+                                                        id="fullScreen" styleClass="mediaButtons"/>
+                                                <Button onAction="#returnToOldDividers" id="oldSize"
+                                                        styleClass="mediaButtons"/>
+                                                <ToggleButton styleClass="mediaButtons" text="Lock" fx:id="lockMediaView"/>
 
                                             </children>
                                         </HBox>
                                     </children>
                                 </StackPane>
-                                <HBox>
+                                <HBox fx:id="sliderHbox">
                                     <children>
-                                        <Label fx:id="currentTimeLabel" styleClass="detailLabels"/>
-                                        <Slider fx:id="playPositionSlider" blockIncrement="1.0" max="1"/>
-                                        <Label fx:id="totalTimeLabel" styleClass="detailLabels"/>
+                                        <Label fx:id="currentTimeLabel" alignment="CENTER"/>
+                                        <Slider fx:id="playPositionSlider" blockIncrement="1.0" max="1"
+                                                visible="false"/>
+                                        <Label fx:id="totalTimeLabel" alignment="CENTER"/>
                                     </children>
                                 </HBox>
 
@@ -128,7 +142,7 @@
                     </menus>
                 </MenuBar>
 
-                <HBox prefHeight="33.0" prefWidth="600.0" spacing="2" BorderPane.alignment="CENTER">
+                <HBox prefHeight="33.0" prefWidth="600.0" spacing="2" BorderPane.alignment="CENTER" fx:id="topHBox">
                     <children>
 
                         <Label text="Filter:"/>
@@ -154,9 +168,9 @@
 
                     </children>
                 </HBox>
-                <HBox>
+                <HBox fx:id="topSecondHBox">
                     <children>
-                        <Label fx:id="activityIndicatorLabel" text="Activity" visible="true"/>
+                        <Label fx:id="activityIndicatorLabel" text="Activity" visible="true" styleClass="detailLabels"/>
 
                     </children>
                 </HBox>
@@ -164,7 +178,7 @@
         </VBox>
     </top>
     <bottom>
-        <HBox prefHeight="36.0" prefWidth="543.0" spacing="10.0" BorderPane.alignment="CENTER">
+        <HBox prefHeight="36.0" prefWidth="543.0" spacing="10.0" BorderPane.alignment="CENTER" fx:id="bottomHBox">
             <children>
                 <Button onAction="#goToHomeDirectory" text="Home"/>
                 <Button onAction="#goToDesktopDirectory" text="Desktop"/>

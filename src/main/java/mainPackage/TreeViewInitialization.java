@@ -71,10 +71,9 @@ public class TreeViewInitialization {
                 row.setOnMouseClicked(e -> {
                     if (e.getButton() == MouseButton.SECONDARY) {
 
-                        FileInfo selectedItem = param.getSelectionModel().getSelectedItem();
+                        FileInfo selectedItem = row.getItem();
 
-                        System.out.println("here");
-                        ContextMenu cm = Utilities.createContextMenu(selectedItem, mainController.mainTableView, mainController.files, mainController);
+                        ContextMenu cm = Utilities.createContextMenu(selectedItem, mainController.mainTableView, mainController.files, mainController, "tableView");
                         cm.show(row, e.getScreenX(), e.getScreenY());
                     }
                 });

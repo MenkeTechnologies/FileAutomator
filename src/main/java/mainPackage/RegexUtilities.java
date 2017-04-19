@@ -1,16 +1,9 @@
 package mainPackage;
 
-import javafx.application.Platform;
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Created by jacobmenke on 4/16/17.
@@ -30,7 +23,6 @@ public class RegexUtilities {
     }
 
     public static void findFilesWithRegex(MainController mainController, String fileToSearch, String directory) {
-
 
         try {
 
@@ -53,12 +45,14 @@ public class RegexUtilities {
                     StringBuilder sb = new StringBuilder();
 
                     while (st.hasMoreTokens()) {
-                        String next = st.nextToken();
+
+                        String next = Pattern.quote(st.nextToken());
 
                         sb.append(".*").append(next);
                     }
 
-                    if (mainController.backgroundTask.getFuture().isCancelled()){
+                    if (mainController.searchingTask.getFuture().isCancelled()){
+
                         throw new RuntimeException();
                     }
 
@@ -72,7 +66,7 @@ public class RegexUtilities {
 
                     if (pattern.matcher(fileName).find()) {
 
-                        mainController.backgroundTask.updateMessage("Found file number " + CommonUtilities.FILE_COUNTER + " : " + file.getFileName());
+                        mainController.searchingTask.updateMessage("Found file number " + CommonUtilities.FILE_COUNTER + " : " + file.getFileName());
 
                         mainController.checkToShowHiddenFiles(file);
                     }
@@ -82,6 +76,7 @@ public class RegexUtilities {
                 }
             });
         } catch (Exception e) {
+            e.printStackTrace();
 
             System.out.println("Stopped indexing.");
         }
