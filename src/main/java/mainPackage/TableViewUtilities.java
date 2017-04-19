@@ -1,8 +1,12 @@
 package mainPackage;
 
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
+
+import java.util.Comparator;
 
 /**
  * Created by jacobmenke on 4/16/17.
@@ -22,6 +26,29 @@ public class TableViewUtilities {
 
         TableColumn<FileInfo, Long> fileSizeColumn = new TableColumn<>("File Size");
         fileSizeColumn.setCellValueFactory(new PropertyValueFactory<FileInfo, Long>("fileSize"));
+        fileSizeColumn.setCellFactory(new Callback<TableColumn<FileInfo, Long>, TableCell<FileInfo, Long>>() {
+            @Override
+            public TableCell<FileInfo, Long> call(TableColumn<FileInfo, Long> param) {
+
+                TableCell<FileInfo, Long> cell = new TableCell<FileInfo, Long>() {
+                    @Override
+                    protected void updateItem(Long item, boolean empty) {
+                        if (item != null) {
+                            setText(CommonUtilities.turnBytesIntoHumanReadable(item));
+                        }
+                    }
+                };
+                return cell;
+
+            }
+        });
+
+        fileSizeColumn.setComparator(new Comparator<Long>() {
+            @Override
+            public int compare(Long o1, Long o2) {
+                return o1 < o2 ? -1 : o1 == o2 ? 0 : 1;
+            }
+        });
 
         TableColumn<FileInfo, Boolean> hiddenColumn = new TableColumn<>("Hidden");
         hiddenColumn.setCellValueFactory(new PropertyValueFactory<FileInfo, Boolean>("hiddenProperty"));
