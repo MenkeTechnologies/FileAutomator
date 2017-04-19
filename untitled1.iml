@@ -13,5 +13,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="groovy-sdk-2.4.10" level="application" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.5" level="project" />
+    <orderEntry type="library" name="Maven: com.aquafx-project:aquafx:0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.guigarage:flatter:0.7" level="project" />
+    <orderEntry type="library" name="Maven: org.aerofx:aerofx:0.1" level="project" />
   </component>
 </module>

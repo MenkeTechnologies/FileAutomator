@@ -100,7 +100,7 @@ public class CommonUtilities {
     public static void secureDelete(FileInfo fileInfo, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 
-        alert.setHeaderText("Are you sure you want to delete this item permanently?");
+        alert.setHeaderText("Are you sure you want to delete \"" + fileInfo.getFileName() + "\" permanently?");
 
         Optional<ButtonType> res = alert.showAndWait();
 
@@ -173,7 +173,7 @@ public class CommonUtilities {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 
-        alert.setHeaderText("Are you sure you want to delete this item?");
+        alert.setHeaderText("Are you sure you want to delete \"" + fileInfo.getFileName() + "\"?");
 
         Optional<ButtonType> res = alert.showAndWait();
 

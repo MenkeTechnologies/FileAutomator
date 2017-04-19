@@ -8,19 +8,20 @@ import javafx.scene.effect.Glow;
 import javafx.scene.effect.Reflection;
 import javafx.scene.input.MouseButton;
 
+import java.nio.file.Paths;
+
 /**
  * Created by jacobmenke on 4/15/17.
  */
 public class TextFieldTreeCellImpl extends TreeCell<String> {
 
-    private TextField textField;
 
     public TextFieldTreeCellImpl(TreeView fileBrowserTreeTable, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
 
         this.setOnMouseClicked(e->{
             if (e.getButton() == MouseButton.SECONDARY){
-                FilePathTreeItem fileInfo = (FilePathTreeItem)fileBrowserTreeTable.getSelectionModel().getSelectedItem();
-                ContextMenu cm = Utilities.createContextMenu(new FileInfo(fileInfo.getPathString()), mainTableView, files, mainController);
+                FilePathTreeItem fileInfo = new FilePathTreeItem(Paths.get(this.getItem()),mainController);
+                ContextMenu cm = Utilities.createContextMenu(new FileInfo(fileInfo.getPathString()), mainTableView, files, mainController, "treeView");
 
                 cm.show(this, e.getScreenX(), e.getScreenY());
             }

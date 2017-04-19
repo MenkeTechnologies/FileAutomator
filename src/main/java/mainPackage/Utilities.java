@@ -13,10 +13,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.effect.Reflection;
-import javafx.scene.image.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -27,6 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -113,32 +112,38 @@ public class Utilities {
     public static void updateThumbnailRightSidePane(MainController mainController, FilePathTreeItem filePathTreeItem) {
 
         Platform.runLater(() -> {
-            ImageView rightPaneImageView = mainController.rightPaneImageView;
-
             if (mainController.rightPaneMediaView.getMediaPlayer() != null) {
                 mainController.rightPaneMediaView.getMediaPlayer().stop();
+                mainController.rightPaneMediaView.getMediaPlayer().dispose();
                 mainController.rightPaneMediaView.setMediaPlayer(null);
             }
 
-            rightPaneImageView.setManaged(false);
-            rightPaneImageView.setVisible(false);
-            mainController.rightPaneMediaView.setManaged(false);
-            mainController.rightPaneMediaView.setVisible(false);
+            MainController.loadingTask.updateMessage("Removing Items");
+
+            removeFromView(mainController.mediaStackPane);
+            removeFromView(mainController.rightPaneImageView);
+            removeFromView(mainController.rightPaneMediaView);
+            removeFromView(mainController.mediaPlayerControls);
+            removeFromView(mainController.sliderHbox);
             removeTextFromRightPane(mainController);
 
+            MainController.loadingTask.updateMessage("Loading Items");
+
+
             if (filePathTreeItem.getType().equals("image")) {
-                rightPaneImageView.setManaged(true);
-                rightPaneImageView.setVisible(true);
-                rightPaneImageView.setImage(new javafx.scene.image.Image("file://" + filePathTreeItem.getPathString(), true));
-                rightPaneImageView.setEffect(new Reflection());
+                addToView(mainController.mediaStackPane);
+                addToView(mainController.rightPaneImageView);
+                mainController.rightPaneImageView.setImage(new javafx.scene.image.Image("file://" + filePathTreeItem.getPathString(), true));
+                mainController.rightPaneImageView.setEffect(new Reflection());
             } else if (filePathTreeItem.getType().equals("video")) {
 
                 try {
 
                     FileInfo fileInfo = new FileInfo(filePathTreeItem.getPathString());
 
-                    mainController.rightPaneMediaView.setManaged(true);
-                    mainController.rightPaneMediaView.setVisible(true);
+                    displayAudioUI(mainController);
+                    addToView(mainController.rightPaneMediaView);
+
                     Media m = new Media(fileInfo.toURI().toString());
                     mainController.mediaPlayer = new MediaPlayer(m);
 
@@ -155,8 +160,9 @@ public class Utilities {
 
                 FileInfo fileInfo = new FileInfo(filePathTreeItem.getPathString());
 
-                mainController.rightPaneImageView.setManaged(true);
-                mainController.rightPaneImageView.setVisible(true);
+                displayAudioUI(mainController);
+                addToView(mainController.rightPaneImageView);
+
                 mainController.rightPaneImageView.setImage(FilePathTreeItem.musicLargeImage);
                 Media m = new Media(fileInfo.toURI().toString());
 
@@ -185,6 +191,23 @@ public class Utilities {
         });
     }
 
+    public static void displayAudioUI(MainController mainController) {
+        addToView(mainController.mediaStackPane);
+        addToView(mainController.mediaPlayerControls);
+        addToView(mainController.sliderHbox);
+        mainController.mediaPlayerControls.setVisible(false);
+    }
+
+    public static void addToView(Node node) {
+        node.setManaged(true);
+        node.setVisible(true);
+    }
+
+    public static void removeFromView(Node node) {
+        node.setManaged(false);
+        node.setVisible(false);
+    }
+
     private static void checkForAutoPlay(MainController mainController) {
         mainController.mediaPlayer.setOnEndOfMedia(() -> {
 
@@ -205,8 +228,10 @@ public class Utilities {
                         String type = FilePathTreeItem.getFileType(nextFile.getAbsolutePath());
                         if (type.equals("music") || type.equals("video")) {
                             mainController.mainTableView.getSelectionModel().select(mainController.mainTableView.getItems().get(currentIndex));
+                            mainController.startPlayingMedia(mainController.mainTableView.getSelectionModel().getSelectedItem(), true);
 
                             mainController.mainTableView.scrollTo(mainController.mainTableView.getItems().get(currentIndex));
+
                             break;
                         } else {
                             System.out.println(nextFile.getFileName() + " no match");
@@ -221,6 +246,8 @@ public class Utilities {
         //TODO:fix loop and slider position not updating to 0
 
         MediaPlayer mp = mainController.mediaPlayer;
+        mainController.playPositionSlider.setManaged(true);
+        mainController.playPositionSlider.setVisible(true);
 
         mp.currentTimeProperty().addListener(new InvalidationListener() {
             @Override
@@ -234,21 +261,27 @@ public class Utilities {
             }
         });
 
-        mainController.playPositionSlider.setOnMouseClicked(e -> {
-            double pos = mainController.playPositionSlider.getValue();
-            mp.seek(mp.getTotalDuration().multiply(pos));
-        });
+//        mainController.playPositionSlider.setOnMouseClicked(e -> {
+//            double pos = mainController.playPositionSlider.getValue();
+//            mp.seek(mp.getTotalDuration().multiply(pos));
+//        });
 
         mainController.playPositionSlider.valueChangingProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (mp.getStatus() == MediaPlayer.Status.UNKNOWN || mp.getStatus() == MediaPlayer.Status.STOPPED) {
-                    mp.play();
-                }
 
-                if (oldValue && !newValue) {
-                    double pos = mainController.playPositionSlider.getValue();
-                    mp.seek(mp.getTotalDuration().multiply(pos));
+                MediaPlayer mp = mainController.rightPaneMediaView.getMediaPlayer();
+
+                if (mp != null) {
+                    if (mp.getStatus() == MediaPlayer.Status.UNKNOWN || mp.getStatus() == MediaPlayer.Status.STOPPED) {
+
+                        System.out.println(mp);
+                        mp.play();
+                    }
+                    if (oldValue && !newValue) {
+                        double pos = mainController.playPositionSlider.getValue();
+                        mp.seek(mp.getTotalDuration().multiply(pos));
+                    }
                 }
             }
         });
@@ -273,6 +306,12 @@ public class Utilities {
 
         initEffects(mainController.rightPaneMediaView);
         initEffects(mainController.rightPaneImageView);
+        initEffects(mainController.playPositionSlider);
+        initEffects(mainController.mediaPlayerControls);
+
+//        initEffects(mainController.currentTimeLabel);
+//        initEffects(mainController.totalTimeLabel);
+
     }
 
     private static void initEffects(Node node) {
@@ -315,10 +354,9 @@ public class Utilities {
         return localDateTime.format(DateTimeFormatter.ISO_DATE) + " " + localDateTime.format(DateTimeFormatter.ISO_TIME);
     }
 
-    public static ContextMenu createContextMenu(FileInfo fileInfo, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
+    public static ContextMenu createContextMenu(FileInfo fileInfo, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController, String sender) {
         ContextMenu rowContextMenu = new ContextMenu();
         String name = "Open \"" + fileInfo.getFileName() + "\"";
-        String parentDirectory = fileInfo.getParent();
         System.out.println(name);
 
         MenuItem openItem = new MenuItem(name);
@@ -331,8 +369,21 @@ public class Utilities {
         MenuItem copyAbsolutePathItem = new MenuItem("Copy Absolute Path");
         MenuItem sendToSourceDirectoryTextFieldItem = new MenuItem("Send to Source Text Field");
         MenuItem sendToDestinationDirectoryTextFieldItem = new MenuItem("Send to Destination Text Field");
+        MenuItem showInTreeView = new MenuItem("Show in Tree View");
+
 
         rowContextMenu.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem, copyAbsolutePathItem, sendToSourceDirectoryTextFieldItem, sendToDestinationDirectoryTextFieldItem);
+
+        if (sender.equals("tableView")){
+
+            rowContextMenu.getItems().add(showInTreeView);
+        }
+
+        showInTreeView.setOnAction(e->{
+            mainController.runInBackgroundThreadSecondary(() -> {
+                FilePathTreeItem.selectTreeItemRecursively(mainController, Paths.get(fileInfo.getAbsolutePath()), true);
+            });
+        });
 
         if (fileInfo.isDirectory()) {
             rowContextMenu.getItems().add(createNewFile);
