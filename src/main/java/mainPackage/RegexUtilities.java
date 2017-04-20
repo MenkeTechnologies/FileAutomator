@@ -1,5 +1,7 @@
 package mainPackage;
 
+import javafx.application.Platform;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.StringTokenizer;
@@ -18,7 +20,12 @@ public class RegexUtilities {
 
             findFilesWithRegex(mainController, fileToSearch, directory);
 
-            mainController.mainTableView.refresh();
+            Platform.runLater(() -> {
+                mainController.numberResultsLabel.setText(mainController.files.size() + " results found.");
+                mainController.mainTableView.refresh();
+            });
+
+
         });
     }
 
@@ -26,8 +33,13 @@ public class RegexUtilities {
 
         try {
 
+            CommonUtilities.TOTAL_FILE_COUNTER.set(0);
+            CommonUtilities.MATCHING_FILE_COUNTER.set(0);
+
             Files.walk(Paths.get(directory)).forEach(file -> {
-                CommonUtilities.FILE_COUNTER.incrementAndGet();
+
+
+                CommonUtilities.TOTAL_FILE_COUNTER.incrementAndGet();
 
                 String fileName;
 
@@ -51,7 +63,7 @@ public class RegexUtilities {
                         sb.append(".*").append(next);
                     }
 
-                    if (mainController.searchingTask.getFuture().isCancelled()){
+                    if (MainController.searchingTask.getFuture().isCancelled()) {
 
                         throw new RuntimeException();
                     }
@@ -66,7 +78,11 @@ public class RegexUtilities {
 
                     if (pattern.matcher(fileName).find()) {
 
-                        mainController.searchingTask.updateMessage("Found file number " + CommonUtilities.FILE_COUNTER + " : " + file.getFileName());
+                        CommonUtilities.MATCHING_FILE_COUNTER.incrementAndGet();
+
+                        String message = "Found " + CommonUtilities.MATCHING_FILE_COUNTER + " files of " + CommonUtilities.TOTAL_FILE_COUNTER + " files : " + file.getFileName();
+
+                        MainController.searchingTask.updateMessage(message);
 
                         mainController.checkToShowHiddenFiles(file);
                     }

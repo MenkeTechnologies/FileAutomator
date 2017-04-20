@@ -85,7 +85,9 @@ public class TreeViewInitialization {
         mainController.fileBrowserTreeTable.setCellFactory(new Callback<TreeView, TreeCell>() {
             @Override
             public TreeCell call(TreeView param) {
+
                 return new TextFieldTreeCellImpl(mainController.fileBrowserTreeTable, mainController.mainTableView, mainController.files, mainController);
+
             }
         });
     }

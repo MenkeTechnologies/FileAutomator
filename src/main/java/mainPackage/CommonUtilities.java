@@ -18,11 +18,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by jacobmenke on 4/15/17.
  */
 public class CommonUtilities {
+
+
+    public static Integer index = 0;
+    public static AtomicLong TOTAL_FILE_COUNTER = new AtomicLong(0);
+    public static AtomicLong MATCHING_FILE_COUNTER = new AtomicLong(0);
+
     public static String turnBytesIntoHumanReadable(long length) {
         Integer power = 0;
 
@@ -60,8 +67,6 @@ public class CommonUtilities {
         return String.format("%02d:%02d", minutes, seconds);
     }
 
-    public static Integer index = 0;
-    public static AtomicInteger FILE_COUNTER = new AtomicInteger(0);
 
     public static void createNewFile(FileInfo fileInfo, MainController mainController) {
         TextInputDialog textInputDialog = new TextInputDialog("");
