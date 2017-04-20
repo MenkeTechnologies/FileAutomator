@@ -15,12 +15,16 @@ import java.nio.file.Paths;
  */
 public class TextFieldTreeCellImpl extends TreeCell<String> {
 
-
     public TextFieldTreeCellImpl(TreeView fileBrowserTreeTable, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
 
         this.setOnMouseClicked(e->{
             if (e.getButton() == MouseButton.SECONDARY){
-                FilePathTreeItem fileInfo = new FilePathTreeItem(Paths.get(this.getItem()),mainController);
+
+                FilePathTreeItem filePathTreeItem = (FilePathTreeItem)this.getTreeItem();
+
+
+
+                FilePathTreeItem fileInfo = new FilePathTreeItem(Paths.get(filePathTreeItem.getPathString()),mainController);
                 ContextMenu cm = Utilities.createContextMenu(new FileInfo(fileInfo.getPathString()), mainTableView, files, mainController, "treeView");
 
                 cm.show(this, e.getScreenX(), e.getScreenY());

@@ -13,6 +13,14 @@ public class CustomTask<T> extends Task<String> {
     MainController mainController;
     ExecutorService executorService;
     Future future;
+    boolean searchingTaskRunning = false;
+
+    public CustomTask(MainController mainController, Runnable r, boolean b) {
+        this.mainController = mainController;
+        this.r = r;
+        searchingTaskRunning = b;
+
+    }
 
     public Future getFuture() {
         return future;
@@ -60,17 +68,19 @@ public class CustomTask<T> extends Task<String> {
         try {
             System.out.println("waiting on future");
             future.get();
+            System.out.println("future done");
 
-            CommonUtilities.FILE_COUNTER.set(0);
 
-            System.out.println("invisible");
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } finally {
-            Platform.runLater(() -> mainController.thinkingIndicator.setVisible(false));
+           if (!searchingTaskRunning){
+               Platform.runLater(() -> mainController.thinkingIndicator.setVisible(false));
+           }
+
         }
 
 //        executorService.shutdownNow();
