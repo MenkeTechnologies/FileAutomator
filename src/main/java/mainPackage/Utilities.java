@@ -3,6 +3,8 @@ package mainPackage;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -26,7 +28,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -40,6 +41,7 @@ public class Utilities {
     static boolean toggle = false;
     static boolean stopSlider = false;
     static boolean swipeRight = false;
+    public static BooleanProperty maximized = new SimpleBooleanProperty(false);
 
     public static void initMenuBar(MenuBar menuBar, Scene scene, Stage stage) {
         Menu file = menuBar.getMenus().get(0);
@@ -133,6 +135,7 @@ public class Utilities {
             removeTextFromRightPane(mainController);
 
             MainController.loadingTask.updateMessage("Loading File: " + filePathTreeItem.getPath().getFileName());
+            mainController.fileNameLabelMediaControls.setText("Playing " + filePathTreeItem.getPath().getFileName().toString());
 
             if (filePathTreeItem.getType().equals("image")) {
                 mainController.initMediaPlayerBindings("image");
@@ -157,7 +160,7 @@ public class Utilities {
                     setupSlider(mainController);
                     mainController.initMediaPlayerBindings("video");
 
-                    checkForAutoPlay(mainController);
+                    checkForAutoPlay(mainController, fileInfo);
                     mainController.mediaPlayer.play();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -180,7 +183,7 @@ public class Utilities {
                 setupSlider(mainController);
                 mainController.initMediaPlayerBindings("music");
 
-                checkForAutoPlay(mainController);
+                checkForAutoPlay(mainController, fileInfo);
                 mainController.mediaPlayer.play();
             } else {
 
@@ -201,7 +204,9 @@ public class Utilities {
     public static void displayAudioUI(MainController mainController) {
         addToView(mainController.mediaStackPane);
         addToView(mainController.mediaPlayerControls);
-        addToView(mainController.sliderHbox);
+        if (!mainController.removeSliderMediaControl.isSelected()) {
+            addToView(mainController.sliderHbox);
+        }
         mainController.mediaPlayerControls.setVisible(false);
     }
 
@@ -215,8 +220,12 @@ public class Utilities {
         node.setVisible(false);
     }
 
-    private static void checkForAutoPlay(MainController mainController) {
+    private static void checkForAutoPlay(MainController mainController, FileInfo fileInfo) {
+        Integer tableIndex = mainController.mainTableView.getItems().indexOf(fileInfo);
+
         mainController.mediaPlayer.setOnEndOfMedia(() -> {
+
+            MainController.mediaPlayer.pause();
 
             if (mainController.loopButton.isSelected()) {
                 MainController.mediaPlayer.stop();
@@ -225,20 +234,17 @@ public class Utilities {
             } else {
 
                 if (mainController.autoplayCheckbox.isSelected()) {
-                    Integer currentIndex = 0;
+                    Integer currentIndex = tableIndex;
 
-                    if (mainController.mainTableView.getSelectionModel().selectedIndexProperty().isNotEqualTo(-1).get()) {
-                        currentIndex = mainController.mainTableView.getSelectionModel().getSelectedIndex();
-                    }
                     while (currentIndex + 1 < mainController.mainTableView.getItems().size()) {
                         currentIndex++;
                         FileInfo nextFile = (FileInfo) mainController.mainTableView.getItems().get(currentIndex);
                         String type = FilePathTreeItem.getFileType(nextFile.getAbsolutePath());
                         if (type.equals("music") || type.equals("video")) {
-                            mainController.mainTableView.getSelectionModel().select(mainController.mainTableView.getItems().get(currentIndex));
-                            mainController.startPlayingMedia(mainController.mainTableView.getSelectionModel().getSelectedItem(), true, false);
 
-                            mainController.mainTableView.scrollTo(mainController.mainTableView.getItems().get(currentIndex));
+                            mainController.startPlayingMedia(mainController.mainTableView.getItems().get(currentIndex), true, false);
+
+//                            mainController.mainTableView.scrollTo(mainController.mainTableView.getItems().get(currentIndex));
 
                             break;
                         } else {
@@ -262,8 +268,12 @@ public class Utilities {
             public void invalidated(javafx.beans.Observable observable) {
                 mainController.currentTimeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()));
                 mainController.totalTimeLabel.setText(CommonUtilities.formatDuration(mp.getTotalDuration()));
-                if (swipeRight){
-                    mainController.volumeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()));
+                if (swipeRight) {
+                    if (mainController.removeSliderMediaControl.isSelected()){
+                        mainController.volumeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()) + " of " + CommonUtilities.formatDuration(mp.getTotalDuration()));
+                    } else{
+                        mainController.volumeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()));
+                    }
                 }
             }
         });

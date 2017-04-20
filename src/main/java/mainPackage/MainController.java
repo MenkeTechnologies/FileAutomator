@@ -104,6 +104,11 @@ public class MainController implements Initializable {
     public Label numberResultsLabel;
     public Label loadingFileLabel;
     public Label volumeLabel;
+    public ToggleButton autoPlayMediaControl;
+    public Label fileNameLabelMediaControls;
+    public Button normalScreenMediaButton;
+    public ToggleButton removeSliderMediaControl;
+
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
@@ -153,10 +158,12 @@ public class MainController implements Initializable {
 
                 Object item = mainTableView.getSelectionModel().getSelectedItem();
 
-                if (lockMediaView.isSelected()) {
-                    startPlayingMedia(item, false, false);
-                } else {
-                    startPlayingMedia(item, true, false);
+                if (item != null) {
+                    if (lockMediaView.isSelected()) {
+                        startPlayingMedia(item, false, false);
+                    } else {
+                        startPlayingMedia(item, true, false);
+                    }
                 }
             }
         });
@@ -297,6 +304,9 @@ public class MainController implements Initializable {
         activityIndicatorLabel.textProperty().bind(searchingTask.messageProperty());
         loadingFileLabel.textProperty().bind(loadingTask.messageProperty());
 
+        fullScreenMediaButton.disableProperty().bind(Utilities.maximized);
+        normalScreenMediaButton.disableProperty().bind(Utilities.maximized.not());
+
         stopCurrentSearchAction.setOnAction(e -> {
             if (searchingTask.getFuture() != null) {
                 searchingTask.getFuture().cancel(true);
@@ -311,7 +321,7 @@ public class MainController implements Initializable {
 
         currentTimeLabel.fontProperty().bind(fontObjectProperty);
         totalTimeLabel.fontProperty().bind(fontObjectProperty);
-        mediaPlayerRateLabel.fontProperty().bind(fontObjectProperty);
+        //mediaPlayerRateLabel.fontProperty().bind(fontObjectProperty);
         volumeLabel.fontProperty().bind(fontObjectProperty);
 
         rightPaneScrollPane.widthProperty().addListener(new ChangeListener<Number>() {
@@ -326,14 +336,14 @@ public class MainController implements Initializable {
 
         totalTimeLabel.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(0.15));
         playPositionSlider.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(0.7));
+
+        volumeSlider.valueProperty().set(1);
     }
 
     public void initMediaPlayerBindings(String sender) {
 
-        if (sender.equals("image")) {
-            mediaStackPane.setOnScroll(e -> {
-            });
-        } else {
+
+        if (sender.equals("video") || sender.equals("music")) {
 
             volumeLabel.setVisible(false);
 
@@ -354,29 +364,30 @@ public class MainController implements Initializable {
                     }
                 }
 
-                if (Math.abs(e.getDeltaX()) > 4) {
-                    Utilities.swipeRight = true;
-                    double changeX = e.getDeltaX();
-                    double scalingFactorX = 0.001;
-                    double changeToX = changeX * scalingFactorX;
+                if (mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(0)) && mediaPlayer.getCurrentTime().lessThan(mediaPlayer.getTotalDuration().subtract(Duration.seconds(2)))) {
+                    if (Math.abs(e.getDeltaX()) > 4) {
+                        Utilities.swipeRight = true;
+                        double changeX = e.getDeltaX();
+                        double scalingFactorX = 0.001;
+                        double changeToX = changeX * scalingFactorX;
 
-                    if (changeToX < 1 || changeToX > 0) {
-                        volumeLabel.setVisible(true);
-                        Duration newDuration = Duration.millis(changeToX * mediaPlayer.getTotalDuration().toMillis()).add(mediaPlayer.getCurrentTime());
-                        if (newDuration.toMillis() < 0)newDuration = Duration.ZERO;
-                        if (newDuration.greaterThan(mediaPlayer.getTotalDuration())){
-                            newDuration = mediaPlayer.getTotalDuration();
+                        if (changeToX < 1 || changeToX > 0) {
+                            volumeLabel.setVisible(true);
+                            Duration newDuration = Duration.millis(changeToX * mediaPlayer.getTotalDuration().toMillis()).add(mediaPlayer.getCurrentTime());
+                            if (newDuration.toMillis() < 0) newDuration = Duration.ZERO;
+                            if (newDuration.greaterThan(mediaPlayer.getTotalDuration())) {
+                                newDuration = mediaPlayer.getTotalDuration();
+                                mediaPlayer.pause();
+                            }
+
+                            mediaPlayer.seek(newDuration);
                         }
-
-                        mediaPlayer.seek(newDuration);
+                        hideVolumeLabelAfterDelay();
                     }
-                    hideVolumeLabelAfterDelay();
                 }
 
                 e.consume();
             });
-
-            volumeSlider.valueProperty().set(1);
 
             volumeSlider.valueChangingProperty().addListener(new ChangeListener<Boolean>() {
                 @Override
@@ -440,10 +451,10 @@ public class MainController implements Initializable {
                 }
             });
         }
+
     }
 
     public void hideVolumeLabelAfterDelay() {
-        System.out.println("hiding label");
         new Thread(() -> {
             try {
                 Thread.sleep(3000);
@@ -485,6 +496,8 @@ public class MainController implements Initializable {
         pathMatchingCheckbox.setOnAction(e -> {
             RegexUtilities.searchAndRefresh(this);
         });
+
+        autoPlayMediaControl.selectedProperty().bindBidirectional(autoplayCheckbox.selectedProperty());
     }
 
     private void refreshTreeViewFromBottom() {
@@ -643,10 +656,20 @@ public class MainController implements Initializable {
         Utilities.removeFromView(bottomHBox);
         Utilities.removeFromView(topSecondHBox);
 
+        Utilities.maximized.set(true);
+
+        Utilities.addToView(fileNameLabelMediaControls);
+
+
+        rightPaneScrollPane.minWidthProperty().bind(mainSplitPane.widthProperty().multiply(0.98));
+//        mainSplitPane.getDividers().get(1).
+
         mainSplitPane.setDividerPositions(0, 0);
     }
 
     public void returnToOldDividers(ActionEvent actionEvent) {
+
+        Utilities.maximized.set(false);
 
         Double sp = Preferences.userRoot().getDouble("dividerPos0", 0.2);
         Double sp2 = Preferences.userRoot().getDouble("dividerPos1", 0.8);
@@ -655,6 +678,21 @@ public class MainController implements Initializable {
         Utilities.addToView(topHBox);
         Utilities.addToView(bottomHBox);
         Utilities.addToView(topSecondHBox);
+
+        Utilities.removeFromView(fileNameLabelMediaControls);
+
+
+            Utilities.addToView(sliderHbox);
+
+
+
+
+
+        if (rightPaneScrollPane.minWidthProperty().isBound()){
+            rightPaneScrollPane.minWidthProperty().unbind();
+            System.out.println("unbinding " + rightPaneScrollPane.minWidthProperty());
+            rightPaneScrollPane.minWidthProperty().set(0);
+        }
 
         mainSplitPane.setDividerPositions(sp, sp2);
     }
@@ -665,5 +703,23 @@ public class MainController implements Initializable {
         runInBackgroundThreadSecondary(() -> {
             FilePathTreeItem.selectTreeItemRecursively(this, Paths.get(home), true);
         });
+    }
+
+    public void rewindToStart(ActionEvent actionEvent) {
+
+        mediaPlayer.stop();
+        mediaPlayer.seek(Duration.ZERO);
+        System.out.println(mediaPlayer.currentTimeProperty().get());
+        mediaPlayer.pause();
+        mediaPlayer.play();
+    }
+
+    public void removeSliderHBox(ActionEvent actionEvent) {
+
+        if (removeSliderMediaControl.isSelected()) {
+            Utilities.removeFromView(sliderHbox);
+        } else {
+            Utilities.addToView(sliderHbox);
+        }
     }
 }
