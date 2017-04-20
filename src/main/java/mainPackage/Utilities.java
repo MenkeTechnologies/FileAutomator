@@ -135,6 +135,7 @@ public class Utilities {
             removeTextFromRightPane(mainController);
 
             MainController.loadingTask.updateMessage("Loading File: " + filePathTreeItem.getPath().getFileName());
+
             mainController.fileNameLabelMediaControls.setText("Playing " + filePathTreeItem.getPath().getFileName().toString());
 
             if (filePathTreeItem.getType().equals("image")) {
@@ -403,7 +404,7 @@ public class Utilities {
 
         rowContextMenu.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem, copyAbsolutePathItem, sendToSourceDirectoryTextFieldItem, sendToDestinationDirectoryTextFieldItem);
 
-        if (sender.equals("tableView")) {
+        if (sender.equals("tableView") || sender.equals("stackPane")) {
 
             rowContextMenu.getItems().add(showInTreeView);
         }

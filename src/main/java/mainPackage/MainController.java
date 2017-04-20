@@ -1,8 +1,8 @@
 package mainPackage;
 
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.*;
-import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -10,28 +10,31 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
 import javafx.event.*;
-import javafx.event.Event;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point3D;
+import javafx.scene.*;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.paint.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Cylinder;
+import javafx.scene.shape.DrawMode;
 import javafx.scene.text.*;
 import javafx.stage.*;
 
@@ -77,7 +80,7 @@ public class MainController implements Initializable {
     public MenuBar menuBar;
     public ProgressIndicator thinkingIndicator;
     public Label activityIndicatorLabel;
-    public Button stopCurrentSearchAction;
+    public Button stopCurrentSearchButton;
     public Button searchButton;
     public ProgressBar progressIndicator;
     public Slider playPositionSlider;
@@ -108,7 +111,10 @@ public class MainController implements Initializable {
     public Label fileNameLabelMediaControls;
     public Button normalScreenMediaButton;
     public ToggleButton removeSliderMediaControl;
-
+    public HBox filterHBox;
+    public MenuButton menuButtonAdd;
+    public Cylinder sphere;
+    public PointLight pointLight;
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
@@ -122,6 +128,39 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        Double scalingFactor = 7d;
+
+        sphere = new Cylinder(2* scalingFactor, 2*scalingFactor);
+        PhongMaterial material = new PhongMaterial(Color.BLUE);
+        material.setSpecularColor(Color.LIGHTBLUE);
+        material.setSpecularPower(10.0d);
+        sphere.setMaterial(material);
+
+        pointLight = new PointLight(Color.WHITE);
+        sphere.setMaterial(material);
+
+        DoubleProperty translateY = new SimpleDoubleProperty();
+
+        Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(0), new KeyValue(translateY, 3000)),
+                new KeyFrame(javafx.util.Duration.seconds(10), new KeyValue(translateY, 0)));
+
+        sphere.setDrawMode(DrawMode.LINE);
+
+        sphere.setRotationAxis(new Point3D(3,1,1));
+        sphere.rotateProperty().bind(translateY);
+        sphere.setTranslateZ(90);
+
+        timeline.setAutoReverse(true);
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+
+        Group group = new Group(sphere, pointLight);
+
+        group.prefWidth(100);
+        group.setStyle("-fx-background-color: red");
+
+        topHBox.getChildren().add(group);
 
         menuBar.setUseSystemMenuBar(true);
 
@@ -203,11 +242,27 @@ public class MainController implements Initializable {
             }
         });
 
+        rightPaneScrollPane.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+
+                System.out.println("right click on media view");
+
+                ObservableList<FileInfo> list = mainTableView.getItems();
+
+                ContextMenu cm = Utilities.createContextMenu(new FileInfo(pathLabelContent.getText()), mainTableView, list, this, "stackPane");
+                cm.show(mediaStackPane.getScene().getWindow(), e.getSceneX(), e.getSceneY());
+            }
+        });
+
+        DraggingInit.initDraggingBindings(this);
+
         directoryToSearchTextField.setText("/Users/jacobmenke/Desktop");
 
         initCheckBoxes();
 
         initTasks();
+
+
     }
 
     public void startPlayingMediaFromTree(Object item) {
@@ -299,7 +354,8 @@ public class MainController implements Initializable {
         rightPaneMediaView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
         rightPaneImageView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
 //        thinkingIndicator.progressProperty().bind(searchingTask.progressProperty());
-        stopCurrentSearchAction.visibleProperty().bind(thinkingIndicator.visibleProperty());
+        stopCurrentSearchButton.visibleProperty().bind(thinkingIndicator.visibleProperty());
+        stopMediaButton.managedProperty().bind(thinkingIndicator.managedProperty());
         searchButton.disableProperty().bind(thinkingIndicator.visibleProperty());
         activityIndicatorLabel.textProperty().bind(searchingTask.messageProperty());
         loadingFileLabel.textProperty().bind(loadingTask.messageProperty());
@@ -307,7 +363,7 @@ public class MainController implements Initializable {
         fullScreenMediaButton.disableProperty().bind(Utilities.maximized);
         normalScreenMediaButton.disableProperty().bind(Utilities.maximized.not());
 
-        stopCurrentSearchAction.setOnAction(e -> {
+        stopCurrentSearchButton.setOnAction(e -> {
             if (searchingTask.getFuture() != null) {
                 searchingTask.getFuture().cancel(true);
             }
@@ -341,7 +397,6 @@ public class MainController implements Initializable {
     }
 
     public void initMediaPlayerBindings(String sender) {
-
 
         if (sender.equals("video") || sender.equals("music")) {
 
@@ -431,15 +486,15 @@ public class MainController implements Initializable {
             });
 
             mediaStackPane.setOnMouseEntered(e -> {
-                if (currentlySelectedFilePathTreeItem != null && currentlySelectedFilePathTreeItem.getType().equals("music") || currentlySelectedFilePathTreeItem.getType().equals("video")) {
+                FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
+                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music"))
                     mediaPlayerControls.setVisible(true);
-                }
             });
 
             mediaStackPane.setOnMouseExited(e -> {
-                if (currentlySelectedFilePathTreeItem != null && currentlySelectedFilePathTreeItem.getType().equals("music") || currentlySelectedFilePathTreeItem.getType().equals("video")) {
+                FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
+                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music"))
                     mediaPlayerControls.setVisible(false);
-                }
             });
 
             playMediaButton.setOnAction(ez -> {
@@ -451,7 +506,6 @@ public class MainController implements Initializable {
                 }
             });
         }
-
     }
 
     public void hideVolumeLabelAfterDelay() {
@@ -556,9 +610,9 @@ public class MainController implements Initializable {
     }
 
     public void runInBackgroundThread(Runnable r) {
-        thinkingIndicator.setVisible(true);
+        Utilities.addToView(thinkingIndicator);
         System.out.println("visible");
-        stopCurrentSearchAction.setText("Stop Search");
+        stopCurrentSearchButton.setText("Stop Search");
 
         searchingTask = new CustomTask<>(this, r, false);
         activityIndicatorLabel.textProperty().bind(searchingTask.messageProperty());
@@ -573,8 +627,8 @@ public class MainController implements Initializable {
     public void runInBackgroundThreadSecondary(Runnable r) {
 
         if (searchingTask.getState() != Task.State.RUNNING) {
-            thinkingIndicator.setVisible(true);
-            stopCurrentSearchAction.setText("Stop Load");
+            Utilities.addToView(thinkingIndicator);
+            stopCurrentSearchButton.setText("Stop Load");
         }
 
         loadingTask = new CustomTask<String>(this, r, true);
@@ -583,7 +637,9 @@ public class MainController implements Initializable {
         Thread thread = new Thread(loadingTask);
 
         if (searchingTask.getState() != Task.State.RUNNING) {
-            Platform.runLater(() -> thinkingIndicator.setVisible(false));
+            Platform.runLater(() -> {
+                Utilities.removeFromView(thinkingIndicator);
+            });
         }
 
         thread.start();
@@ -660,7 +716,6 @@ public class MainController implements Initializable {
 
         Utilities.addToView(fileNameLabelMediaControls);
 
-
         rightPaneScrollPane.minWidthProperty().bind(mainSplitPane.widthProperty().multiply(0.98));
 //        mainSplitPane.getDividers().get(1).
 
@@ -681,14 +736,9 @@ public class MainController implements Initializable {
 
         Utilities.removeFromView(fileNameLabelMediaControls);
 
+        Utilities.addToView(sliderHbox);
 
-            Utilities.addToView(sliderHbox);
-
-
-
-
-
-        if (rightPaneScrollPane.minWidthProperty().isBound()){
+        if (rightPaneScrollPane.minWidthProperty().isBound()) {
             rightPaneScrollPane.minWidthProperty().unbind();
             System.out.println("unbinding " + rightPaneScrollPane.minWidthProperty());
             rightPaneScrollPane.minWidthProperty().set(0);
@@ -720,6 +770,97 @@ public class MainController implements Initializable {
             Utilities.removeFromView(sliderHbox);
         } else {
             Utilities.addToView(sliderHbox);
+        }
+    }
+
+    public void addFilter(ActionEvent actionEvent) {
+
+        MenuItem menuItem = (MenuItem) actionEvent.getSource();
+        Label label = new Label();
+
+        switch (menuItem.getText()) {
+            case "+ Or":
+                label.setText("OR");
+                break;
+            case "+ And":
+                label.setText("AND");
+                break;
+            default:
+                break;
+        }
+
+        TextField textField = new TextField();
+        textField.setPrefWidth(40);
+
+        HBox hBox = new HBox();
+        hBox.getChildren().addAll(label, textField);
+        filterHBox.getChildren().add(hBox);
+
+        label.setOnDragDetected(event -> {
+
+            Dragboard db = label.startDragAndDrop(TransferMode.ANY);
+            mainTableView.getScene().setCursor(Cursor.CLOSED_HAND);
+            ClipboardContent clipboardContent = new ClipboardContent();
+
+            clipboardContent.putString(filterHBox.getChildren().indexOf(hBox) + "");
+            db.setContent(clipboardContent);
+
+            event.consume();
+        });
+
+        fileBrowserTreeTable.setOnDragOver(e ->
+
+        {
+            if (e.getGestureSource() != mainTableView && e.getDragboard().hasString()) {
+                e.acceptTransferModes(TransferMode.ANY);
+
+                mainTableView.getScene().setCursor(Cursor.DISAPPEAR);
+            }
+
+            e.consume();
+        });
+
+        fileBrowserTreeTable.setOnDragEntered(e -> {
+            if (e.getSource() != mainTableView) {
+                mainTableView.getScene().setCursor(Cursor.DISAPPEAR);
+            }
+            e.consume();
+        });
+
+        fileBrowserTreeTable.setOnDragExited(e -> {
+
+            mainTableView.getScene().setCursor(Cursor.CLOSED_HAND);
+
+            e.consume();
+        });
+
+        fileBrowserTreeTable.setOnDragDropped(e ->
+
+        {
+
+            Dragboard db = e.getDragboard();
+            if (db.hasString()) {
+
+                int integer = Integer.parseInt(db.getString());
+                filterHBox.getChildren().remove(integer);
+            }
+
+            e.setDropCompleted(true);
+            mainTableView.getScene().setCursor(Cursor.DEFAULT);
+
+            e.consume();
+        });
+
+        label.setOnDragDone(e -> {
+            System.out.println("done with drag and drop");
+            e.consume();
+        });
+    }
+
+    public void removeFilter(ActionEvent actionEvent) {
+
+        if (filterHBox.getChildren().size() > 1) {
+            filterHBox.getChildren().remove(filterHBox.getChildren().size() - 1);
         }
     }
 }
