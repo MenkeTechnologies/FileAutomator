@@ -2,16 +2,26 @@ package mainPackage;
 
 import javafx.application.Platform;
 
+import java.awt.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+
+import javafx.scene.control.*;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 
 /**
  * Created by jacobmenke on 4/16/17.
  */
 public class RegexUtilities {
     public static void searchAndRefresh(MainController mainController) {
+        mainController.mainTableView.getItems().clear();
+        mainController.mainTableView.refresh();
+
         mainController.runInBackgroundThread(() -> {
 
             String fileToSearch = mainController.mainTextField.getText();
@@ -19,7 +29,32 @@ public class RegexUtilities {
             mainController.files.clear();
             mainController.numberResultsLabel.setVisible(false);
 
-            findFilesWithRegex(mainController, fileToSearch, directory);
+            ArrayList<String> orTerms = new ArrayList<>();
+            ArrayList<String> andTerms = new ArrayList<>();
+
+            mainController.filterHBox.getChildren().forEach(child -> {
+                if (child instanceof TextField){
+
+                    TextField tf = (TextField)child;
+                    orTerms.add(tf.getText());
+
+                } else if (child instanceof HBox){
+                    Label label = (Label)((HBox) child).getChildren().get(0);
+                    TextField tf = (TextField)((HBox)child).getChildren().get(1);
+
+                    if (!tf.getText().equals("")) {
+                        if (label.getText().equals("OR")) {
+                            orTerms.add(tf.getText());
+                        } else {
+                            andTerms.add(tf.getText());
+                        }
+                    }
+                }
+
+            });
+
+
+            findFilesWithRegex(mainController, directory, andTerms, orTerms);
 
             Platform.runLater(() -> {
                 mainController.numberResultsLabel.setVisible(true);
@@ -29,7 +64,7 @@ public class RegexUtilities {
         });
     }
 
-    public static void findFilesWithRegex(MainController mainController, String fileToSearch, String directory) {
+    public static void findFilesWithRegex(MainController mainController, String directory, ArrayList<String> andTerms, ArrayList<String> orTerms) {
 
         try {
 
@@ -48,39 +83,53 @@ public class RegexUtilities {
                     fileName = file.toAbsolutePath().getFileName().toString();
                 }
 
-                if (!fileToSearch.equals("")) {
-                    Pattern pattern;
+                if (!orTerms.get(0).equals("")) {
 
-                    StringTokenizer st = new StringTokenizer(fileToSearch);
+                    orTerms.forEach(fileString->{
 
-                    StringBuilder sb = new StringBuilder();
+                        Pattern pattern;
 
-                    while (st.hasMoreTokens()) {
+                        StringBuilder andTermsBuilder = new StringBuilder(fileString);
 
-                        String next = Pattern.quote(st.nextToken());
+                        andTerms.forEach(term->{
+                            andTermsBuilder.append(" ").append(term).append(" ");
+                        });
 
-                        sb.append(".*").append(next);
-                    }
+                        StringTokenizer st = new StringTokenizer(andTermsBuilder.toString());
 
-                    if (MainController.searchingTask.getFuture().isCancelled()) {
+//                        System.out.println("compound searcher = " + andTermsBuilder.toString());
 
-                        throw new RuntimeException();
-                    }
+                        StringBuilder sb = new StringBuilder();
 
-                    String regexString = sb.toString();
+                        while (st.hasMoreTokens()) {
 
-                    if (mainController.caseInsensitiveMatchingCheckbox.isSelected()) {
-                        pattern = Pattern.compile(regexString, Pattern.CASE_INSENSITIVE);
-                    } else {
-                        pattern = Pattern.compile(regexString);
-                    }
+                            String next = Pattern.quote(st.nextToken());
 
-                    if (pattern.matcher(fileName).find()) {
+                            sb.append(".*").append(next);
+                        }
 
-                        CommonUtilities.MATCHING_FILE_COUNTER.incrementAndGet();
+                        if (MainController.searchingTask.getFuture().isCancelled()) {
 
-                        mainController.checkToShowHiddenFiles(file);
-                    }
+                            throw new RuntimeException();
+                        }
+
+                        String regexString = sb.toString();
+
+                        if (mainController.caseInsensitiveMatchingCheckbox.isSelected()) {
+                            pattern = Pattern.compile(regexString, Pattern.CASE_INSENSITIVE);
+                        } else {
+                            pattern = Pattern.compile(regexString);
+                        }
+
+                        if (pattern.matcher(fileName).find()) {
+
+                            CommonUtilities.MATCHING_FILE_COUNTER.incrementAndGet();
+
+                            mainController.checkToShowHiddenFiles(file);
+                        }
+
+                    });
+
                 } else {
 
                     mainController.checkToShowHiddenFiles(file);

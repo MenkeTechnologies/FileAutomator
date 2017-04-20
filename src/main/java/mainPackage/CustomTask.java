@@ -78,7 +78,9 @@ public class CustomTask<T> extends Task<String> {
             e.printStackTrace();
         } finally {
            if (!searchingTaskRunning){
-               Platform.runLater(() -> mainController.thinkingIndicator.setVisible(false));
+               Platform.runLater(() -> {
+                   Utilities.removeFromView(mainController.thinkingIndicator);
+               });
            }
 
         }
