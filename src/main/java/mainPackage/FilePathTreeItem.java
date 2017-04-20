@@ -134,7 +134,8 @@ public class FilePathTreeItem extends TreeItem<String> {
     }
 
     static public String getFileType(String pathName) {
-        String type;
+        String type = "";
+
 
         if (pathName.lastIndexOf('.') > 0) {
             String fileType = pathName.substring(pathName.lastIndexOf('.') + 1);

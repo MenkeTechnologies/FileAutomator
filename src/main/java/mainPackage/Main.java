@@ -4,6 +4,8 @@ import com.aquafx_project.AquaFx;
 import com.guigarage.flatterfx.FlatterFX;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
@@ -42,15 +44,22 @@ public class Main extends Application {
 
         Scene scene = new Scene(root, 1800, 1200);
 
-
-
         mainController.initBindings();
+        scene.widthProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if (Utilities.maximized.get()){
+                    mainController.mainSplitPane.setDividerPositions(0,0);
+                }
+            }
+        });
+
         Utilities.initMenuBar(mainController.menuBar, scene, primaryStage);
 
         Double sp = Preferences.userRoot().getDouble("dividerPos0", 0.2);
         Double sp2 = Preferences.userRoot().getDouble("dividerPos1", 0.8);
 
-        mainController.mainSplitPane.setDividerPositions(sp,sp2);
+        mainController.mainSplitPane.setDividerPositions(sp, sp2);
 
         AquaFx.style();
 

@@ -17,15 +17,15 @@ public class RegexUtilities {
             String fileToSearch = mainController.mainTextField.getText();
             String directory = mainController.directoryToSearchTextField.getText();
             mainController.files.clear();
+            mainController.numberResultsLabel.setVisible(false);
 
             findFilesWithRegex(mainController, fileToSearch, directory);
 
             Platform.runLater(() -> {
-                mainController.numberResultsLabel.setText(mainController.files.size() + " results found.");
+                mainController.numberResultsLabel.setVisible(true);
+                mainController.numberResultsLabel.setText(mainController.files.size() + " results found");
                 mainController.mainTableView.refresh();
             });
-
-
         });
     }
 
@@ -37,7 +37,6 @@ public class RegexUtilities {
             CommonUtilities.MATCHING_FILE_COUNTER.set(0);
 
             Files.walk(Paths.get(directory)).forEach(file -> {
-
 
                 CommonUtilities.TOTAL_FILE_COUNTER.incrementAndGet();
 
@@ -80,16 +79,16 @@ public class RegexUtilities {
 
                         CommonUtilities.MATCHING_FILE_COUNTER.incrementAndGet();
 
-                        String message = "Found " + CommonUtilities.MATCHING_FILE_COUNTER + " files of " + CommonUtilities.TOTAL_FILE_COUNTER + " files : " + file.getFileName();
-
-                        MainController.searchingTask.updateMessage(message);
-
                         mainController.checkToShowHiddenFiles(file);
                     }
                 } else {
 
                     mainController.checkToShowHiddenFiles(file);
                 }
+
+                String message = "Filtered " + CommonUtilities.MATCHING_FILE_COUNTER + " files of " + CommonUtilities.TOTAL_FILE_COUNTER + " files : Processing " + file.getFileName();
+
+                MainController.searchingTask.updateMessage(message);
             });
         } catch (Exception e) {
             e.printStackTrace();

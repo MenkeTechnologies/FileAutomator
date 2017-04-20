@@ -4,8 +4,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 
+import java.io.File;
 import java.util.Comparator;
 
 /**
@@ -15,6 +17,39 @@ public class TableViewUtilities {
     static public void initTableViewColumns(TableView mainTableView) {
         TableColumn<FileInfo, String> filesColumn = new TableColumn<>("File Name");
         filesColumn.setPrefWidth(150);
+        filesColumn.setCellFactory(new Callback<TableColumn<FileInfo, String>, TableCell<FileInfo, String>>() {
+            @Override
+            public TableCell<FileInfo, String> call(TableColumn<FileInfo, String> param) {
+                TableCell<FileInfo, String> tableCell = new TableCell<FileInfo, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        if (item != null) {
+                            setText(item);
+
+//                        FileInfo fileInfo = (FileInfo)this.getTableRow().getItem();
+
+                            switch (FilePathTreeItem.getFileType(item)) {
+                                case "music":
+                                    setGraphic(new ImageView(FilePathTreeItem.musicImage));
+                                    break;
+                                case "image":
+                                    setGraphic(new ImageView(FilePathTreeItem.pictureImage));
+                                    break;
+                                case "video":
+                                    setGraphic(new ImageView(FilePathTreeItem.movieImage));
+                                    break;
+                                case "text":
+                                case "file":
+                                    setGraphic(new ImageView(FilePathTreeItem.fileImage));
+                                    break;
+                            }
+                        }
+                    }
+                };
+
+                return tableCell;
+            }
+        });
         filesColumn.setCellValueFactory(new PropertyValueFactory<FileInfo, String>("fileName"));
 
         TableColumn<FileInfo, String> pathColumn = new TableColumn<>("File Path");
@@ -39,7 +74,6 @@ public class TableViewUtilities {
                     }
                 };
                 return cell;
-
             }
         });
 
