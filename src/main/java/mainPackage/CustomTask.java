@@ -79,7 +79,9 @@ public class CustomTask<T> extends Task<String> {
         } finally {
            if (!searchingTaskRunning){
                Platform.runLater(() -> {
-                   Utilities.removeFromView(mainController.thinkingIndicator);
+             //      Utilities.removeFromView(mainController.thinkingIndicator);
+                   Utilities.removeFromView(mainController.sphere);
+                   mainController.timeline.stop();
                });
            }
 
