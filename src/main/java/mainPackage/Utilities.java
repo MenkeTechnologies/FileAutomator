@@ -131,7 +131,7 @@ public class Utilities {
             removeFromView(mainController.rightPaneMediaView);
             removeFromView(mainController.mediaPlayerControls);
             removeFromView(mainController.sliderHbox);
-            removeFromView(mainController.volumeLabel);
+            removeFromView(mainController.volumeAndCurrentTimeSwipeLabel);
             removeTextFromRightPane(mainController);
 
             MainController.loadingTask.updateMessage("Loading File: " + filePathTreeItem.getPath().getFileName());
@@ -152,7 +152,7 @@ public class Utilities {
 
                     displayAudioUI(mainController);
                     addToView(mainController.rightPaneMediaView);
-                    addToView(mainController.volumeLabel);
+                    addToView(mainController.volumeAndCurrentTimeSwipeLabel);
 
                     Media m = new Media(fileInfo.toURI().toString());
                     mainController.mediaPlayer = new MediaPlayer(m);
@@ -172,7 +172,7 @@ public class Utilities {
 
                 displayAudioUI(mainController);
                 addToView(mainController.rightPaneImageView);
-                addToView(mainController.volumeLabel);
+                addToView(mainController.volumeAndCurrentTimeSwipeLabel);
 
                 mainController.rightPaneImageView.setImage(FilePathTreeItem.musicLargeImage);
                 Media m = new Media(fileInfo.toURI().toString());
@@ -271,9 +271,9 @@ public class Utilities {
                 mainController.totalTimeLabel.setText(CommonUtilities.formatDuration(mp.getTotalDuration()));
                 if (swipeRight) {
                     if (mainController.removeSliderMediaControl.isSelected()){
-                        mainController.volumeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()) + " of " + CommonUtilities.formatDuration(mp.getTotalDuration()));
+                        mainController.volumeAndCurrentTimeSwipeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()) + " of " + CommonUtilities.formatDuration(mp.getTotalDuration()));
                     } else{
-                        mainController.volumeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()));
+                        mainController.volumeAndCurrentTimeSwipeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()));
                     }
                 }
             }
@@ -337,7 +337,7 @@ public class Utilities {
         initEffects(mainController.rightPaneImageView);
         initEffects(mainController.playPositionSlider);
         initEffects(mainController.mediaPlayerControls);
-        initEffects(mainController.volumeLabel);
+        initEffects(mainController.volumeAndCurrentTimeSwipeLabel);
 
 //        initEffects(mainController.currentTimeLabel);
 //        initEffects(mainController.totalTimeLabel);

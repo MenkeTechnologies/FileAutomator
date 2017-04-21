@@ -106,7 +106,7 @@ public class MainController implements Initializable {
     public ToggleButton lockMediaView;
     public Label numberResultsLabel;
     public Label loadingFileLabel;
-    public Label volumeLabel;
+    public Label volumeAndCurrentTimeSwipeLabel;
     public ToggleButton autoPlayMediaControl;
     public Label fileNameLabelMediaControls;
     public Button normalScreenMediaButton;
@@ -125,35 +125,37 @@ public class MainController implements Initializable {
     public DoubleProperty mediaPlayerVolumeProperty = new SimpleDoubleProperty(1);
     Double[] dividerPositions = {0d, 0d};
     FilePathTreeItem currentlySelectedFilePathTreeItem = null;
+    Timeline timeline;
+    Timer disappearTimer;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
         Double scalingFactor = 7d;
 
-        sphere = new Cylinder(2* scalingFactor, 2*scalingFactor);
-        PhongMaterial material = new PhongMaterial(Color.BLUE);
+        sphere = new Cylinder(2 * scalingFactor, 2 * scalingFactor);
+        PhongMaterial material = new PhongMaterial(Color.BLACK);
         material.setSpecularColor(Color.LIGHTBLUE);
         material.setSpecularPower(10.0d);
         sphere.setMaterial(material);
+//        sphere.setEffect(new DropShadow());
 
         pointLight = new PointLight(Color.WHITE);
         sphere.setMaterial(material);
 
         DoubleProperty translateY = new SimpleDoubleProperty();
 
-        Timeline timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(0), new KeyValue(translateY, 3000)),
+        timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(0), new KeyValue(translateY, 3000)),
                 new KeyFrame(javafx.util.Duration.seconds(10), new KeyValue(translateY, 0)));
 
         sphere.setDrawMode(DrawMode.LINE);
 
-        sphere.setRotationAxis(new Point3D(3,1,1));
+        sphere.setRotationAxis(new Point3D(3, 1, 1));
         sphere.rotateProperty().bind(translateY);
         sphere.setTranslateZ(90);
 
         timeline.setAutoReverse(true);
         timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
 
         Group group = new Group(sphere, pointLight);
 
@@ -261,8 +263,6 @@ public class MainController implements Initializable {
         initCheckBoxes();
 
         initTasks();
-
-
     }
 
     public void startPlayingMediaFromTree(Object item) {
@@ -354,9 +354,9 @@ public class MainController implements Initializable {
         rightPaneMediaView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
         rightPaneImageView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
 //        thinkingIndicator.progressProperty().bind(searchingTask.progressProperty());
-        stopCurrentSearchButton.visibleProperty().bind(thinkingIndicator.visibleProperty());
-        stopMediaButton.managedProperty().bind(thinkingIndicator.managedProperty());
-        searchButton.disableProperty().bind(thinkingIndicator.visibleProperty());
+        stopCurrentSearchButton.visibleProperty().bind(sphere.visibleProperty());
+        stopCurrentSearchButton.managedProperty().bind(sphere.managedProperty());
+        searchButton.disableProperty().bind(sphere.visibleProperty());
         activityIndicatorLabel.textProperty().bind(searchingTask.messageProperty());
         loadingFileLabel.textProperty().bind(loadingTask.messageProperty());
 
@@ -377,8 +377,8 @@ public class MainController implements Initializable {
 
         currentTimeLabel.fontProperty().bind(fontObjectProperty);
         totalTimeLabel.fontProperty().bind(fontObjectProperty);
-        //mediaPlayerRateLabel.fontProperty().bind(fontObjectProperty);
-        volumeLabel.fontProperty().bind(fontObjectProperty);
+
+        volumeAndCurrentTimeSwipeLabel.fontProperty().bind(fontObjectProperty);
 
         rightPaneScrollPane.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -400,7 +400,7 @@ public class MainController implements Initializable {
 
         if (sender.equals("video") || sender.equals("music")) {
 
-            volumeLabel.setVisible(false);
+            volumeAndCurrentTimeSwipeLabel.setVisible(false);
 
             mediaStackPane.setOnScroll(e -> {
 
@@ -427,7 +427,7 @@ public class MainController implements Initializable {
                         double changeToX = changeX * scalingFactorX;
 
                         if (changeToX < 1 || changeToX > 0) {
-                            volumeLabel.setVisible(true);
+                            volumeAndCurrentTimeSwipeLabel.setVisible(true);
                             Duration newDuration = Duration.millis(changeToX * mediaPlayer.getTotalDuration().toMillis()).add(mediaPlayer.getCurrentTime());
                             if (newDuration.toMillis() < 0) newDuration = Duration.ZERO;
                             if (newDuration.greaterThan(mediaPlayer.getTotalDuration())) {
@@ -437,7 +437,7 @@ public class MainController implements Initializable {
 
                             mediaPlayer.seek(newDuration);
                         }
-                        hideVolumeLabelAfterDelay();
+                        hideNodeAfterDelay(volumeAndCurrentTimeSwipeLabel);
                     }
                 }
 
@@ -447,9 +447,9 @@ public class MainController implements Initializable {
             volumeSlider.valueChangingProperty().addListener(new ChangeListener<Boolean>() {
                 @Override
                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    volumeLabel.setVisible(true);
+                    volumeAndCurrentTimeSwipeLabel.setVisible(true);
                     if (oldValue && !newValue) {
-                        hideVolumeLabelAfterDelay();
+                        hideNodeAfterDelay(volumeAndCurrentTimeSwipeLabel);
                     }
                 }
             });
@@ -461,7 +461,7 @@ public class MainController implements Initializable {
                 public void invalidated(javafx.beans.Observable observable) {
                     Utilities.swipeRight = false;
 
-                    volumeLabel.setText(String.format("Volume: %.1f%%", ((DoubleProperty) observable).doubleValue() * 100));
+                    volumeAndCurrentTimeSwipeLabel.setText(String.format("Volume: %.1f%%", ((DoubleProperty) observable).doubleValue() * 100));
                 }
             });
 
@@ -487,14 +487,52 @@ public class MainController implements Initializable {
 
             mediaStackPane.setOnMouseEntered(e -> {
                 FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
-                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music"))
+                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music")) {
                     mediaPlayerControls.setVisible(true);
+                    disappearTimer = new Timer();
+                    disappearTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            Platform.runLater(()->{
+                                Utilities.removeFromView(mediaPlayerControls);
+                            });
+                        }
+                    }, 3 * 1000);
+                }
             });
+
+            mediaStackPane.setOnMouseMoved(e->{
+
+                if (!mediaPlayerControls.isVisible()){
+                    Utilities.addToView(mediaPlayerControls);
+
+                } else {
+                    disappearTimer.cancel();
+                    disappearTimer.purge();
+                    disappearTimer = new Timer();
+                    disappearTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            Platform.runLater(()->{
+                                Utilities.removeFromView(mediaPlayerControls);
+                            });
+                        }
+                    }, 1000);
+
+                }
+            });
+
+
 
             mediaStackPane.setOnMouseExited(e -> {
                 FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
-                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music"))
-                    mediaPlayerControls.setVisible(false);
+                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music")) {
+                    Utilities.removeFromView(mediaPlayerControls);
+                }
+                if (disappearTimer != null) {
+                    disappearTimer.cancel();
+                    disappearTimer.purge();
+                }
             });
 
             playMediaButton.setOnAction(ez -> {
@@ -508,15 +546,18 @@ public class MainController implements Initializable {
         }
     }
 
-    public void hideVolumeLabelAfterDelay() {
-        new Thread(() -> {
+    public void hideNodeAfterDelay(Node node) {
+        Thread t = new Thread(() -> {
             try {
                 Thread.sleep(3000);
-                Platform.runLater(() -> volumeLabel.setVisible(false));
+
+                Platform.runLater(() -> node.setVisible(false));
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }
-        }).start();
+        });
+
+        t.start();
     }
 
     public void updateRightSidePane(FileInfo newValue) {
@@ -610,7 +651,9 @@ public class MainController implements Initializable {
     }
 
     public void runInBackgroundThread(Runnable r) {
-        Utilities.addToView(thinkingIndicator);
+        Utilities.addToView(sphere);
+        timeline.play();
+//        Utilities.addToView(thinkingIndicator);
         System.out.println("visible");
         stopCurrentSearchButton.setText("Stop Search");
 
@@ -627,7 +670,9 @@ public class MainController implements Initializable {
     public void runInBackgroundThreadSecondary(Runnable r) {
 
         if (searchingTask.getState() != Task.State.RUNNING) {
-            Utilities.addToView(thinkingIndicator);
+            Utilities.addToView(sphere);
+            timeline.play();
+//           Utilities.addToView(thinkingIndicator);
             stopCurrentSearchButton.setText("Stop Load");
         }
 
@@ -638,7 +683,9 @@ public class MainController implements Initializable {
 
         if (searchingTask.getState() != Task.State.RUNNING) {
             Platform.runLater(() -> {
-                Utilities.removeFromView(thinkingIndicator);
+
+                Utilities.removeFromView(sphere);
+                timeline.stop();
             });
         }
 
@@ -716,7 +763,7 @@ public class MainController implements Initializable {
 
         Utilities.addToView(fileNameLabelMediaControls);
 
-        rightPaneScrollPane.minWidthProperty().bind(mainSplitPane.widthProperty().multiply(0.98));
+        rightPaneScrollPane.minWidthProperty().bind(mainSplitPane.widthProperty().multiply(0.96));
 //        mainSplitPane.getDividers().get(1).
 
         mainSplitPane.setDividerPositions(0, 0);
@@ -738,9 +785,10 @@ public class MainController implements Initializable {
 
         Utilities.addToView(sliderHbox);
 
+        //allow scroll pane to slider to right, had to lock scroll pane to make sure that video kept maximized during
+        //screen resize from left side stage
         if (rightPaneScrollPane.minWidthProperty().isBound()) {
             rightPaneScrollPane.minWidthProperty().unbind();
-            System.out.println("unbinding " + rightPaneScrollPane.minWidthProperty());
             rightPaneScrollPane.minWidthProperty().set(0);
         }
 

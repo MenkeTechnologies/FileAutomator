@@ -137,7 +137,7 @@
 
                                             </children>
                                         </HBox>
-                                        <Label fx:id="volumeLabel" styleClass="blackBoxWhiteText" visible="false" />
+                                        <Label fx:id="volumeAndCurrentTimeSwipeLabel" styleClass="blackBoxWhiteText" visible="false" />
 
                                     </children>
                                 </StackPane>
@@ -193,9 +193,9 @@
                     </items>
                   </MenuButton>
                         <Button onAction="#removeFilter" text="-" />
-                        <HBox fx:id="filterHBox" HBox.hgrow="ALWAYS">
+                        <HBox fx:id="filterHBox">
                             <children>
-                                <TextField fx:id="mainTextField" prefWidth="40.0" promptText="Search For File" />
+                                <TextField fx:id="mainTextField" prefWidth="100.0" promptText="Search For File" />
                             </children>
                         </HBox>
 
@@ -212,6 +212,7 @@
                         <Button onAction="#openDestinationFolder" text="Open Destination" />
                         <ProgressIndicator fx:id="thinkingIndicator" progress="-1" visible="false" />
                         <Button fx:id="stopCurrentSearchButton" text="Stop" visible="false" />
+                        <Region HBox.hgrow="ALWAYS"></Region>
 
                     </children>
                 </HBox>
