@@ -14,7 +14,9 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.media.MediaView?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainPackage.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+            prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mainPackage.MainController">
     <center>
         <SplitPane fx:id="mainSplitPane" dividerPositions="0.5, 0.5">
             <items>
@@ -22,11 +24,12 @@
                 </TreeView>
                 <TableView fx:id="mainTableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <columns>
-                        <TableColumn prefWidth="75.0" text="C1" />
-                        <TableColumn prefWidth="75.0" text="C2" />
+                        <TableColumn prefWidth="75.0" text="C1"/>
+                        <TableColumn prefWidth="75.0" text="C2"/>
                     </columns>
                 </TableView>
-                <ScrollPane fx:id="rightPaneScrollPane" fitToHeight="true" fitToWidth="true" prefViewportHeight="329.0" prefViewportWidth="281.0">
+                <ScrollPane fx:id="rightPaneScrollPane" fitToHeight="true" fitToWidth="true" prefViewportHeight="329.0"
+                            prefViewportWidth="281.0">
                     <content>
                         <VBox fx:id="rightSidePaneVBox" prefHeight="200.0" prefWidth="100.0" spacing="10">
                             <children>
@@ -34,118 +37,147 @@
                                     <children>
                                         <TextFlow fx:id="textFlowRightPane">
                                             <children>
-                                                <Text fx:id="fileNamDetailLabel" styleClass="detailLabels" text="File: " />
-                                                <Text fx:id="fileNamDetailLabelContent" />
+                                                <Text fx:id="fileNamDetailLabel" styleClass="detailLabels"
+                                                      text="File: "/>
+                                                <Text fx:id="fileNamDetailLabelContent"/>
                                             </children>
                                         </TextFlow>
                                         <TextFlow>
                                             <children>
-                                                <Text fx:id="sizeLabel" styleClass="detailLabels" text="Size: " />
-                                                <Text fx:id="sizeDetailLabelContent" />
+                                                <Text fx:id="sizeLabel" styleClass="detailLabels" text="Size: "/>
+                                                <Text fx:id="sizeDetailLabelContent"/>
                                             </children>
                                         </TextFlow>
 
                                         <TextFlow>
                                             <children>
-                                                <Text fx:id="pathLabel" styleClass="detailLabels" text="Path: " />
-                                                <Text fx:id="pathLabelContent" />
+                                                <Text fx:id="pathLabel" styleClass="detailLabels" text="Path: "/>
+                                                <Text fx:id="pathLabelContent"/>
                                             </children>
                                         </TextFlow>
 
                                         <TextFlow>
                                             <children>
-                                                <Text fx:id="lastModifiedLabel" styleClass="detailLabels" text="Last Modified: " />
-                                                <Text fx:id="lastModifiedLabelContent" />
+                                                <Text fx:id="lastModifiedLabel" styleClass="detailLabels"
+                                                      text="Last Modified: "/>
+                                                <Text fx:id="lastModifiedLabelContent"/>
                                             </children>
                                         </TextFlow>
 
                                         <TextFlow>
                                             <children>
-                                                <Text fx:id="textLabel" styleClass="detailLabels" />
-                                                <Text fx:id="textContent" />
+                                                <Text fx:id="textLabel" styleClass="detailLabels"/>
                                             </children>
                                         </TextFlow>
+
+
+                                        <TextFlow>
+                                            <children>
+                                                <Text fx:id="textContent"/>
+                                            </children>
+                                        </TextFlow>
+
+
                                     </children>
                                 </VBox>
 
 
                                 <StackPane fx:id="mediaStackPane">
                                     <children>
-                                        <ImageView fx:id="rightPaneImageView" pickOnBounds="true" preserveRatio="true" />
-
-                                        <MediaView fx:id="rightPaneMediaView" preserveRatio="true" />
-                                        <HBox fx:id="mediaPlayerControls" prefHeight="100.0" prefWidth="200.0" visible="false">
+                                        <VBox fx:id="imagesVBox">
                                             <children>
-                                                <Button id="2xslower" fx:id="play2XSlowerButton" mnemonicParsing="false" styleClass="mediaButtons">
+                                                <ImageView fx:id="rightPaneImageView" pickOnBounds="true"
+                                                           preserveRatio="true"/>
+
+                                            </children>
+                                        </VBox>
+
+                                        <MediaView fx:id="rightPaneMediaView" preserveRatio="true"/>
+                                        <HBox fx:id="mediaPlayerControls" prefHeight="100.0" prefWidth="200.0"
+                                              visible="false">
+                                            <children>
+                                                <Button id="2xslower" fx:id="play2XSlowerButton" mnemonicParsing="false"
+                                                        styleClass="mediaButtons">
                                                     <tooltip>
-                                                        <Tooltip text="Play 2x Slower" />
+                                                        <Tooltip text="Play 2x Slower"/>
                                                     </tooltip>
                                                 </Button>
-                                                <Label fx:id="mediaPlayerRateLabel" styleClass="rateLabel" text="1x" />
-                                                <Button id="2xfaster" fx:id="play2XFasterButton" mnemonicParsing="false" styleClass="mediaButtons">
+                                                <Label fx:id="mediaPlayerRateLabel" styleClass="rateLabel" text="1x"/>
+                                                <Button id="2xfaster" fx:id="play2XFasterButton" mnemonicParsing="false"
+                                                        styleClass="mediaButtons">
                                                     <tooltip>
-                                                        <Tooltip text="Play 2x Faster" />
+                                                        <Tooltip text="Play 2x Faster"/>
                                                     </tooltip>
                                                 </Button>
                                                 <Slider fx:id="volumeSlider" max="1" orientation="HORIZONTAL">
                                                     <tooltip>
-                                                        <Tooltip text="Adjust Volume" />
+                                                        <Tooltip text="Adjust Volume"/>
                                                     </tooltip>
                                                 </Slider>
-                                                <Button id="playMedia" fx:id="playMediaButton" styleClass="mediaButtons">
+                                                <Button id="playMedia" fx:id="playMediaButton"
+                                                        styleClass="mediaButtons">
                                                     <tooltip>
-                                                        <Tooltip text="Play Media" />
+                                                        <Tooltip text="Play Media"/>
                                                     </tooltip>
                                                 </Button>
-                                                <Button onAction="#rewindToStart" styleClass="mediaButtons" text="Rewind">
+                                                <Button onAction="#rewindToStart" id="rewind" styleClass="mediaButtons">
                                                     <tooltip>
-                                                        <Tooltip text="Rewind to Start" />
+                                                        <Tooltip text="Rewind to Start"/>
                                                     </tooltip>
                                                 </Button>
-                                                <ToggleButton id="loopMedia" fx:id="loopButton" styleClass="mediaButtons">
+                                                <ToggleButton id="loopMedia" fx:id="loopButton"
+                                                              styleClass="mediaButtons">
                                                     <tooltip>
-                                                        <Tooltip text="Loop Currently Playing Media" />
+                                                        <Tooltip text="Loop Currently Playing Media"/>
                                                     </tooltip>
                                                 </ToggleButton>
-                                                <Button id="fullScreen" fx:id="fullScreenMediaButton" onAction="#maximizeVideo" styleClass="mediaButtons">
+                                                <Button id="fullScreen" fx:id="fullScreenMediaButton"
+                                                        onAction="#maximizeVideo" styleClass="mediaButtons">
                                                     <tooltip>
-                                                        <Tooltip text="Maximize Media Player Pane" />
+                                                        <Tooltip text="Maximize Media Player Pane"/>
                                                     </tooltip>
                                                 </Button>
-                                                <Button id="oldSize" fx:id="normalScreenMediaButton" onAction="#returnToOldDividers" styleClass="mediaButtons">
+                                                <Button id="oldSize" fx:id="normalScreenMediaButton"
+                                                        onAction="#returnToOldDividers" styleClass="mediaButtons">
                                                     <tooltip>
-                                                        <Tooltip text="Return to Old Pane Sizes" />
+                                                        <Tooltip text="Return to Old Pane Sizes"/>
                                                     </tooltip>
                                                 </Button>
-                                                <ToggleButton fx:id="lockMediaView" styleClass="mediaButtons" text="Lock">
+                                                <ToggleButton fx:id="lockMediaView" id="lock" styleClass="mediaButtons">
                                                     <tooltip>
-                                                        <Tooltip text="Keep Current Media Playing in Right Pane" />
+                                                        <Tooltip text="Keep Current Media Playing in Right Pane"/>
                                                     </tooltip>
                                                 </ToggleButton>
-                                                <ToggleButton fx:id="autoPlayMediaControl" styleClass="mediaButtons" text="AutoPlay">
+                                                <ToggleButton fx:id="autoPlayMediaControl" styleClass="mediaButtons"
+                                                              text="AutoPlay">
                                                     <tooltip>
-                                                        <Tooltip text="Automatically Play Next Media In Table" />
+                                                        <Tooltip text="Automatically Play Next Media In Table"/>
                                                     </tooltip>
                                                 </ToggleButton>
-                                                <ToggleButton fx:id="removeSliderMediaControl" onAction="#removeSliderHBox" styleClass="mediaButtons" text="Remove Slider">
+                                                <ToggleButton fx:id="removeSliderMediaControl"
+                                                              onAction="#removeSliderHBox" styleClass="mediaButtons"
+                                                              text="Remove Slider">
                                                     <tooltip>
-                                                        <Tooltip text="Hide Slider" />
+                                                        <Tooltip text="Hide Slider"/>
                                                     </tooltip>
                                                 </ToggleButton>
 
-                                                <Label fx:id="fileNameLabelMediaControls" styleClass="blackBoxWhiteText" visible="false" />
+                                                <Label fx:id="fileNameLabelMediaControls" styleClass="blackBoxWhiteText"
+                                                       visible="false"/>
 
                                             </children>
                                         </HBox>
-                                        <Label fx:id="volumeAndCurrentTimeSwipeLabel" styleClass="blackBoxWhiteText" visible="false" />
+                                        <Label fx:id="volumeAndCurrentTimeSwipeLabel" styleClass="blackBoxWhiteText"
+                                               visible="false"/>
 
                                     </children>
                                 </StackPane>
                                 <HBox fx:id="sliderHbox">
                                     <children>
-                                        <Label fx:id="currentTimeLabel" alignment="CENTER" />
-                                        <Slider fx:id="playPositionSlider" blockIncrement="1.0" max="1" visible="false" />
-                                        <Label fx:id="totalTimeLabel" alignment="CENTER" />
+                                        <Label fx:id="currentTimeLabel" alignment="CENTER"/>
+                                        <Slider fx:id="playPositionSlider" blockIncrement="1.0" max="1"
+                                                visible="false"/>
+                                        <Label fx:id="totalTimeLabel" alignment="CENTER"/>
                                     </children>
                                 </HBox>
 
@@ -164,19 +196,19 @@
                     <menus>
                         <Menu mnemonicParsing="false" text="File">
                             <items>
-                                <MenuItem accelerator="Meta+W" mnemonicParsing="false" text="Close" />
-                                <MenuItem accelerator="Meta+," mnemonicParsing="false" text="Settings" />
+                                <MenuItem accelerator="Meta+W" mnemonicParsing="false" text="Close"/>
+                                <MenuItem accelerator="Meta+," mnemonicParsing="false" text="Settings"/>
 
                             </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Edit">
                             <items>
-                                <MenuItem mnemonicParsing="false" text="Delete" />
+                                <MenuItem mnemonicParsing="false" text="Delete"/>
                             </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Help">
                             <items>
-                                <MenuItem mnemonicParsing="false" text="About" />
+                                <MenuItem mnemonicParsing="false" text="About"/>
                             </items>
                         </Menu>
                     </menus>
@@ -185,33 +217,37 @@
                 <HBox fx:id="topHBox" prefHeight="45.0" prefWidth="600.0" spacing="2" BorderPane.alignment="CENTER">
                     <children>
 
-                        <Label text="Filter:" />
-                  <MenuButton fx:id="menuButtonAdd" mnemonicParsing="false" text="Add">
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#addFilter" text="+ Or" />
-                      <MenuItem mnemonicParsing="false" onAction="#addFilter" text="+ And" />
-                    </items>
-                  </MenuButton>
-                        <Button onAction="#removeFilter" text="-" />
+                        <Label text="Filter:"/>
+                        <MenuButton fx:id="menuButtonAdd" mnemonicParsing="false" text="Add">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#addFilter" text="+ Or"/>
+                                <MenuItem mnemonicParsing="false" onAction="#addFilter" text="+ And"/>
+                            </items>
+                        </MenuButton>
+                        <Button onAction="#removeFilter" text="-"/>
                         <HBox fx:id="filterHBox">
                             <children>
-                                <TextField fx:id="mainTextField" prefWidth="100.0" promptText="Search For File" />
+                                <TextField fx:id="mainTextField" prefWidth="100.0" promptText="Search For File"/>
                             </children>
                         </HBox>
 
 
-                        <Label layoutX="10.0" layoutY="10.0" text="Directory:" />
-                        <TextField fx:id="directoryToSearchTextField" prefHeight="27.0" prefWidth="300.0" promptText="Source Directory" />
-                        <Button fx:id="searchButton" defaultButton="true" mnemonicParsing="false" onAction="#searchForFile" text="Search" />
-                        <Button onAction="#findDirectoryInTree" text="Find In Tree" />
-                        <Button mnemonicParsing="false" onAction="#chooseDir" text="Choose" />
-                        <Button mnemonicParsing="false" text="Move All" />
-                        <Button layoutX="515.0" layoutY="10.0" mnemonicParsing="false" text="Delete All" />
-                        <Button layoutX="488.0" layoutY="10.0" mnemonicParsing="false" onAction="#copyAllButtonAction" text="Copy All" />
-                        <TextField fx:id="destinationCopyAllTextField" prefWidth="300" promptText="Destination Directory" />
-                        <Button onAction="#openDestinationFolder" text="Open Destination" />
-                        <ProgressIndicator fx:id="thinkingIndicator" progress="-1" visible="false" />
-                        <Button fx:id="stopCurrentSearchButton" text="Stop" visible="false" />
+                        <Label layoutX="10.0" layoutY="10.0" text="Directory:"/>
+                        <TextField fx:id="directoryToSearchTextField" prefHeight="27.0" prefWidth="300.0"
+                                   promptText="Source Directory"/>
+                        <Button fx:id="searchButton" defaultButton="true" mnemonicParsing="false"
+                                onAction="#searchForFile" text="Search"/>
+                        <Button onAction="#findDirectoryInTree" text="Find In Tree"/>
+                        <Button mnemonicParsing="false" onAction="#chooseDir" text="Choose"/>
+                        <Button mnemonicParsing="false" text="Move All"/>
+                        <Button layoutX="515.0" layoutY="10.0" mnemonicParsing="false" text="Delete All"/>
+                        <Button layoutX="488.0" layoutY="10.0" mnemonicParsing="false" onAction="#copyAllButtonAction"
+                                text="Copy All"/>
+                        <TextField fx:id="destinationCopyAllTextField" prefWidth="300"
+                                   promptText="Destination Directory"/>
+                        <Button onAction="#openDestinationFolder" text="Open Destination"/>
+                        <ProgressIndicator fx:id="thinkingIndicator" progress="-1" visible="false"/>
+                        <Button fx:id="stopCurrentSearchButton" text="Stop" visible="false"/>
                         <Region HBox.hgrow="ALWAYS"></Region>
 
                     </children>
@@ -222,28 +258,30 @@
     <bottom>
         <VBox>
             <children>
-                <HBox fx:id="bottomHBox" prefHeight="36.0" prefWidth="543.0" spacing="10.0" BorderPane.alignment="CENTER">
+                <HBox fx:id="bottomHBox" prefHeight="36.0" prefWidth="543.0" spacing="10.0"
+                      BorderPane.alignment="CENTER">
                     <children>
-                        <Button onAction="#goToHomeDirectory" text="Home" />
-                        <Button onAction="#goToDesktopDirectory" text="Desktop" />
-                        <Button onAction="#goToDownloadsDirectory" text="Downloads" />
-                        <Button onAction="#collapseAllTreeNodes" text="Collapse All" />
-                        <Button onAction="#refreshTreeView" text="Refresh Tree View" />
-                        <CheckBox fx:id="caseInsensitiveMatchingCheckbox" mnemonicParsing="false" text="Case Insensitive Matching" />
-                        <CheckBox fx:id="pathMatchingCheckbox" mnemonicParsing="false" text="Path Matching" />
+                        <Button onAction="#goToHomeDirectory" text="Home"/>
+                        <Button onAction="#goToDesktopDirectory" text="Desktop"/>
+                        <Button onAction="#goToDownloadsDirectory" text="Downloads"/>
+                        <Button onAction="#collapseAllTreeNodes" text="Collapse All"/>
+                        <Button onAction="#refreshTreeView" text="Refresh Tree View"/>
+                        <CheckBox fx:id="caseInsensitiveMatchingCheckbox" mnemonicParsing="false"
+                                  text="Case Insensitive Matching"/>
+                        <CheckBox fx:id="pathMatchingCheckbox" mnemonicParsing="false" text="Path Matching"/>
 
-                        <CheckBox fx:id="automaticSearchCheckBox" mnemonicParsing="false" text="Automatic Filtering" />
-                        <CheckBox fx:id="selectInTreeViewCheckBox" selected="false" text="Select in Tree View" />
-                        <CheckBox fx:id="showHiddenFilesCheckBox" mnemonicParsing="false" text="Show Hidden Files" />
-                        <CheckBox fx:id="hideDirectoriesCheckBox" text="Hide Directories" />
-                        <CheckBox fx:id="autoplayCheckbox" text="Autoplay" />
+                        <CheckBox fx:id="automaticSearchCheckBox" mnemonicParsing="false" text="Automatic Filtering"/>
+                        <CheckBox fx:id="selectInTreeViewCheckBox" selected="false" text="Select in Tree View"/>
+                        <CheckBox fx:id="showHiddenFilesCheckBox" mnemonicParsing="false" text="Show Hidden Files"/>
+                        <CheckBox fx:id="hideDirectoriesCheckBox" text="Hide Directories"/>
+                        <CheckBox fx:id="autoplayCheckbox" text="Autoplay"/>
 
                         <HBox>
                             <children>
-                                <Button onAction="#openFromRightSidePane" text="Open File" />
-                                <Button onAction="#copyPath" text="Copy Path" />
-                                <Button onAction="#openEnclosing" text="Open Enclosing" />
-                                <Button onAction="#moveToTrash" text="Delete" />
+                                <Button onAction="#openFromRightSidePane" text="Open File"/>
+                                <Button onAction="#copyPath" text="Copy Path"/>
+                                <Button onAction="#openEnclosing" text="Open Enclosing"/>
+                                <Button onAction="#moveToTrash" text="Delete"/>
                             </children>
                         </HBox>
                     </children>
@@ -251,14 +289,14 @@
 
                 <HBox fx:id="topSecondHBox">
                     <children>
-                        <Label fx:id="activityIndicatorLabel" styleClass="detailLabels" text="Activity" visible="true" />
+                        <Label fx:id="activityIndicatorLabel" styleClass="detailLabels" text="Activity" visible="true"/>
 
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="loadingFileLabel" styleClass="detailLabels" text="Activity" visible="true" />
-                        <Separator />
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="loadingFileLabel" styleClass="detailLabels" text="Activity" visible="true"/>
+                        <Separator/>
 
 
-                        <Label fx:id="numberResultsLabel" styleClass="detailLabelsLarge" text="Results" />
+                        <Label fx:id="numberResultsLabel" styleClass="detailLabelsLarge" text="Results"/>
                     </children>
                 </HBox>
             </children>

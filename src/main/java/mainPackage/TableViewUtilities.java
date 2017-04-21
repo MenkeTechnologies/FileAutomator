@@ -27,24 +27,58 @@ public class TableViewUtilities {
                         if (item != null) {
                             setText(item);
 
-//                        FileInfo fileInfo = (FileInfo)this.getTableRow().getItem();
+                            FileInfo fileInfo = (FileInfo) this.getTableRow().getItem();
 
-                            FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(""),null);
+                            if (fileInfo != null && fileInfo.isDirectory()) {
+                                setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
+                            } else {
+                                switch (FilePathTreeItem.getFileType(item)) {
+                                    case "music":
+                                        setGraphic(new ImageView(FilePathTreeItem.musicImage));
+                                        break;
+                                    case "image":
+                                        setGraphic(new ImageView(FilePathTreeItem.pictureImage));
+                                        break;
+                                    case "video":
+                                        setGraphic(new ImageView(FilePathTreeItem.movieImage));
+                                        break;
+                                    case "word":
+                                        setGraphic(new ImageView(FilePathTreeItem.documentImage));
+                                        break;
+                                    case "excel":
+                                        setGraphic(new ImageView(FilePathTreeItem.excelImage));
+                                        break;
+                                    case "jar":
+                                    case "java":
+                                        setGraphic(new ImageView(FilePathTreeItem.javaImage));
+                                        break;
+                                    case "js":
+                                        setGraphic(new ImageView(FilePathTreeItem.jsImage));
+                                        break;
+                                    case "py":
+                                        setGraphic(new ImageView(FilePathTreeItem.pythonImage));
+                                        break;
+                                    case "ruby":
+                                        setGraphic(new ImageView(FilePathTreeItem.rubyImage));
+                                        break;
+                                    case "html":
+                                        setGraphic(new ImageView(FilePathTreeItem.htmlImage));
+                                        break;
+                                    case "css":
+                                        setGraphic(new ImageView(FilePathTreeItem.cssImage));
+                                        break;
 
-                            switch (FilePathTreeItem.getFileType(item)) {
-                                case "music":
-                                    setGraphic(new ImageView(filePathTreeItem.musicImage));
-                                    break;
-                                case "image":
-                                    setGraphic(new ImageView(filePathTreeItem.pictureImage));
-                                    break;
-                                case "video":
-                                    setGraphic(new ImageView(filePathTreeItem.movieImage));
-                                    break;
-                                case "text":
-                                case "file":
-                                    setGraphic(new ImageView(filePathTreeItem.fileImage));
-                                    break;
+                                    case "pdf":
+                                        setGraphic(new ImageView(FilePathTreeItem.pdfImage));
+                                        break;
+                                    case "xml":
+                                        setGraphic(new ImageView(FilePathTreeItem.xmlImage));
+                                        break;
+                                    case "text":
+                                    case "file":
+                                        setGraphic(new ImageView(FilePathTreeItem.fileImage));
+                                        break;
+                                }
                             }
                         }
                     }

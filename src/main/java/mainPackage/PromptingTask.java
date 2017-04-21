@@ -13,8 +13,11 @@ import javafx.event.*;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.*;
+
 
 public class PromptingTask extends Application {
     private static final String[] SAMPLE_TEXT =
@@ -39,6 +42,10 @@ public class PromptingTask extends Application {
         VBox layout = new VBox(10);
         layout.getChildren().addAll(status, progress, textContainer);
         layout.setStyle("-fx-background-color: cornsilk; -fx-padding: 10;");
+
+        ImageView imageView  =new ImageView(new Image(getClass().getResourceAsStream("../png/back.png")));
+
+        layout.getChildren().add(imageView);
 
         primaryStage.setScene(new Scene(layout, 300, 700));
         primaryStage.show();

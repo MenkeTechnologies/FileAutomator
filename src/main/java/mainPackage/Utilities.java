@@ -16,6 +16,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.effect.Reflection;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Modality;
@@ -33,6 +35,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 /**
  * Created by jacobmenke on 4/13/17.
@@ -41,7 +44,10 @@ public class Utilities {
     static boolean toggle = false;
     static boolean stopSlider = false;
     static boolean swipeRight = false;
+    static ArrayList<ImageView> imageViews;
     public static BooleanProperty maximized = new SimpleBooleanProperty(false);
+    static String textContent = null;
+    static Image image = null;
 
     public static void initMenuBar(MenuBar menuBar, Scene scene, Stage stage) {
         Menu file = menuBar.getMenus().get(0);
@@ -78,10 +84,6 @@ public class Utilities {
 
                 toggle = false;
             }
-//            stage.setWidth(width);
-//            stage.setHeight(height);
-//            stage.setX(x);
-//            stage.setY(y);
         });
     }
 
@@ -116,92 +118,193 @@ public class Utilities {
     }
 
     public static void updateThumbnailRightSidePane(MainController mainController, FilePathTreeItem filePathTreeItem) {
-
         System.gc();
+        MainController.loadingTask.updateMessage("Loading File: " + filePathTreeItem.getPath().getFileName());
+        //loading phase
+        String fileType = filePathTreeItem.getType();
+
+        FileInfo fileInfo = new FileInfo(filePathTreeItem.getPathString());
+
+        switch (fileType) {
+            case "image":
+                image = new javafx.scene.image.Image("file://" + filePathTreeItem.getPathString());
+                break;
+            case "music":
+                image = FilePathTreeItem.musicLargeImage;
+            case "video":
+                Media m = new Media(fileInfo.toURI().toString());
+                MainController.mediaPlayer = new MediaPlayer(m);
+                break;
+            case "pdf":
+                getImageViewsFromPDF(mainController, filePathTreeItem);
+                break;
+            case "jar":
+                textContent = CommonUtilities.invokeCommandLineAndReturnString("jar", "tf", filePathTreeItem.getPathString());
+
+                break;
+            case "excel":
+                textContent = MicrosoftUtilities.getStringFromExcelDocument(filePathTreeItem.getPathString());
+                break;
+            case "word":
+                textContent = MicrosoftUtilities.getStringFromWordDocument(filePathTreeItem.getPathString());
+                break;
+            case "java":
+            case "js":
+            case "ruby":
+            case "python":
+            case "xml":
+            case "html":
+            case "css":
+            case "text":
+                try {
+                    textContent = new String(Files.readAllBytes(filePathTreeItem.getPath()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            default:
+                break;
+        }
+
+        //UI updates
 
         Platform.runLater(() -> {
+
+            MainController.loadingTask.updateMessage("Clearing Items");
+
+            removeFromView(mainController.mediaStackPane);
+            removeFromView(mainController.rightPaneMediaView);
+            removeFromView(mainController.mediaPlayerControls);
+            removeFromView(mainController.imagesVBox);
+
+            removeFromView(mainController.sliderHbox);
+            removeFromView(mainController.volumeAndCurrentTimeSwipeLabel);
+            removeTextFromRightPane(mainController);
+
             if (mainController.rightPaneMediaView.getMediaPlayer() != null) {
                 mainController.rightPaneMediaView.getMediaPlayer().stop();
                 mainController.rightPaneMediaView.getMediaPlayer().dispose();
                 mainController.rightPaneMediaView.setMediaPlayer(null);
             }
 
-            MainController.loadingTask.updateMessage("Clearing Items");
-
-            removeFromView(mainController.mediaStackPane);
-            removeFromView(mainController.rightPaneImageView);
-            removeFromView(mainController.rightPaneMediaView);
-            removeFromView(mainController.mediaPlayerControls);
-            removeFromView(mainController.sliderHbox);
-            removeFromView(mainController.volumeAndCurrentTimeSwipeLabel);
-            removeTextFromRightPane(mainController);
+            mainController.imagesVBox.getChildren().clear();
 
             MainController.loadingTask.updateMessage("Loading File: " + filePathTreeItem.getPath().getFileName());
 
             mainController.fileNameLabelMediaControls.setText("Playing " + filePathTreeItem.getPath().getFileName().toString());
 
-            if (filePathTreeItem.getType().equals("image")) {
-                mainController.initMediaPlayerBindings("image");
-                addToView(mainController.mediaStackPane);
-                addToView(mainController.rightPaneImageView);
-                mainController.rightPaneImageView.setImage(new javafx.scene.image.Image("file://" + filePathTreeItem.getPathString(), true));
-                mainController.rightPaneImageView.setEffect(new Reflection());
-            } else if (filePathTreeItem.getType().equals("video")) {
+            System.out.println("on Thread " + Thread.currentThread().getName());
 
-                try {
+            switch (fileType) {
 
-                    FileInfo fileInfo = new FileInfo(filePathTreeItem.getPathString());
+                case "image":
+                    mainController.initMediaPlayerBindings("image");
+                    addToView(mainController.mediaStackPane);
+                    addToView(mainController.imagesVBox);
+
+                    mainController.imagesVBox.getChildren().add(mainController.rightPaneImageView);
+                    mainController.rightPaneImageView.setImage(image);
+                    mainController.rightPaneImageView.setEffect(new Reflection());
+
+                    break;
+
+                case "video":
+
+                    try {
+
+                        displayAudioUI(mainController);
+                        addToView(mainController.rightPaneMediaView);
+                        addToView(mainController.volumeAndCurrentTimeSwipeLabel);
+
+                        mainController.rightPaneMediaView.setMediaPlayer(mainController.mediaPlayer);
+                        mainController.initMediaPlayerBindings("video");
+
+                        setupSlider(mainController);
+                        checkForAutoPlay(mainController, fileInfo);
+                        mainController.mediaPlayer.play();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
+                case "music":
 
                     displayAudioUI(mainController);
-                    addToView(mainController.rightPaneMediaView);
+                    addToView(mainController.rightPaneImageView);
                     addToView(mainController.volumeAndCurrentTimeSwipeLabel);
+                    addToView(mainController.imagesVBox);
 
-                    Media m = new Media(fileInfo.toURI().toString());
-                    mainController.mediaPlayer = new MediaPlayer(m);
+                    mainController.rightPaneImageView.setImage(image);
+
+                    mainController.imagesVBox.getChildren().add(mainController.rightPaneImageView);
+
+                    System.out.println(mainController.imagesVBox.getChildren());
+                    System.out.println(mainController.rightPaneImageView.getImage());
 
                     mainController.rightPaneMediaView.setMediaPlayer(mainController.mediaPlayer);
+
                     setupSlider(mainController);
-                    mainController.initMediaPlayerBindings("video");
+                    mainController.initMediaPlayerBindings("music");
 
                     checkForAutoPlay(mainController, fileInfo);
                     mainController.mediaPlayer.play();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (filePathTreeItem.getType().equals("music")) {
+                    break;
+                case "word":
 
-                FileInfo fileInfo = new FileInfo(filePathTreeItem.getPathString());
+                    mainController.textLabel.setText("Content: ");
+                    mainController.textContent.setText(textContent);
+                    break;
+                case "excel":
+                    mainController.textLabel.setText("Content: ");
+                    mainController.textContent.setText(textContent);
+                    break;
+                case "jar":
 
-                displayAudioUI(mainController);
-                addToView(mainController.rightPaneImageView);
-                addToView(mainController.volumeAndCurrentTimeSwipeLabel);
+                    mainController.textLabel.setText("Content: ");
+                    mainController.textContent.setText(textContent);
 
-                mainController.rightPaneImageView.setImage(filePathTreeItem.musicLargeImage);
-                Media m = new Media(fileInfo.toURI().toString());
+                    break;
+                case "pdf":
 
-                mainController.mediaPlayer = new MediaPlayer(m);
+                    mainController.initMediaPlayerBindings("pdf");
 
-                mainController.rightPaneMediaView.setMediaPlayer(mainController.mediaPlayer);
+                    addToView(mainController.mediaStackPane);
+                    addToView(mainController.imagesVBox);
 
-                setupSlider(mainController);
-                mainController.initMediaPlayerBindings("music");
-
-                checkForAutoPlay(mainController, fileInfo);
-                mainController.mediaPlayer.play();
-            } else {
-
-                if (filePathTreeItem.getType().equals("text")) {
-                    try {
-                        mainController.textLabel.setText("Content: ");
-                        mainController.textContent.setText(new String(Files.readAllBytes(filePathTreeItem.getPath())));
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    for (int i = 0; i < imageViews.size(); i++) {
+                        mainController.imagesVBox.getChildren().add(imageViews.get(i));
                     }
-                } else {
 
-                }
+                    break;
+                case "java":
+                case "js":
+                case "ruby":
+                case "python":
+                case "xml":
+                case "html":
+                case "css":
+                case "text":
+
+                    mainController.textLabel.setText("Content: ");
+                    mainController.textContent.setText(textContent);
+
+                    break;
             }
         });
+    }
+
+    public static void getImageViewsFromPDF(MainController mainController, FilePathTreeItem filePathTreeItem) {
+        imageViews = new ArrayList<>();
+        mainController.loadingTask.updateMessage("Rasterizing PDF: " + filePathTreeItem.getPathString());
+
+        ArrayList<Image> images = CommonUtilities.createImageFromPDF(filePathTreeItem.getPathString());
+        for (int i = 0; i < images.size(); i++) {
+            ImageView imageView = new ImageView(images.get(i));
+            imageView.setPreserveRatio(true);
+            imageView.fitWidthProperty().bind(mainController.rightPaneScrollPane.widthProperty());
+
+            imageViews.add(imageView);
+        }
     }
 
     public static void displayAudioUI(MainController mainController) {
@@ -247,8 +350,6 @@ public class Utilities {
 
                             mainController.startPlayingMedia(mainController.mainTableView.getItems().get(currentIndex), true, false);
 
-//                            mainController.mainTableView.scrollTo(mainController.mainTableView.getItems().get(currentIndex));
-
                             break;
                         } else {
                             System.out.println(nextFile.getFileName() + " no match");
@@ -272,9 +373,9 @@ public class Utilities {
                 mainController.currentTimeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()));
                 mainController.totalTimeLabel.setText(CommonUtilities.formatDuration(mp.getTotalDuration()));
                 if (swipeRight) {
-                    if (mainController.removeSliderMediaControl.isSelected()){
+                    if (mainController.removeSliderMediaControl.isSelected()) {
                         mainController.volumeAndCurrentTimeSwipeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()) + " of " + CommonUtilities.formatDuration(mp.getTotalDuration()));
-                    } else{
+                    } else {
                         mainController.volumeAndCurrentTimeSwipeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()));
                     }
                 }
@@ -340,10 +441,6 @@ public class Utilities {
         initEffects(mainController.playPositionSlider);
         initEffects(mainController.mediaPlayerControls);
         initEffects(mainController.volumeAndCurrentTimeSwipeLabel);
-
-//        initEffects(mainController.currentTimeLabel);
-//        initEffects(mainController.totalTimeLabel);
-
     }
 
     private static void initEffects(Node node) {
