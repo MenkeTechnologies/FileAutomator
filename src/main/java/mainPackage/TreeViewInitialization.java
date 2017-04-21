@@ -25,7 +25,7 @@ public class TreeViewInitialization {
             e.printStackTrace();
         }
 
-        Image image = new Image("file:src/main/java/png/computer.png", true);
+        Image image = new Image(mainController.getClass().getResourceAsStream("/png/computer.png"));
 
         TreeItem<String> rootnode = new TreeItem<>(hostName, new ImageView(image));
         Iterable<Path> rootDirectories = FileSystems.getDefault().getRootDirectories();

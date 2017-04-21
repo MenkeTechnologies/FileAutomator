@@ -117,6 +117,8 @@ public class Utilities {
 
     public static void updateThumbnailRightSidePane(MainController mainController, FilePathTreeItem filePathTreeItem) {
 
+        System.gc();
+
         Platform.runLater(() -> {
             if (mainController.rightPaneMediaView.getMediaPlayer() != null) {
                 mainController.rightPaneMediaView.getMediaPlayer().stop();
@@ -174,7 +176,7 @@ public class Utilities {
                 addToView(mainController.rightPaneImageView);
                 addToView(mainController.volumeAndCurrentTimeSwipeLabel);
 
-                mainController.rightPaneImageView.setImage(FilePathTreeItem.musicLargeImage);
+                mainController.rightPaneImageView.setImage(filePathTreeItem.musicLargeImage);
                 Media m = new Media(fileInfo.toURI().toString());
 
                 mainController.mediaPlayer = new MediaPlayer(m);

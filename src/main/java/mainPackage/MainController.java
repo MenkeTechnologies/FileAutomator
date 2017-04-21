@@ -100,7 +100,7 @@ public class MainController implements Initializable {
     public Button fullScreenMediaButton;
     public HBox topHBox;
     public HBox bottomHBox;
-    static MediaPlayer mediaPlayer = new MediaPlayer(new Media(new File("src/main/resources/ClosedHH.wav").toURI().toString()));
+    static MediaPlayer mediaPlayer;
     public VBox rightSidePaneTextVBox;
     public HBox topSecondHBox;
     public ToggleButton lockMediaView;
@@ -130,7 +130,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        mediaPlayer =  new MediaPlayer(new Media(getClass().getResource("/ClosedHH.wav").toExternalForm()));
         Double scalingFactor = 7d;
 
         sphere = new Cylinder(2 * scalingFactor, 2 * scalingFactor);
@@ -470,7 +470,7 @@ public class MainController implements Initializable {
             mediaPlayer.volumeProperty().bind(mediaPlayerVolumeProperty);
 
             playMediaButton.graphicProperty().bind(Bindings.when(mediaPlayer.statusProperty().isEqualTo(MediaPlayer.Status.PLAYING))
-                    .then(new ImageView(new Image("file:src/main/resources/png/pause.png"))).otherwise(new ImageView(new Image("file:src/main/resources/png/play.png"))));
+                    .then(new ImageView(new Image(getClass().getResourceAsStream("/png/pause.png")))).otherwise(new ImageView(new Image(getClass().getResourceAsStream("/png/play.png")))));
             play2XFasterButton.setOnAction(e -> {
                 if (mediaPlayerRateProperty.get() < 8) {
                     mediaPlayerRateProperty.set(mediaPlayerRateProperty.get() + 0.25);
@@ -517,7 +517,7 @@ public class MainController implements Initializable {
                                 Utilities.removeFromView(mediaPlayerControls);
                             });
                         }
-                    }, 1000);
+                    }, 3000);
 
                 }
             });

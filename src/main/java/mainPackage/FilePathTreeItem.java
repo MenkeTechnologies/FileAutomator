@@ -20,16 +20,19 @@ import java.util.Iterator;
  * Created by jacobmenke on 4/13/17.
  */
 public class FilePathTreeItem extends TreeItem<String> {
-    public static Image folderCollapseImage = new Image("file:src/main/java/png/folderClosed.png", true);
-    public static Image folderExpandImage = new Image("file:src/main/java/png/folderOpen.png", true);
-    public static Image fileImage = new Image("file:src/main/java/png/file.png", true);
-    public static Image homeImage = new Image("file:src/main/java/png/home.png", true);
-    public static Image pictureImage = new Image("file:src/main/java/png/picture.png", true);
-    public static Image movieImage = new Image("file:src/main/java/png/movie.png", true);
-    public static Image musicImage = new Image("file:src/main/java/png/music.png", true);
-    public static Image musicLargeImage = new Image("file:src/main/java/png/music-large.png", true);
+    public  Image folderCollapseImage = new Image(this.getClass().getResourceAsStream("/png/folderClosed.png"));
+    public  Image folderExpandImage = new Image(getClass().getResourceAsStream("/png/folderOpen.png"));
+    public  Image fileImage = new Image(getClass().getResourceAsStream("/png/file.png"));
+    public  Image homeImage = new Image(getClass().getResourceAsStream("/png/home.png"));
+    public  Image pictureImage = new Image(getClass().getResourceAsStream("/png/picture.png"));
+    public  Image movieImage = new Image(getClass().getResourceAsStream("/png/movie.png"));
+    public  Image musicImage = new Image(getClass().getResourceAsStream("/png/music.png"));
+    public  Image musicLargeImage = new Image(getClass().getResourceAsStream("/png/music-large.png"));
+
     private String fullPath;
+
     boolean isDirectory;
+
     private String type;
 
     public String getType() {

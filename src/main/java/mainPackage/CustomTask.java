@@ -61,6 +61,7 @@ public class CustomTask<T> extends Task<String> {
     @Override
     protected String call() throws Exception {
 
+
         executorService = Executors.newSingleThreadExecutor();
         future = executorService.submit(r);
         System.out.println("called and submitting to executor");
@@ -87,7 +88,9 @@ public class CustomTask<T> extends Task<String> {
 
         }
 
-//        executorService.shutdownNow();
+        executorService.shutdownNow();
+
+        System.gc();
 
         return "Completed";
     }
