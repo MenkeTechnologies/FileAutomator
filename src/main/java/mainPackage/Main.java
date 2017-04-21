@@ -24,10 +24,10 @@ import java.util.prefs.Preferences;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
+//
+//        URL url = new File("src/main/java/mainPackage/main.fxml").toURL();
 
-        URL url = new File("src/main/java/mainPackage/main.fxml").toURL();
-
-        FXMLLoader loader = new FXMLLoader(url);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
 
         Parent root = loader.load();
 

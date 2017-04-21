@@ -8,6 +8,7 @@ import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Comparator;
 
 /**
@@ -28,19 +29,21 @@ public class TableViewUtilities {
 
 //                        FileInfo fileInfo = (FileInfo)this.getTableRow().getItem();
 
+                            FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(""),null);
+
                             switch (FilePathTreeItem.getFileType(item)) {
                                 case "music":
-                                    setGraphic(new ImageView(FilePathTreeItem.musicImage));
+                                    setGraphic(new ImageView(filePathTreeItem.musicImage));
                                     break;
                                 case "image":
-                                    setGraphic(new ImageView(FilePathTreeItem.pictureImage));
+                                    setGraphic(new ImageView(filePathTreeItem.pictureImage));
                                     break;
                                 case "video":
-                                    setGraphic(new ImageView(FilePathTreeItem.movieImage));
+                                    setGraphic(new ImageView(filePathTreeItem.movieImage));
                                     break;
                                 case "text":
                                 case "file":
-                                    setGraphic(new ImageView(FilePathTreeItem.fileImage));
+                                    setGraphic(new ImageView(filePathTreeItem.fileImage));
                                     break;
                             }
                         }
