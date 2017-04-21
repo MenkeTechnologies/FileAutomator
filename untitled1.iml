@@ -12,9 +12,28 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="groovy-sdk-2.4.10" level="application" />
+    <orderEntry type="library" name="jPDFViewerFX" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.5" level="project" />
     <orderEntry type="library" name="Maven: com.aquafx-project:aquafx:0.1" level="project" />
     <orderEntry type="library" name="Maven: com.guigarage:flatter:0.7" level="project" />
     <orderEntry type="library" name="Maven: org.aerofx:aerofx:0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.15" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi:3.15" level="project" />
+    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.10" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-collections4:4.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:3.15" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:2.6.0" level="project" />
+    <orderEntry type="library" name="Maven: stax:stax-api:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.04" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-scratchpad:3.15" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pdfbox:pdfbox:2.0.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pdfbox:fontbox:2.0.5" level="project" />
+    <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pdfbox:pdfbox-tools:2.0.0-RC1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pdfbox:pdfbox-debugger:2.0.0-RC1" level="project" />
+    <orderEntry type="library" name="Maven: org.jpedal:OpenViewerFX:7.11.31" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.birt.runtime.3_7_1:org.mozilla.javascript:1.7.2" level="project" />
+    <orderEntry type="library" name="Maven: bouncycastle:bcprov-jdk16:140" level="project" />
+    <orderEntry type="library" name="Maven: bouncycastle:bcmail-jdk16:140" level="project" />
   </component>
 </module>

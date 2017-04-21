@@ -20,19 +20,28 @@ import java.util.Iterator;
  * Created by jacobmenke on 4/13/17.
  */
 public class FilePathTreeItem extends TreeItem<String> {
-    public  Image folderCollapseImage = new Image(this.getClass().getResourceAsStream("/png/folderClosed.png"));
-    public  Image folderExpandImage = new Image(getClass().getResourceAsStream("/png/folderOpen.png"));
-    public  Image fileImage = new Image(getClass().getResourceAsStream("/png/file.png"));
-    public  Image homeImage = new Image(getClass().getResourceAsStream("/png/home.png"));
-    public  Image pictureImage = new Image(getClass().getResourceAsStream("/png/picture.png"));
-    public  Image movieImage = new Image(getClass().getResourceAsStream("/png/movie.png"));
-    public  Image musicImage = new Image(getClass().getResourceAsStream("/png/music.png"));
-    public  Image musicLargeImage = new Image(getClass().getResourceAsStream("/png/music-large.png"));
+    public static Image folderCollapseImage = new Image(MainController.class.getResourceAsStream("/png/folderClosed.png"));
+    public static Image folderExpandImage = new Image(MainController.class.getResourceAsStream("/png/folderOpen.png"));
+    public static Image fileImage = new Image(MainController.class.getResourceAsStream("/png/file.png"));
+    public static Image homeImage = new Image(MainController.class.getResourceAsStream("/png/home.png"));
+    public static Image pictureImage = new Image(MainController.class.getResourceAsStream("/png/picture.png"));
+    public static Image movieImage = new Image(MainController.class.getResourceAsStream("/png/movie.png"));
+    public static Image musicImage = new Image(MainController.class.getResourceAsStream("/png/music.png"));
+    public static Image musicLargeImage = new Image(MainController.class.getResourceAsStream("/png/music-large.png"));
+    public static Image documentImage = new Image(MainController.class.getResourceAsStream("/png/word.png"));
+    public static Image excelImage = new Image(MainController.class.getResourceAsStream("/png/excel.png"));
+    public static Image pythonImage = new Image(MainController.class.getResourceAsStream("/png/py.png"));
+    public static Image rubyImage = new Image(MainController.class.getResourceAsStream("/png/ruby.png"));
+    public static Image javaImage = new Image(MainController.class.getResourceAsStream("/png/java.png"));
+    public static Image jsImage = new Image(MainController.class.getResourceAsStream("/png/js.png"));
+    public static Image htmlImage = new Image(MainController.class.getResourceAsStream("/png/html.png"));
+    public static Image xmlImage = new Image(MainController.class.getResourceAsStream("/png/xml.png"));
+    public static Image pdfImage = new Image(MainController.class.getResourceAsStream("/png/pdf.png"));
+    public static Image cssImage = new Image(MainController.class.getResourceAsStream("/png/css.png"));
+
 
     private String fullPath;
-
     boolean isDirectory;
-
     private String type;
 
     public String getType() {
@@ -79,7 +88,6 @@ public class FilePathTreeItem extends TreeItem<String> {
 
             type = getFileType(pathName);
 
-
             switch (type) {
                 case "music":
                     setGraphic(new ImageView(musicImage));
@@ -89,6 +97,37 @@ public class FilePathTreeItem extends TreeItem<String> {
                     break;
                 case "video":
                     setGraphic(new ImageView(movieImage));
+                    break;
+                case "word":
+                    setGraphic(new ImageView(documentImage));
+                    break;
+                case "excel":
+                    setGraphic(new ImageView(excelImage));
+                    break;
+                case "js":
+                    setGraphic(new ImageView(jsImage));
+                    break;
+                case "java":
+                case "jar":
+                    setGraphic(new ImageView(javaImage));
+                    break;
+                case "css":
+                    setGraphic(new ImageView(cssImage));
+                    break;
+                case "html":
+                    setGraphic(new ImageView(htmlImage));
+                    break;
+                case "pdf":
+                    setGraphic(new ImageView(pdfImage));
+                    break;
+                case "xml":
+                    setGraphic(new ImageView(xmlImage));
+                    break;
+                case "ruby":
+                    setGraphic(new ImageView(rubyImage));
+                    break;
+                case "python":
+                    setGraphic(new ImageView(pythonImage));
                     break;
                 case "text":
                 case "file":
@@ -139,7 +178,6 @@ public class FilePathTreeItem extends TreeItem<String> {
     static public String getFileType(String pathName) {
         String type = "";
 
-
         if (pathName.lastIndexOf('.') > 0) {
             String fileType = pathName.substring(pathName.lastIndexOf('.') + 1);
 
@@ -148,38 +186,67 @@ public class FilePathTreeItem extends TreeItem<String> {
                 case "jpg":
                 case "jpeg":
                 case "svg":
-
                     type = "image";
                     break;
                 case "mp4":
                 case "mov":
                     type = "video";
                     break;
-                case "txt":
                 case "java":
-                case "c":
-                case "cpp":
-                case "h":
+                    type = "java";
+                    break;
                 case "py":
-                case "pl":
-                case "tcl":
-                case "json":
+                    type = "python";
+                    break;
                 case "rb":
-                case "swift":
+                    type = "ruby";
+                    break;
+                case "json":
                 case "js":
-                case "html":
-                case "xml":
-                case "plist":
-                case "css":
-                case "conf":
+                    type = "js";
+                    break;
                 case "fxml":
-                    type = "text";
+                case "xml":
+                    type = "xml";
+                    break;
+                case "pdf":
+                    type = "pdf";
+                    break;
+                case "html":
+                    type = "html";
+                    break;
+                case "css":
+                    type = "css";
                     break;
                 case "mp3":
                 case "wav":
                 case "aiff":
                 case "flac":
                     type = "music";
+                    break;
+
+                case "doc":
+                case "docx":
+                    type = "word";
+                    break;
+                case "xls":
+                case "xlsx":
+                    type = "excel";
+                    break;
+                case "pl":
+                case "tcl":
+                case "txt":
+                case "c":
+                case "cpp":
+                case "h":
+                case "swift":
+
+                case "plist":
+                case "conf":
+                    type = "text";
+                    break;
+                case "jar":
+                    type = "jar";
                     break;
 
                 default:

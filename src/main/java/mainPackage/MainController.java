@@ -48,6 +48,8 @@ import java.util.prefs.Preferences;
 
 import javafx.scene.text.Font;
 import javafx.util.Duration;
+import org.jpedal.examples.viewer.OpenViewerFX;
+import org.jpedal.examples.viewer.SharedViewer;
 
 public class MainController implements Initializable {
     public TableView mainTableView;
@@ -115,6 +117,7 @@ public class MainController implements Initializable {
     public MenuButton menuButtonAdd;
     public Cylinder sphere;
     public PointLight pointLight;
+    public VBox imagesVBox;
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
@@ -130,7 +133,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        mediaPlayer =  new MediaPlayer(new Media(getClass().getResource("/ClosedHH.wav").toExternalForm()));
+        mediaPlayer = new MediaPlayer(new Media(getClass().getResource("/ClosedHH.wav").toExternalForm()));
         Double scalingFactor = 7d;
 
         sphere = new Cylinder(2 * scalingFactor, 2 * scalingFactor);
@@ -404,44 +407,47 @@ public class MainController implements Initializable {
 
             mediaStackPane.setOnScroll(e -> {
 
-                if (Math.abs(e.getDeltaY()) > 4) {
-                    Utilities.swipeRight = false;
+                FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
+                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music")) {
+                    if (Math.abs(e.getDeltaY()) > 4) {
+                        Utilities.swipeRight = false;
 
-                    double changeY = e.getDeltaY() * -1;
-                    double scalingFactor = 0.005;
+                        double changeY = e.getDeltaY() * -1;
+                        double scalingFactor = 0.005;
 
-                    double changeTo = changeY * scalingFactor + volumeSlider.getValue();
+                        double changeTo = changeY * scalingFactor + volumeSlider.getValue();
 
-                    if (changeTo < 1 || changeTo > 0) {
-                        volumeSlider.valueProperty().set(changeTo);
-                        volumeSlider.setValueChanging(true);
-                        volumeSlider.setValueChanging(false);
-                    }
-                }
-
-                if (mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(0)) && mediaPlayer.getCurrentTime().lessThan(mediaPlayer.getTotalDuration().subtract(Duration.seconds(2)))) {
-                    if (Math.abs(e.getDeltaX()) > 4) {
-                        Utilities.swipeRight = true;
-                        double changeX = e.getDeltaX();
-                        double scalingFactorX = 0.001;
-                        double changeToX = changeX * scalingFactorX;
-
-                        if (changeToX < 1 || changeToX > 0) {
-                            volumeAndCurrentTimeSwipeLabel.setVisible(true);
-                            Duration newDuration = Duration.millis(changeToX * mediaPlayer.getTotalDuration().toMillis()).add(mediaPlayer.getCurrentTime());
-                            if (newDuration.toMillis() < 0) newDuration = Duration.ZERO;
-                            if (newDuration.greaterThan(mediaPlayer.getTotalDuration())) {
-                                newDuration = mediaPlayer.getTotalDuration();
-                                mediaPlayer.pause();
-                            }
-
-                            mediaPlayer.seek(newDuration);
+                        if (changeTo < 1 || changeTo > 0) {
+                            volumeSlider.valueProperty().set(changeTo);
+                            volumeSlider.setValueChanging(true);
+                            volumeSlider.setValueChanging(false);
                         }
-                        hideNodeAfterDelay(volumeAndCurrentTimeSwipeLabel);
                     }
-                }
 
-                e.consume();
+                    if (mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(0)) && mediaPlayer.getCurrentTime().lessThan(mediaPlayer.getTotalDuration().subtract(Duration.seconds(2)))) {
+                        if (Math.abs(e.getDeltaX()) > 4) {
+                            Utilities.swipeRight = true;
+                            double changeX = e.getDeltaX();
+                            double scalingFactorX = 0.001;
+                            double changeToX = changeX * scalingFactorX;
+
+                            if (changeToX < 1 || changeToX > 0) {
+                                volumeAndCurrentTimeSwipeLabel.setVisible(true);
+                                Duration newDuration = Duration.millis(changeToX * mediaPlayer.getTotalDuration().toMillis()).add(mediaPlayer.getCurrentTime());
+                                if (newDuration.toMillis() < 0) newDuration = Duration.ZERO;
+                                if (newDuration.greaterThan(mediaPlayer.getTotalDuration())) {
+                                    newDuration = mediaPlayer.getTotalDuration();
+                                    mediaPlayer.pause();
+                                }
+
+                                mediaPlayer.seek(newDuration);
+                            }
+                            hideNodeAfterDelay(volumeAndCurrentTimeSwipeLabel);
+                        }
+                    }
+
+                    e.consume();
+                }
             });
 
             volumeSlider.valueChangingProperty().addListener(new ChangeListener<Boolean>() {
@@ -493,7 +499,7 @@ public class MainController implements Initializable {
                     disappearTimer.schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            Platform.runLater(()->{
+                            Platform.runLater(() -> {
                                 Utilities.removeFromView(mediaPlayerControls);
                             });
                         }
@@ -501,28 +507,28 @@ public class MainController implements Initializable {
                 }
             });
 
-            mediaStackPane.setOnMouseMoved(e->{
+            mediaStackPane.setOnMouseMoved(e -> {
 
-                if (!mediaPlayerControls.isVisible()){
-                    Utilities.addToView(mediaPlayerControls);
+                FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
+                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music")) {
 
-                } else {
-                    disappearTimer.cancel();
-                    disappearTimer.purge();
-                    disappearTimer = new Timer();
-                    disappearTimer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            Platform.runLater(()->{
-                                Utilities.removeFromView(mediaPlayerControls);
-                            });
-                        }
-                    }, 3000);
-
+                    if (!mediaPlayerControls.isVisible()) {
+                        Utilities.addToView(mediaPlayerControls);
+                    } else {
+                        disappearTimer.cancel();
+                        disappearTimer.purge();
+                        disappearTimer = new Timer();
+                        disappearTimer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                Platform.runLater(() -> {
+                                    Utilities.removeFromView(mediaPlayerControls);
+                                });
+                            }
+                        }, 3000);
+                    }
                 }
             });
-
-
 
             mediaStackPane.setOnMouseExited(e -> {
                 FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
@@ -672,22 +678,19 @@ public class MainController implements Initializable {
         if (searchingTask.getState() != Task.State.RUNNING) {
             Utilities.addToView(sphere);
             timeline.play();
-//           Utilities.addToView(thinkingIndicator);
+            System.out.println("started secondary");
             stopCurrentSearchButton.setText("Stop Load");
+            loadingTask = new CustomTask<String>(this, r, false);
+        } else {
+            loadingTask = new CustomTask<String>(this, r, true);
+
         }
 
-        loadingTask = new CustomTask<String>(this, r, true);
+
+
         loadingFileLabel.textProperty().bind(MainController.loadingTask.messageProperty());
 
         Thread thread = new Thread(loadingTask);
-
-        if (searchingTask.getState() != Task.State.RUNNING) {
-            Platform.runLater(() -> {
-
-                Utilities.removeFromView(sphere);
-                timeline.stop();
-            });
-        }
 
         thread.start();
     }

@@ -26,6 +26,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
 //
 //        URL url = new File("src/main/java/mainPackage/main.fxml").toURL();
+        System.out.println("temp dir = " + System.getProperty("java.io.tmpdir"));
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
 
