@@ -48,8 +48,6 @@ import java.util.prefs.Preferences;
 
 import javafx.scene.text.Font;
 import javafx.util.Duration;
-import org.jpedal.examples.viewer.OpenViewerFX;
-import org.jpedal.examples.viewer.SharedViewer;
 
 public class MainController implements Initializable {
     public TableView mainTableView;
@@ -359,7 +357,7 @@ public class MainController implements Initializable {
 //        thinkingIndicator.progressProperty().bind(searchingTask.progressProperty());
         stopCurrentSearchButton.visibleProperty().bind(sphere.visibleProperty());
         stopCurrentSearchButton.managedProperty().bind(sphere.managedProperty());
-        searchButton.disableProperty().bind(sphere.visibleProperty());
+        searchButton.disableProperty().bind(searchingTask.runningProperty());
         activityIndicatorLabel.textProperty().bind(searchingTask.messageProperty());
         loadingFileLabel.textProperty().bind(loadingTask.messageProperty());
 
@@ -371,7 +369,9 @@ public class MainController implements Initializable {
                 searchingTask.getFuture().cancel(true);
             }
             if (loadingTask.getFuture() != null) {
-                loadingTask.getFuture().cancel(true);
+                if (stopCurrentSearchButton.getText().equals("Stop Load")) {
+                    loadingTask.getFuture().cancel(true);
+                }
             }
         });
         currentTimeLabel.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(0.15));
@@ -515,17 +515,19 @@ public class MainController implements Initializable {
                     if (!mediaPlayerControls.isVisible()) {
                         Utilities.addToView(mediaPlayerControls);
                     } else {
-                        disappearTimer.cancel();
-                        disappearTimer.purge();
-                        disappearTimer = new Timer();
-                        disappearTimer.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                Platform.runLater(() -> {
-                                    Utilities.removeFromView(mediaPlayerControls);
-                                });
-                            }
-                        }, 3000);
+                        if (disappearTimer != null) {
+                            disappearTimer.cancel();
+                            disappearTimer.purge();
+                            disappearTimer = new Timer();
+                            disappearTimer.schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    Platform.runLater(() -> {
+                                        Utilities.removeFromView(mediaPlayerControls);
+                                    });
+                                }
+                            }, 3000);
+                        }
                     }
                 }
             });
@@ -683,10 +685,7 @@ public class MainController implements Initializable {
             loadingTask = new CustomTask<String>(this, r, false);
         } else {
             loadingTask = new CustomTask<String>(this, r, true);
-
         }
-
-
 
         loadingFileLabel.textProperty().bind(MainController.loadingTask.messageProperty());
 

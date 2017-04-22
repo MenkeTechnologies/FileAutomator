@@ -236,7 +236,7 @@
                         <TextField fx:id="directoryToSearchTextField" prefHeight="27.0" prefWidth="300.0"
                                    promptText="Source Directory"/>
                         <Button fx:id="searchButton" defaultButton="true" mnemonicParsing="false"
-                                onAction="#searchForFile" text="Search"/>
+                                onAction="#searchForFile" id="search"/>
                         <Button onAction="#findDirectoryInTree" text="Find In Tree"/>
                         <Button mnemonicParsing="false" onAction="#chooseDir" text="Choose"/>
                         <Button mnemonicParsing="false" text="Move All"/>
