@@ -1,5 +1,8 @@
 package mainPackage;
 
+import com.terminalfx.TerminalBuilder;
+import com.terminalfx.TerminalTab;
+import com.terminalfx.config.TerminalConfig;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -18,8 +21,10 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -48,17 +53,46 @@ public class Utilities {
     public static BooleanProperty maximized = new SimpleBooleanProperty(false);
     static String textContent = null;
     static Image image = null;
+    static  boolean fromAutoPlay = false;
 
     public static void initMenuBar(MenuBar menuBar, Scene scene, Stage stage) {
         Menu file = menuBar.getMenus().get(0);
 
         Scene oldScene = menuBar.getScene();
-        Group group = new Group();
+        VBox group = new VBox();
+
+        Button cleanUpButton = new Button("Clean up");
+        cleanUpButton.setOnAction(e->{
+            try {
+                Files.walk(Paths.get(System.getProperty("java.io.tmpdir"))).forEach(path->{
+                    path.toFile().delete();
+                });
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            MainController.loadingTask.updateMessage("Cleaning old resources.");
+        });
 
         MenuBar menuBar1 = new MenuBar();
         menuBar1.getMenus().addAll(menuBar.getMenus());
 
-        group.getChildren().addAll(new Button("text"), menuBar1);
+        TerminalBuilder terminalBuilder = new TerminalBuilder();
+        TerminalTab terminal = terminalBuilder.newTerminal();
+
+        TerminalConfig darkConfig = new TerminalConfig();
+        darkConfig.setBackgroundColor(Color.rgb(16, 16, 16));
+        darkConfig.setForegroundColor(Color.rgb(240, 240, 240));
+        darkConfig.setCursorColor(Color.rgb(255, 0, 0, 0.5));
+
+        TerminalBuilder terminalBuilder1 = new TerminalBuilder(darkConfig);
+        TerminalTab terminalTab = terminalBuilder1.newTerminal();
+
+
+        TabPane tabPane = new TabPane();
+        tabPane.getTabs().addAll(terminal, terminalTab);
+
+
+        group.getChildren().addAll(cleanUpButton, menuBar1, tabPane, new Label("cool"));
 //        Scene newScene = new Scene(group, oldScene.getWidth(), oldScene.getHeight());
         Parent root = scene.getRoot();
 
@@ -327,7 +361,6 @@ public class Utilities {
     }
 
     private static void checkForAutoPlay(MainController mainController, FileInfo fileInfo) {
-        Integer tableIndex = mainController.mainTableView.getItems().indexOf(fileInfo);
 
         mainController.mediaPlayer.setOnEndOfMedia(() -> {
 
@@ -340,20 +373,34 @@ public class Utilities {
             } else {
 
                 if (mainController.autoplayCheckbox.isSelected()) {
-                    Integer currentIndex = tableIndex;
+                    File currentlyPlayingFile = new FileInfo(mainController.pathLabelContent.getText());
+                    System.out.println(mainController.filesForAutoplay);
+//                    System.out.println("playFile = " + currentlyPlayingFile);
 
-                    while (currentIndex + 1 < mainController.mainTableView.getItems().size()) {
-                        currentIndex++;
-                        FileInfo nextFile = (FileInfo) mainController.mainTableView.getItems().get(currentIndex);
-                        String type = FilePathTreeItem.getFileType(nextFile.getAbsolutePath());
-                        if (type.equals("music") || type.equals("video")) {
+                    Integer currentIndex = 0;
 
-                            mainController.startPlayingMedia(mainController.mainTableView.getItems().get(currentIndex), true, false);
+                    if (mainController.filesForAutoplay.indexOf(currentlyPlayingFile) >= 0) {
+                        currentIndex = mainController.filesForAutoplay.indexOf(currentlyPlayingFile);
 
-                            break;
-                        } else {
-                            System.out.println(nextFile.getFileName() + " no match");
+                        while (currentIndex + 1 < mainController.filesForAutoplay.size()) {
+                            currentIndex++;
+                            FileInfo nextFile = mainController.filesForAutoplay.get(currentIndex);
+
+//                        System.out.println("next file is " + nextFile);
+                            String type = FilePathTreeItem.getFileType(nextFile.getAbsolutePath());
+                            if (type.equals("music") || type.equals("video")) {
+
+                                fromAutoPlay = true;
+
+                                mainController.startPlayingMedia(nextFile, true, false);
+
+                                break;
+                            } else {
+                                System.out.println(nextFile.getFileName() + " no match");
+                            }
                         }
+                    } else {
+                        mainController.startPlayingMedia(mainController.filesForAutoplay.get(currentIndex), true, false);
                     }
                 }
             }
@@ -500,6 +547,7 @@ public class Utilities {
         MenuItem sendToDestinationDirectoryTextFieldItem = new MenuItem("Send to Destination Text Field");
         MenuItem showInTreeView = new MenuItem("Show in Tree View");
         MenuItem playInRightPane = new MenuItem("Play in Right Pane");
+        MenuItem updateAutoPlaylist = new MenuItem("Update Auto Playlist With Contents Of Table");
 
         rowContextMenu.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem, copyAbsolutePathItem, sendToSourceDirectoryTextFieldItem, sendToDestinationDirectoryTextFieldItem);
 
@@ -507,6 +555,12 @@ public class Utilities {
 
             rowContextMenu.getItems().add(showInTreeView);
         }
+
+        rowContextMenu.getItems().add(updateAutoPlaylist);
+
+        updateAutoPlaylist.setOnAction(e->{
+            mainController.storeFileList(null);
+        });
 
         rowContextMenu.getItems().addAll(playInRightPane);
 

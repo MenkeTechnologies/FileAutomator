@@ -4,6 +4,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 
@@ -15,7 +16,7 @@ import java.util.Comparator;
  * Created by jacobmenke on 4/16/17.
  */
 public class TableViewUtilities {
-    static public void initTableViewColumns(TableView mainTableView) {
+    static public void initTableViewColumns(TableView mainTableView, MainController mainController) {
         TableColumn<FileInfo, String> filesColumn = new TableColumn<>("File Name");
         filesColumn.setPrefWidth(150);
         filesColumn.setCellFactory(new Callback<TableColumn<FileInfo, String>, TableCell<FileInfo, String>>() {
@@ -27,57 +28,33 @@ public class TableViewUtilities {
                         if (item != null) {
                             setText(item);
 
-                            FileInfo fileInfo = (FileInfo) this.getTableRow().getItem();
+                            FileInfo fileAtRow = (FileInfo) this.getTableRow().getItem();
 
-                            if (fileInfo != null && fileInfo.isDirectory()) {
-                                setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
-                            } else {
-                                switch (FilePathTreeItem.getFileType(item)) {
-                                    case "music":
-                                        setGraphic(new ImageView(FilePathTreeItem.musicImage));
-                                        break;
-                                    case "image":
-                                        setGraphic(new ImageView(FilePathTreeItem.pictureImage));
-                                        break;
-                                    case "video":
-                                        setGraphic(new ImageView(FilePathTreeItem.movieImage));
-                                        break;
-                                    case "word":
-                                        setGraphic(new ImageView(FilePathTreeItem.documentImage));
-                                        break;
-                                    case "excel":
-                                        setGraphic(new ImageView(FilePathTreeItem.excelImage));
-                                        break;
-                                    case "jar":
-                                    case "java":
-                                        setGraphic(new ImageView(FilePathTreeItem.javaImage));
-                                        break;
-                                    case "js":
-                                        setGraphic(new ImageView(FilePathTreeItem.jsImage));
-                                        break;
-                                    case "py":
-                                        setGraphic(new ImageView(FilePathTreeItem.pythonImage));
-                                        break;
-                                    case "ruby":
-                                        setGraphic(new ImageView(FilePathTreeItem.rubyImage));
-                                        break;
-                                    case "html":
-                                        setGraphic(new ImageView(FilePathTreeItem.htmlImage));
-                                        break;
-                                    case "css":
-                                        setGraphic(new ImageView(FilePathTreeItem.cssImage));
-                                        break;
+//                            FileInfo playingFile = null;
+//                            if (mainController.pathLabelContent != null && mainController.pathLabelContent.getText() != "") {
+//                                playingFile = new FileInfo(mainController.pathLabelContent.getText());
+//                            }
 
-                                    case "pdf":
-                                        setGraphic(new ImageView(FilePathTreeItem.pdfImage));
-                                        break;
-                                    case "xml":
-                                        setGraphic(new ImageView(FilePathTreeItem.xmlImage));
-                                        break;
-                                    case "text":
-                                    case "file":
-                                        setGraphic(new ImageView(FilePathTreeItem.fileImage));
-                                        break;
+//                            if (fileAtRow != null) {
+
+//                                if (fileAtRow.equals(playingFile) && mainController.showPlayingIconCheckbox.isSelected()) {
+//                                    setGraphic(new ImageView(FilePathTreeItem.playingImage));
+//                                }
+//                            } else {
+                            if (fileAtRow != null) {
+
+                                if (fileAtRow.isDirectory()) {
+                                    setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
+                                } else {
+
+                                    String type = FilePathTreeItem.getFileType(fileAtRow.getAbsolutePath());
+
+                                    System.out.println(type);
+                                    Image image = FilePathTreeItem.getImageFromType(type);
+
+                                    System.out.println(image);
+
+                                    setGraphic(new ImageView(image));
                                 }
                             }
                         }

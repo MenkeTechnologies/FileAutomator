@@ -91,7 +91,6 @@ public class MainController implements Initializable {
     public Label mediaPlayerRateLabel;
     public StackPane mediaStackPane;
     public Slider volumeSlider;
-    public Button stopMediaButton;
     public Button playMediaButton;
     public Label currentTimeLabel;
     public Label totalTimeLabel;
@@ -116,12 +115,14 @@ public class MainController implements Initializable {
     public Cylinder sphere;
     public PointLight pointLight;
     public VBox imagesVBox;
+    public CheckBox showPlayingIconCheckbox;
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
     boolean hidden = false;
     static CustomTask<String> searchingTask;
     static CustomTask<String> loadingTask;
+    static CustomTask<String> rasterizingTask;
     public DoubleProperty mediaPlayerRateProperty = new SimpleDoubleProperty(1);
     public DoubleProperty mediaPlayerVolumeProperty = new SimpleDoubleProperty(1);
     Double[] dividerPositions = {0d, 0d};
@@ -129,8 +130,12 @@ public class MainController implements Initializable {
     Timeline timeline;
     Timer disappearTimer;
 
+    ObservableList<FileInfo> filesForAutoplay = FXCollections.observableArrayList();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+
         mediaPlayer = new MediaPlayer(new Media(getClass().getResource("/ClosedHH.wav").toExternalForm()));
         Double scalingFactor = 7d;
 
@@ -181,7 +186,7 @@ public class MainController implements Initializable {
 
         mainTableView.setItems(files);
 
-        TableViewUtilities.initTableViewColumns(mainTableView);
+        TableViewUtilities.initTableViewColumns(mainTableView,this);
 
         mainTableView.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
             if (e.isSecondaryButtonDown()) {
@@ -196,6 +201,8 @@ public class MainController implements Initializable {
         });
 
         mainTableView.setOnMouseClicked(e -> {
+            Utilities.fromAutoPlay = false;
+
             if (e.getButton() == MouseButton.PRIMARY) {
 
                 Object item = mainTableView.getSelectionModel().getSelectedItem();
@@ -211,6 +218,8 @@ public class MainController implements Initializable {
         });
 
         mainTableView.setOnKeyReleased(e -> {
+            Utilities.fromAutoPlay = false;
+
             if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
                 Object item = mainTableView.getSelectionModel().getSelectedItem();
 
@@ -247,8 +256,6 @@ public class MainController implements Initializable {
 
         rightPaneScrollPane.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-
-                System.out.println("right click on media view");
 
                 ObservableList<FileInfo> list = mainTableView.getItems();
 
@@ -290,9 +297,12 @@ public class MainController implements Initializable {
         if (selectInTreeViewCheckBox.isSelected()) {
 
             if (!fromContext) {
-                runInBackgroundThreadSecondary(() -> {
-                    FilePathTreeItem.selectTreeItemRecursively(MainController.this, Paths.get(fileInfo.getAbsolutePath()), true);
-                });
+
+               if (!Utilities.fromAutoPlay){
+                   runInBackgroundThreadSecondary(() -> {
+                       FilePathTreeItem.selectTreeItemRecursively(MainController.this, Paths.get(fileInfo.getAbsolutePath()), true);
+                   });
+               }
             }
         }
 
@@ -351,7 +361,8 @@ public class MainController implements Initializable {
     public void initBindings() {
 
         mainTextField.setText("mp4");
-        RegexUtilities.searchAndRefresh(this);
+        //TODO init refresh
+//        RegexUtilities.searchAndRefresh(this);
         rightPaneMediaView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
         rightPaneImageView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
 //        thinkingIndicator.progressProperty().bind(searchingTask.progressProperty());
@@ -529,6 +540,32 @@ public class MainController implements Initializable {
                             }, 3000);
                         }
                     }
+                } else if (filePathTreeItem.getType().equals("pdf")) {
+
+                    //TODO full screen pdf
+//                    ObservableList<Node> nodes = mediaPlayerControls.getChildren();
+//                    if (!mediaPlayerControls.isVisible()) {
+//                        System.out.println(mediaPlayerControls.getChildren());
+//                        mediaPlayerControls.getChildren().remove(0,6);
+//                        mediaPlayerControls.getChildren().remove(9,10);
+//                        Utilities.addToView(mediaPlayerControls);
+//                    } else {
+//                        if (disappearTimer != null) {
+//                            disappearTimer.cancel();
+//                            disappearTimer.purge();
+//                            disappearTimer = new Timer();
+//                            disappearTimer.schedule(new TimerTask() {
+//                                @Override
+//                                public void run() {
+//                                    Platform.runLater(() -> {
+//                                        Utilities.removeFromView(mediaPlayerControls);
+//                                        mediaPlayerControls.getChildren().clear();
+//                                        mediaPlayerControls.getChildren().addAll(nodes);
+//                                    });
+//                                }
+//                            }, 3000);
+//                        }
+//                    }
                 }
             });
 
@@ -912,5 +949,29 @@ public class MainController implements Initializable {
         if (filterHBox.getChildren().size() > 1) {
             filterHBox.getChildren().remove(filterHBox.getChildren().size() - 1);
         }
+    }
+
+    public void storeFileList(ActionEvent actionEvent) {
+        if (autoplayCheckbox.isSelected()){
+mainTableView.refresh();
+            filesForAutoplay.clear();
+
+            for (int i = 0; i < mainTableView.getItems().size(); i++) {
+                filesForAutoplay.add((FileInfo)mainTableView.getItems().get(i));
+            }
+
+            System.out.println(filesForAutoplay);
+
+
+
+        }
+    }
+
+    public void showPlayingIcon(ActionEvent actionEvent) {
+        if (showPlayingIconCheckbox.isSelected()){
+            mainTableView.refresh();
+        }
+
+
     }
 }

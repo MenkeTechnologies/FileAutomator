@@ -8,6 +8,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -19,14 +20,17 @@ import org.aerofx.AeroFX;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.prefs.Preferences;
 
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-//
-//        URL url = new File("src/main/java/mainPackage/main.fxml").toURL();
-        System.out.println("temp dir = " + System.getProperty("java.io.tmpdir"));
+
+
+
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
 
@@ -45,6 +49,7 @@ public class Main extends Application {
 
         Scene scene = new Scene(root, 1800, 1200);
 
+
         mainController.initBindings();
         scene.widthProperty().addListener(new InvalidationListener() {
             @Override
@@ -62,7 +67,7 @@ public class Main extends Application {
 
         mainController.mainSplitPane.setDividerPositions(sp, sp2);
 
-        AquaFx.style();
+        //AquaFx.style();
 
         scene.getStylesheets().add("stylesheets/styles.css");
         primaryStage.setScene(scene);

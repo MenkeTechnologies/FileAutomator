@@ -149,14 +149,14 @@
                                                     </tooltip>
                                                 </ToggleButton>
                                                 <ToggleButton fx:id="autoPlayMediaControl" styleClass="mediaButtons"
-                                                              text="AutoPlay">
+                                                              id="autoplay" onAction="#storeFileList">
                                                     <tooltip>
                                                         <Tooltip text="Automatically Play Next Media In Table"/>
                                                     </tooltip>
                                                 </ToggleButton>
                                                 <ToggleButton fx:id="removeSliderMediaControl"
                                                               onAction="#removeSliderHBox" styleClass="mediaButtons"
-                                                              text="Remove Slider">
+                                                              id="hide">
                                                     <tooltip>
                                                         <Tooltip text="Hide Slider"/>
                                                     </tooltip>
@@ -237,8 +237,8 @@
                                    promptText="Source Directory"/>
                         <Button fx:id="searchButton" defaultButton="true" mnemonicParsing="false"
                                 onAction="#searchForFile" id="search"/>
-                        <Button onAction="#findDirectoryInTree" text="Find In Tree"/>
-                        <Button mnemonicParsing="false" onAction="#chooseDir" text="Choose"/>
+                        <Button onAction="#findDirectoryInTree" id="tree"/>
+                        <Button mnemonicParsing="false" onAction="#chooseDir" id="dialog"/>
                         <Button mnemonicParsing="false" text="Move All"/>
                         <Button layoutX="515.0" layoutY="10.0" mnemonicParsing="false" text="Delete All"/>
                         <Button layoutX="488.0" layoutY="10.0" mnemonicParsing="false" onAction="#copyAllButtonAction"
@@ -261,20 +261,22 @@
                 <HBox fx:id="bottomHBox" prefHeight="36.0" prefWidth="543.0" spacing="10.0"
                       BorderPane.alignment="CENTER">
                     <children>
-                        <Button onAction="#goToHomeDirectory" text="Home"/>
-                        <Button onAction="#goToDesktopDirectory" text="Desktop"/>
-                        <Button onAction="#goToDownloadsDirectory" text="Downloads"/>
+                        <Button onAction="#goToHomeDirectory" id="home"/>
+                        <Button onAction="#goToDesktopDirectory" id="desktop"/>
+                        <Button onAction="#goToDownloadsDirectory" id="downloads"/>
                         <Button onAction="#collapseAllTreeNodes" text="Collapse All"/>
-                        <Button onAction="#refreshTreeView" text="Refresh Tree View"/>
+                        <Button onAction="#refreshTreeView" id="refresh"/>
                         <CheckBox fx:id="caseInsensitiveMatchingCheckbox" mnemonicParsing="false"
                                   text="Case Insensitive Matching"/>
                         <CheckBox fx:id="pathMatchingCheckbox" mnemonicParsing="false" text="Path Matching"/>
 
                         <CheckBox fx:id="automaticSearchCheckBox" mnemonicParsing="false" text="Automatic Filtering"/>
-                        <CheckBox fx:id="selectInTreeViewCheckBox" selected="false" text="Select in Tree View"/>
+                        <CheckBox fx:id="selectInTreeViewCheckBox" selected="false" id="tree"/>
                         <CheckBox fx:id="showHiddenFilesCheckBox" mnemonicParsing="false" text="Show Hidden Files"/>
                         <CheckBox fx:id="hideDirectoriesCheckBox" text="Hide Directories"/>
-                        <CheckBox fx:id="autoplayCheckbox" text="Autoplay"/>
+                        <CheckBox fx:id="autoplayCheckbox" id="autoplay" onAction="#storeFileList"/>
+                        <CheckBox fx:id="showPlayingIconCheckbox" onAction="#showPlayingIcon" text="Show Playing Icon"/>
+
 
                         <HBox>
                             <children>

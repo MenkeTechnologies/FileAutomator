@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -38,11 +40,19 @@ public class FilePathTreeItem extends TreeItem<String> {
     public static Image xmlImage = new Image(MainController.class.getResourceAsStream("/png/xml.png"));
     public static Image pdfImage = new Image(MainController.class.getResourceAsStream("/png/pdf.png"));
     public static Image cssImage = new Image(MainController.class.getResourceAsStream("/png/css.png"));
-
-
+    public static Image aiImage = new Image(MainController.class.getResourceAsStream("/png/ai.png"));
+    public static Image psdImage = new Image(MainController.class.getResourceAsStream("/png/psd.png"));
+    public static Image txtImage = new Image(MainController.class.getResourceAsStream("/png/txt.png"));
+    public static Image dlImage = new Image(MainController.class.getResourceAsStream("/png/dl.png"));
+    public static Image desktopImage = new Image(MainController.class.getResourceAsStream("/png/desktop.png"));
+    public static Image playingImage = new Image(MainController.class.getResourceAsStream("/png/playing.png"));
     private String fullPath;
     boolean isDirectory;
     private String type;
+    String home = System.getProperty("user.home");
+    String downloads = System.getProperty("user.home") + File.separator + "Downloads";
+    String desktop = System.getProperty("user.home") + File.separator + "Desktop";
+    ArrayList<String> specialDirs = new ArrayList<>();
 
     public String getType() {
         return type;
@@ -72,14 +82,24 @@ public class FilePathTreeItem extends TreeItem<String> {
 
     public FilePathTreeItem(Path file, MainController mainController) {
         super(file.toString());
+
+        specialDirs.addAll(Arrays.asList(home, desktop, downloads));
+
         this.fullPath = file.toString();
         this.mainController = mainController;
 
         if (Files.isDirectory(file)) {
             isDirectory = true;
-            if (getPathString().equals(System.getProperty("user.home"))) {
+            if (getPathString().equals(home)) {
                 setGraphic(new ImageView(homeImage));
+            } else if (getPathString().equals(downloads)) {
+
+                setGraphic(new ImageView(dlImage));
+            } else if (getPathString().equals(desktop)) {
+
+                setGraphic(new ImageView(desktopImage));
             } else {
+
                 setGraphic(new ImageView(folderCollapseImage));
             }
             type = "directory";
@@ -88,52 +108,8 @@ public class FilePathTreeItem extends TreeItem<String> {
 
             type = getFileType(pathName);
 
-            switch (type) {
-                case "music":
-                    setGraphic(new ImageView(musicImage));
-                    break;
-                case "image":
-                    setGraphic(new ImageView(pictureImage));
-                    break;
-                case "video":
-                    setGraphic(new ImageView(movieImage));
-                    break;
-                case "word":
-                    setGraphic(new ImageView(documentImage));
-                    break;
-                case "excel":
-                    setGraphic(new ImageView(excelImage));
-                    break;
-                case "js":
-                    setGraphic(new ImageView(jsImage));
-                    break;
-                case "java":
-                case "jar":
-                    setGraphic(new ImageView(javaImage));
-                    break;
-                case "css":
-                    setGraphic(new ImageView(cssImage));
-                    break;
-                case "html":
-                    setGraphic(new ImageView(htmlImage));
-                    break;
-                case "pdf":
-                    setGraphic(new ImageView(pdfImage));
-                    break;
-                case "xml":
-                    setGraphic(new ImageView(xmlImage));
-                    break;
-                case "ruby":
-                    setGraphic(new ImageView(rubyImage));
-                    break;
-                case "python":
-                    setGraphic(new ImageView(pythonImage));
-                    break;
-                case "text":
-                case "file":
-                    setGraphic(new ImageView(fileImage));
-                    break;
-            }
+            setGraphic(new ImageView(FilePathTreeItem.getImageFromType(type)));
+
         }
 
         if (!fullPath.endsWith(File.separator)) {
@@ -151,7 +127,15 @@ public class FilePathTreeItem extends TreeItem<String> {
             public void handle(Event event) {
                 FilePathTreeItem source = (FilePathTreeItem) event.getSource();
                 if (source.isDirectory() && source.isExpanded()) {
-                    if (!source.getPathString().equals(System.getProperty("user.home"))) {
+
+                    boolean isSpecial = false;
+                    for (int i = 0; i < specialDirs.size(); i++) {
+                        if (specialDirs.get(i).equals(source.getPathString())) {
+                            isSpecial = true;
+                        }
+                    }
+
+                    if (!isSpecial) {
                         ImageView iv = (ImageView) source.getGraphic();
                         iv.setImage(folderExpandImage);
                     }
@@ -166,7 +150,16 @@ public class FilePathTreeItem extends TreeItem<String> {
             public void handle(Event event) {
                 FilePathTreeItem source = (FilePathTreeItem) event.getSource();
                 if (source.isDirectory() && !source.isExpanded()) {
-                    if (!source.getPathString().equals(System.getProperty("user.home"))) {
+
+                    boolean isSpecial = false;
+                    for (int i = 0; i < specialDirs.size(); i++) {
+                        if (specialDirs.get(i).equals(source.getPathString())) {
+                            isSpecial = true;
+                        }
+                    }
+
+                    if (!isSpecial) {
+
                         ImageView iv = (ImageView) source.getGraphic();
                         iv.setImage(folderCollapseImage);
                     }
@@ -176,7 +169,7 @@ public class FilePathTreeItem extends TreeItem<String> {
     }
 
     static public String getFileType(String pathName) {
-        String type = "";
+        String type = "file";
 
         if (pathName.lastIndexOf('.') > 0) {
             String fileType = pathName.substring(pathName.lastIndexOf('.') + 1);
@@ -187,6 +180,12 @@ public class FilePathTreeItem extends TreeItem<String> {
                 case "jpeg":
                 case "svg":
                     type = "image";
+                    break;
+                case "psd":
+                    type = "psd";
+                    break;
+                case "ai":
+                    type = "ai";
                     break;
                 case "mp4":
                 case "mov":
@@ -233,22 +232,20 @@ public class FilePathTreeItem extends TreeItem<String> {
                 case "xlsx":
                     type = "excel";
                     break;
-                case "pl":
-                case "tcl":
                 case "txt":
-                case "c":
-                case "cpp":
-                case "h":
-                case "swift":
-
-                case "plist":
-                case "conf":
                     type = "text";
                     break;
                 case "jar":
                     type = "jar";
                     break;
-
+                case "pl":
+                case "tcl":
+                case "c":
+                case "cpp":
+                case "h":
+                case "swift":
+                case "plist":
+                case "conf":
                 default:
                     type = "file";
                     break;
@@ -406,5 +403,49 @@ public class FilePathTreeItem extends TreeItem<String> {
             }
             filePathTreeItem.recurseAndSelectTreeItems(path.iterator(), checkForExpanded, mainController);
         });
+    }
+
+    static Image getImageFromType(String type) {
+        switch (type) {
+            case "music":
+                return FilePathTreeItem.musicImage;
+
+            case "image":
+                return FilePathTreeItem.pictureImage;
+
+            case "video":
+                return FilePathTreeItem.movieImage;
+            case "word":
+                return FilePathTreeItem.documentImage;
+            case "excel":
+                return FilePathTreeItem.excelImage;
+            case "js":
+                return FilePathTreeItem.jsImage;
+            case "java":
+            case "jar":
+                return FilePathTreeItem.javaImage;
+            case "css":
+                return FilePathTreeItem.cssImage;
+            case "html":
+                return FilePathTreeItem.htmlImage;
+            case "pdf":
+                return FilePathTreeItem.pdfImage;
+            case "ai":
+                return FilePathTreeItem.aiImage;
+            case "psd":
+                return FilePathTreeItem.psdImage;
+            case "xml":
+                return FilePathTreeItem.xmlImage;
+            case "ruby":
+                return FilePathTreeItem.rubyImage;
+            case "python":
+                return FilePathTreeItem.pythonImage;
+            case "text":
+                return FilePathTreeItem.txtImage;
+            case "file":
+                return FilePathTreeItem.fileImage;
+            default:
+                return null;
+        }
     }
 }
