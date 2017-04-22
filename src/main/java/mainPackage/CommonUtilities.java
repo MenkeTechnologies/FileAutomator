@@ -53,12 +53,17 @@ public class CommonUtilities {
             Integer dpi = 72;
 
             PDFRenderer pdfRenderer = new PDFRenderer(document);
+
             String temp = System.getProperty("java.io.tmpdir");
             String fileName = temp + File.separator + Paths.get(destinationFile.getAbsolutePath()).getFileName();
 
             for (int i = 0; i < document.getNumberOfPages(); i++) {
+
+
                 String addition = "-" + (i + 1) + ".png";
                 if (!new File(fileName + addition).exists()) {
+                    MainController.loadingTask.updateMessage("Rastering " + pathString + " page "+ (i+1) + " of " + document.getNumberOfPages() + ".");
+
 
                     BufferedImage bim = pdfRenderer.renderImageWithDPI(i, dpi, ImageType.RGB);
 
@@ -68,6 +73,8 @@ public class CommonUtilities {
 
                     images.add(image);
                 } else {
+                    MainController.loadingTask.updateMessage("Loading " + pathString + " page "+ (i+1) + " of " + document.getNumberOfPages() + ".");
+
                     Image image = new Image("file:" + fileName+addition);
 
                     images.add(image);
