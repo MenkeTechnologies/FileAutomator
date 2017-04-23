@@ -16,9 +16,9 @@ import static mainPackage.CustomTableRow.changeToolTipTime;
 /**
  * Created by jacobmenke on 4/15/17.
  */
-public class TextFieldTreeCellImpl extends TreeCell {
+public class CustomTreeCell extends TreeCell {
 
-    public TextFieldTreeCellImpl(TreeView fileBrowserTreeTable, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
+    public CustomTreeCell(TreeView fileBrowserTreeTable, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
 
         this.setOnMouseClicked(e->{
             if (e.getButton() == MouseButton.SECONDARY){

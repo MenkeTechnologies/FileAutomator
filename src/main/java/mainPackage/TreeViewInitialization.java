@@ -5,7 +5,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.util.Callback;
 
 import java.io.IOException;
@@ -65,12 +64,7 @@ public class TreeViewInitialization {
         });
 
 
-        mainController.mainTableView.setRowFactory(new Callback<TableView, TableRow>() {
-            @Override
-            public TableRow call(TableView param) {
-                return new CustomTableRow(mainController.mainTableView, mainController.files, mainController);
-            }
-        });
+
 
 //        mainController.mainTableView.setRowFactory(new Callback() {
 //
@@ -95,7 +89,7 @@ public class TreeViewInitialization {
             @Override
             public TreeCell call(TreeView param) {
 
-                return new TextFieldTreeCellImpl(mainController.fileBrowserTreeTable, mainController.mainTableView, mainController.files, mainController);
+                return new CustomTreeCell(mainController.fileBrowserTreeTable, mainController.mainTableView, mainController.files, mainController);
 
             }
         });

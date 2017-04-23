@@ -51,7 +51,7 @@ import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 public class MainController implements Initializable {
-    public TableView mainTableView;
+    public TableView<FileInfo> mainTableView;
     public TextField mainTextField;
     public TextField directoryToSearchTextField;
     public SplitPane mainSplitPane;
