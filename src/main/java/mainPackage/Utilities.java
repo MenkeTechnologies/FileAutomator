@@ -150,7 +150,11 @@ public class Utilities {
 
     public static void updateThumbnailRightSidePane(MainController mainController, FilePathTreeItem filePathTreeItem) {
         System.gc();
-        MainController.loadingTask.updateMessage("Loading File: " + filePathTreeItem.getPath().getFileName());
+
+        if (!filePathTreeItem.getType().equals("pdf")){
+            MainController.loadingTask.updateMessage("Loading File: " + filePathTreeItem.getPath().getFileName());
+        }
+
         //loading phase
         String fileType = filePathTreeItem.getType();
 
@@ -170,14 +174,14 @@ public class Utilities {
                 getImageViewsFromPDF(mainController, filePathTreeItem);
                 break;
             case "jar":
-                textContent = CommonUtilities.invokeCommandLineAndReturnString("jar", "tf", filePathTreeItem.getPathString());
 
+                textContent = CommonUtilities.createLineNumberingFromString(CommonUtilities.invokeCommandLineAndReturnString("jar", "tf", filePathTreeItem.getPathString()), mainController);
                 break;
             case "excel":
-                textContent = MicrosoftUtilities.getStringFromExcelDocument(filePathTreeItem.getPathString());
+                textContent = CommonUtilities.createLineNumberingFromString(MicrosoftUtilities.getStringFromExcelDocument(filePathTreeItem.getPathString()), mainController);
                 break;
             case "word":
-                textContent = MicrosoftUtilities.getStringFromWordDocument(filePathTreeItem.getPathString());
+                textContent = CommonUtilities.createLineNumberingFromString(MicrosoftUtilities.getStringFromWordDocument(filePathTreeItem.getPathString()), mainController);
                 break;
             case "java":
             case "js":
@@ -188,7 +192,8 @@ public class Utilities {
             case "css":
             case "text":
                 try {
-                    textContent = new String(Files.readAllBytes(filePathTreeItem.getPath()));
+                    textContent = CommonUtilities.createLineNumberingFromString(new String(Files.readAllBytes(filePathTreeItem.getPath())), mainController);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -201,7 +206,6 @@ public class Utilities {
 
         Platform.runLater(() -> {
 
-            MainController.loadingTask.updateMessage("Clearing Items");
 
             removeFromView(mainController.mediaStackPane);
             removeFromView(mainController.rightPaneMediaView);
@@ -220,11 +224,8 @@ public class Utilities {
 
             mainController.imagesVBox.getChildren().clear();
 
-            MainController.loadingTask.updateMessage("Loading File: " + filePathTreeItem.getPath().getFileName());
-
             mainController.fileNameLabelMediaControls.setText("Playing " + filePathTreeItem.getPath().getFileName().toString());
 
-            System.out.println("on Thread " + Thread.currentThread().getName());
 
             switch (fileType) {
 
@@ -326,7 +327,7 @@ public class Utilities {
 
     public static void getImageViewsFromPDF(MainController mainController, FilePathTreeItem filePathTreeItem) {
         imageViews = new ArrayList<>();
-        mainController.loadingTask.updateMessage("Rasterizing PDF: " + filePathTreeItem.getPathString());
+        mainController.loadingTask.updateMessage("Rasterizing PDF: " + filePathTreeItem.getPath().getFileName());
 
         ArrayList<Image> images = CommonUtilities.createImageFromPDF(filePathTreeItem.getPathString());
         for (int i = 0; i < images.size(); i++) {

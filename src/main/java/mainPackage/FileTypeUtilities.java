@@ -4,6 +4,40 @@ package mainPackage;
  * Created by jacobmenke on 4/22/17.
  */
 public class FileTypeUtilities {
+    public static boolean determineIfTextual(String type) {
+        switch (type){
+            case "pdf":
+            case "java":
+            case "py":
+            case "json":
+            case "rb":
+            case "js":
+            case "fxml":
+            case "xml":
+            case "html":
+            case "css":
+            case "doc":
+            case "docx":
+            case "xls":
+            case "xlsx":
+            case "txt":
+            case "jar":
+            case "pl":
+            case "tcl":
+            case "c":
+            case "cpp":
+            case "h":
+            case "swift":
+            case "plist":
+            case "conf":
+                return true;
+            default:
+                return false;
+
+        }
+
+    }
+
     static public String getFileType(String pathName) {
         String type = "file";
 

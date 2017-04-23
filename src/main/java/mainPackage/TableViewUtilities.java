@@ -2,6 +2,7 @@ package mainPackage;
 
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -65,6 +66,8 @@ public class TableViewUtilities {
                 return tableCell;
             }
         });
+
+
         filesColumn.setCellValueFactory(new PropertyValueFactory<FileInfo, String>("fileName"));
 
         TableColumn<FileInfo, String> pathColumn = new TableColumn<>("File Path");
@@ -99,12 +102,17 @@ public class TableViewUtilities {
             }
         });
 
+        TableColumn<FileInfo, String> fileTypeColumn = new TableColumn<>("File Type");
+        fileTypeColumn.setCellValueFactory(new PropertyValueFactory<>("fileType"));
+
+
         TableColumn<FileInfo, Boolean> hiddenColumn = new TableColumn<>("Hidden");
         hiddenColumn.setCellValueFactory(new PropertyValueFactory<FileInfo, Boolean>("hiddenProperty"));
 
         TableColumn<FileInfo, String> dateTimeTableColumn = new TableColumn<>("Last Modified");
         dateTimeTableColumn.setCellValueFactory(new PropertyValueFactory<FileInfo, String>("lastModified"));
 
-        mainTableView.getColumns().addAll(filesColumn, pathColumn, fileSizeColumn, dateTimeTableColumn, hiddenColumn, directoryColumn);
+        mainTableView.getColumns().addAll(filesColumn, pathColumn, fileSizeColumn, dateTimeTableColumn, fileTypeColumn,hiddenColumn, directoryColumn);
+
     }
 }

@@ -116,6 +116,9 @@ public class MainController implements Initializable {
     public PointLight pointLight;
     public VBox imagesVBox;
     public CheckBox showPlayingIconCheckbox;
+    public CheckBox showPlayingIconTreeCheckbox;
+    public CheckBox showLineNumbersCheckbox;
+    public HBox showPlayinIconTreeHBox;
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
@@ -271,6 +274,14 @@ public class MainController implements Initializable {
         initCheckBoxes();
 
         initTasks();
+
+        initToolTips();
+    }
+
+    private void initToolTips() {
+
+        Tooltip.install(showPlayinIconTreeHBox, new Tooltip("Change Icon of Playing File in File Browser"));
+
     }
 
     public void startPlayingMediaFromTree(Object item) {
@@ -285,7 +296,7 @@ public class MainController implements Initializable {
             Utilities.updateThumbnailRightSidePane(MainController.this, filePathTreeItem);
         });
 
-        if (showPlayingIconCheckbox.isSelected()){
+        if (showPlayingIconTreeCheckbox.isSelected()){
             runInBackgroundThreadSecondary(()->{
                 FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(filePathTreeItem.getPathString()), true);
             });
@@ -317,7 +328,7 @@ public class MainController implements Initializable {
 
         if (playInRightPane) {
 
-            if (showPlayingIconCheckbox.isSelected()){
+            if (showPlayingIconTreeCheckbox.isSelected()){
                 runInBackgroundThreadSecondary(()->{
                     FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(fileInfo.getAbsolutePath()), true);
                 });
@@ -990,13 +1001,31 @@ public class MainController implements Initializable {
     }
 
     public void showPlayingIcon(ActionEvent actionEvent) {
-        if (showPlayingIconCheckbox.isSelected()){
-            mainTableView.refresh();
+        mainTableView.refresh();
+
+        if (showPlayingIconTreeCheckbox.isSelected()){
             fileBrowserTreeTable.refresh();
 
             FileInfo fileInfo = new FileInfo(pathLabelContent.getText());
 
             FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this,Paths.get(fileInfo.getAbsolutePath()),true );
+        }
+
+
+    }
+
+    public void showLineNumbers(ActionEvent actionEvent) {
+
+        if (pathLabelContent != null) {
+
+            FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
+
+            if (filePathTreeItem.isTextual()){
+                Utilities.updateThumbnailRightSidePane(this, filePathTreeItem);
+
+            }
+
+
         }
 
 
