@@ -130,7 +130,7 @@ public class MainController implements Initializable {
     Timeline timeline;
     Timer disappearTimer;
 
-    ObservableList<FileInfo> filesForAutoplay = FXCollections.observableArrayList();
+    ArrayList<String> filesForAutoplay = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -284,6 +284,13 @@ public class MainController implements Initializable {
         runInBackgroundThreadSecondary(() -> {
             Utilities.updateThumbnailRightSidePane(MainController.this, filePathTreeItem);
         });
+
+        if (showPlayingIconCheckbox.isSelected()){
+            runInBackgroundThreadSecondary(()->{
+                FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(filePathTreeItem.getPathString()), true);
+            });
+        }
+
     }
 
     public void startPlayingMedia(Object item, boolean playInRightPane, boolean fromContext) {
@@ -300,13 +307,21 @@ public class MainController implements Initializable {
 
                if (!Utilities.fromAutoPlay){
                    runInBackgroundThreadSecondary(() -> {
-                       FilePathTreeItem.selectTreeItemRecursively(MainController.this, Paths.get(fileInfo.getAbsolutePath()), true);
+                       FilePathTreeItem.selectTreeItemRecursively(this, Paths.get(fileInfo.getAbsolutePath()), true);
                    });
                }
             }
         }
 
+
+
         if (playInRightPane) {
+
+            if (showPlayingIconCheckbox.isSelected()){
+                runInBackgroundThreadSecondary(()->{
+                    FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(fileInfo.getAbsolutePath()), true);
+                });
+            }
             updateRightSidePane(fileInfo);
 
             runInBackgroundThreadSecondary(() -> {
@@ -368,7 +383,7 @@ public class MainController implements Initializable {
 //        thinkingIndicator.progressProperty().bind(searchingTask.progressProperty());
         stopCurrentSearchButton.visibleProperty().bind(sphere.visibleProperty());
         stopCurrentSearchButton.managedProperty().bind(sphere.managedProperty());
-        searchButton.disableProperty().bind(searchingTask.runningProperty());
+
         activityIndicatorLabel.textProperty().bind(searchingTask.messageProperty());
         loadingFileLabel.textProperty().bind(loadingTask.messageProperty());
 
@@ -378,6 +393,7 @@ public class MainController implements Initializable {
         stopCurrentSearchButton.setOnAction(e -> {
             if (searchingTask.getFuture() != null) {
                 searchingTask.getFuture().cancel(true);
+
             }
             if (loadingTask.getFuture() != null) {
                 if (stopCurrentSearchButton.getText().equals("Stop Load")) {
@@ -617,6 +633,10 @@ public class MainController implements Initializable {
 
             lastModifiedLabelContent.setText(Utilities.formatDate(fileInfo.lastModified()));
         }
+
+        if (showPlayingIconCheckbox.isSelected()){
+            mainTableView.refresh();
+        }
     }
 
     private void initCheckBoxes() {
@@ -641,6 +661,7 @@ public class MainController implements Initializable {
     }
 
     private void refreshTreeViewFromBottom() {
+
 
     }
 
@@ -704,6 +725,8 @@ public class MainController implements Initializable {
 
         searchingTask = new CustomTask<>(this, r, false);
         activityIndicatorLabel.textProperty().bind(searchingTask.messageProperty());
+
+        searchButton.disableProperty().bind(searchingTask.runningProperty());
 
         searchingTask.setRunnable(r);
 
@@ -953,16 +976,15 @@ public class MainController implements Initializable {
 
     public void storeFileList(ActionEvent actionEvent) {
         if (autoplayCheckbox.isSelected()){
-mainTableView.refresh();
+            mainTableView.refresh();
             filesForAutoplay.clear();
 
             for (int i = 0; i < mainTableView.getItems().size(); i++) {
-                filesForAutoplay.add((FileInfo)mainTableView.getItems().get(i));
+
+                FileInfo file = (FileInfo) mainTableView.getItems().get(i);
+                filesForAutoplay.add(file.getAbsolutePath());
+
             }
-
-            System.out.println(filesForAutoplay);
-
-
 
         }
     }
@@ -970,6 +992,11 @@ mainTableView.refresh();
     public void showPlayingIcon(ActionEvent actionEvent) {
         if (showPlayingIconCheckbox.isSelected()){
             mainTableView.refresh();
+            fileBrowserTreeTable.refresh();
+
+            FileInfo fileInfo = new FileInfo(pathLabelContent.getText());
+
+            FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this,Paths.get(fileInfo.getAbsolutePath()),true );
         }
 
 

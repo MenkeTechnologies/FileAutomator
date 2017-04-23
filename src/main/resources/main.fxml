@@ -275,7 +275,7 @@
                         <CheckBox fx:id="showHiddenFilesCheckBox" mnemonicParsing="false" text="Show Hidden Files"/>
                         <CheckBox fx:id="hideDirectoriesCheckBox" text="Hide Directories"/>
                         <CheckBox fx:id="autoplayCheckbox" id="autoplay" onAction="#storeFileList"/>
-                        <CheckBox fx:id="showPlayingIconCheckbox" onAction="#showPlayingIcon" text="Show Playing Icon"/>
+                        <CheckBox fx:id="showPlayingIconCheckbox" onAction="#showPlayingIcon" id="play"/>
 
 
                         <HBox>

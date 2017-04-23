@@ -8,8 +8,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.Comparator;
 
 /**
@@ -30,33 +28,36 @@ public class TableViewUtilities {
 
                             FileInfo fileAtRow = (FileInfo) this.getTableRow().getItem();
 
-//                            FileInfo playingFile = null;
-//                            if (mainController.pathLabelContent != null && mainController.pathLabelContent.getText() != "") {
-//                                playingFile = new FileInfo(mainController.pathLabelContent.getText());
-//                            }
+                            FileInfo playingFile = null;
+                            if (mainController.pathLabelContent != null && mainController.pathLabelContent.getText() != "") {
+                                playingFile = new FileInfo(mainController.pathLabelContent.getText());
+                            }
 
-//                            if (fileAtRow != null) {
-
-//                                if (fileAtRow.equals(playingFile) && mainController.showPlayingIconCheckbox.isSelected()) {
-//                                    setGraphic(new ImageView(FilePathTreeItem.playingImage));
-//                                }
-//                            } else {
                             if (fileAtRow != null) {
-
-                                if (fileAtRow.isDirectory()) {
-                                    setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
+                                if (playingFile != null) {
+                                    if (fileAtRow.getAbsolutePath().equals(playingFile.getAbsolutePath()) && mainController.showPlayingIconCheckbox.isSelected()) {
+                                        setGraphic(new ImageView(FilePathTreeItem.playingImage));
+                                    } else {
+                                        setDefaultGraphic(fileAtRow);
+                                    }
                                 } else {
 
-                                    String type = FilePathTreeItem.getFileType(fileAtRow.getAbsolutePath());
-
-                                    System.out.println(type);
-                                    Image image = FilePathTreeItem.getImageFromType(type);
-
-                                    System.out.println(image);
-
-                                    setGraphic(new ImageView(image));
+                                    setDefaultGraphic(fileAtRow);
                                 }
                             }
+                        }
+                    }
+
+                    private void setDefaultGraphic(FileInfo fileAtRow) {
+                        if (fileAtRow.isDirectory()) {
+                            setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
+                        } else {
+
+                            String type = FileTypeUtilities.getFileType(fileAtRow.getAbsolutePath());
+
+                            Image image = FilePathTreeItem.getImageFromType(type);
+
+                            setGraphic(new ImageView(image));
                         }
                     }
                 };
