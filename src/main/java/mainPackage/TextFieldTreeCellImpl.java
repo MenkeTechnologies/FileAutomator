@@ -22,8 +22,6 @@ public class TextFieldTreeCellImpl extends TreeCell<String> {
 
                 FilePathTreeItem filePathTreeItem = (FilePathTreeItem)this.getTreeItem();
 
-
-
                 FilePathTreeItem fileInfo = new FilePathTreeItem(Paths.get(filePathTreeItem.getPathString()),mainController);
                 ContextMenu cm = Utilities.createContextMenu(new FileInfo(fileInfo.getPathString()), mainTableView, files, mainController, "treeView");
 

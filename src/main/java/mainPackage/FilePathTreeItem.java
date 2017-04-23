@@ -56,6 +56,11 @@ public class FilePathTreeItem extends TreeItem<String> {
     String downloads = System.getProperty("user.home") + File.separator + "Downloads";
     String desktop = System.getProperty("user.home") + File.separator + "Desktop";
     ArrayList<String> specialDirs = new ArrayList<>();
+    private boolean isTextual;
+
+    public boolean isTextual() {
+        return isTextual;
+    }
 
     public String getType() {
         return type;
@@ -110,6 +115,8 @@ public class FilePathTreeItem extends TreeItem<String> {
             String pathName = getPathString().toLowerCase();
 
             type = FileTypeUtilities.getFileType(pathName);
+
+            isTextual = FileTypeUtilities.determineIfTextual(type);
 
             setGraphic(new ImageView(FilePathTreeItem.getImageFromType(type)));
         }
@@ -169,6 +176,7 @@ public class FilePathTreeItem extends TreeItem<String> {
             }
         });
     }
+
 
     public void populateSourceAndImmediateChildren(FilePathTreeItem source) {
 

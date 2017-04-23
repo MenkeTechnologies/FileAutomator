@@ -12,9 +12,21 @@ public class FileInfo extends File {
     private SimpleStringProperty fileName;
     private SimpleStringProperty filePath;
     private SimpleBooleanProperty directoryProperty;
-
     private SimpleLongProperty fileSize;
     private SimpleStringProperty lastModified;
+    private SimpleStringProperty fileType;
+
+    public String getFileType() {
+        return fileType.get();
+    }
+
+    public SimpleStringProperty fileTypeProperty() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType.set(fileType);
+    }
 
     Image fileImage;
 
@@ -112,6 +124,7 @@ public class FileInfo extends File {
         fileSize = new SimpleLongProperty(length());
         hiddenProperty = new SimpleBooleanProperty(isHidden());
         lastModified = new SimpleStringProperty(Utilities.formatDate(lastModified()));
+        fileType = new SimpleStringProperty(FileTypeUtilities.getFileType(getAbsolutePath()));
 
     }
 
@@ -135,6 +148,19 @@ public class FileInfo extends File {
 
     public String getFileName() {
         return fileName.get();
+    }
+
+    @Override
+    public String toString() {
+        return "FileInfo{" +
+                "fileName=" + fileName.get() +
+                ", filePath=" + filePath.get() +
+                ", directoryProperty=" + directoryProperty.get() +
+                ", fileSize=" + fileSize.get() +
+                ", lastModified=" + lastModified.get() +
+                ", fileType=" + fileType.get() +
+                ", hiddenProperty=" + hiddenProperty.get() +
+                "} " + super.toString();
     }
 
     public SimpleStringProperty fileNameProperty() {

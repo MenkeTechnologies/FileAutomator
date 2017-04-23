@@ -7,17 +7,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -28,9 +25,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -40,6 +35,27 @@ public class CommonUtilities {
     public static Integer index = 0;
     public static AtomicLong TOTAL_FILE_COUNTER = new AtomicLong(0);
     public static AtomicLong MATCHING_FILE_COUNTER = new AtomicLong(0);
+
+    public static String createLineNumberingFromString(String s, MainController mainController) {
+
+        Scanner scanner = new Scanner(s);
+
+        StringBuilder sb = new StringBuilder();
+        int counter = 0;
+
+        while (scanner.hasNextLine()){
+            if (mainController.showLineNumbersCheckbox.isSelected()){
+                counter++;
+                sb.append(counter).append("\t").append(scanner.nextLine()).append("\n");
+            } else {
+                sb.append(scanner.nextLine()).append("\n");
+            }
+
+        }
+
+        return sb.toString();
+
+    }
 
     public static ArrayList<Image> createImageFromPDF(String pathString) {
 
@@ -64,7 +80,6 @@ public class CommonUtilities {
                 if (!new File(fileName + addition).exists()) {
                     MainController.loadingTask.updateMessage("Rastering " + pathString + " page "+ (i+1) + " of " + document.getNumberOfPages() + ".");
 
-
                     BufferedImage bim = pdfRenderer.renderImageWithDPI(i, dpi, ImageType.RGB);
 
                     ImageIOUtil.writeImage(bim, fileName + addition, dpi);
@@ -73,7 +88,7 @@ public class CommonUtilities {
 
                     images.add(image);
                 } else {
-                    MainController.loadingTask.updateMessage("Loading " + pathString + " page "+ (i+1) + " of " + document.getNumberOfPages() + ".");
+                    MainController.loadingTask.updateMessage("Loading " + sourceFile.getName() + " page "+ (i+1) + " of " + document.getNumberOfPages() + ".");
 
                     Image image = new Image("file:" + fileName+addition);
 

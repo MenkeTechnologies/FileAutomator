@@ -64,21 +64,11 @@ public class TreeViewInitialization {
             }
         });
 
-        mainController.mainTableView.setRowFactory(new Callback<TableView<FileInfo>, TableRow<FileInfo>>() {
+
+        mainController.mainTableView.setRowFactory(new Callback<TableView, TableRow>() {
             @Override
-            public TableRow<FileInfo> call(TableView<FileInfo> param) {
-                TableRow<FileInfo> row = new TableRow<>();
-                row.setOnMouseClicked(e -> {
-                    if (e.getButton() == MouseButton.SECONDARY) {
-
-                        FileInfo selectedItem = row.getItem();
-
-                        ContextMenu cm = Utilities.createContextMenu(selectedItem, mainController.mainTableView, mainController.files, mainController, "tableView");
-                        cm.show(row, e.getScreenX(), e.getScreenY());
-                    }
-                });
-
-                return row;
+            public TableRow call(TableView param) {
+                return new CustomTableRow(mainController.mainTableView, mainController.files, mainController);
             }
         });
 
