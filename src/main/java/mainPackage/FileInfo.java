@@ -2,12 +2,8 @@ package mainPackage;
 
 import javafx.beans.property.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 import java.io.File;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 /**
  * Created by jacobmenke on 4/13/17.
@@ -128,7 +124,7 @@ public class FileInfo extends File {
     }
 
     private void initImage() {
-        String type = FilePathTreeItem.getFileType(getAbsolutePath());
+        String type = FileTypeUtilities.getFileType(getAbsolutePath());
         fileImage = getImageFromType(type);
     }
 

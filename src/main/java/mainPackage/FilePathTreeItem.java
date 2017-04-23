@@ -3,6 +3,7 @@ package mainPackage;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -46,6 +47,8 @@ public class FilePathTreeItem extends TreeItem<String> {
     public static Image dlImage = new Image(MainController.class.getResourceAsStream("/png/dl.png"));
     public static Image desktopImage = new Image(MainController.class.getResourceAsStream("/png/desktop.png"));
     public static Image playingImage = new Image(MainController.class.getResourceAsStream("/png/playing.png"));
+    public static FilePathTreeItem oldFilePathTreeItem = null;
+    public static Node oldPathGraphic = null;
     private String fullPath;
     boolean isDirectory;
     private String type;
@@ -106,10 +109,9 @@ public class FilePathTreeItem extends TreeItem<String> {
         } else {
             String pathName = getPathString().toLowerCase();
 
-            type = getFileType(pathName);
+            type = FileTypeUtilities.getFileType(pathName);
 
             setGraphic(new ImageView(FilePathTreeItem.getImageFromType(type)));
-
         }
 
         if (!fullPath.endsWith(File.separator)) {
@@ -166,95 +168,6 @@ public class FilePathTreeItem extends TreeItem<String> {
                 }
             }
         });
-    }
-
-    static public String getFileType(String pathName) {
-        String type = "file";
-
-        if (pathName.lastIndexOf('.') > 0) {
-            String fileType = pathName.substring(pathName.lastIndexOf('.') + 1);
-
-            switch (fileType) {
-                case "png":
-                case "jpg":
-                case "jpeg":
-                case "svg":
-                    type = "image";
-                    break;
-                case "psd":
-                    type = "psd";
-                    break;
-                case "ai":
-                    type = "ai";
-                    break;
-                case "mp4":
-                case "mov":
-                    type = "video";
-                    break;
-                case "java":
-                    type = "java";
-                    break;
-                case "py":
-                    type = "python";
-                    break;
-                case "rb":
-                    type = "ruby";
-                    break;
-                case "json":
-                case "js":
-                    type = "js";
-                    break;
-                case "fxml":
-                case "xml":
-                    type = "xml";
-                    break;
-                case "pdf":
-                    type = "pdf";
-                    break;
-                case "html":
-                    type = "html";
-                    break;
-                case "css":
-                    type = "css";
-                    break;
-                case "mp3":
-                case "wav":
-                case "aiff":
-                case "flac":
-                    type = "music";
-                    break;
-
-                case "doc":
-                case "docx":
-                    type = "word";
-                    break;
-                case "xls":
-                case "xlsx":
-                    type = "excel";
-                    break;
-                case "txt":
-                    type = "text";
-                    break;
-                case "jar":
-                    type = "jar";
-                    break;
-                case "pl":
-                case "tcl":
-                case "c":
-                case "cpp":
-                case "h":
-                case "swift":
-                case "plist":
-                case "conf":
-                default:
-                    type = "file";
-                    break;
-            }
-        } else {
-            //no file ending
-            type = "file";
-        }
-        return type;
     }
 
     public void populateSourceAndImmediateChildren(FilePathTreeItem source) {
@@ -349,17 +262,13 @@ public class FilePathTreeItem extends TreeItem<String> {
         }
     }
 
-    public void recurseAndSelectTreeItems(Iterator pathIterator, boolean checkForExpanded, MainController mainController) {
+    public void recurseAndSelectTreeItems(Iterator pathIterator, boolean checkForExpanded, MainController mainController, boolean select) {
         Path nextPath = (Path) pathIterator.next();
-//        System.out.println("next path is " + nextPath);
-//        System.out.println("original tree item is " + getPathString());
-//        System.out.println("children are " + getChildren());
 
         for (TreeItem<String> child : getChildren()) {
             String treePathName = child.getValue().toString().replace("/", "");
 
             if (treePathName.equals(nextPath.toString())) {
-//                System.out.println("treePathName " + treePathName + " equal " + nextPath);
 
                 FilePathTreeItem filePathTreeItem1 = (FilePathTreeItem) child;
                 child.setExpanded(true);
@@ -370,24 +279,42 @@ public class FilePathTreeItem extends TreeItem<String> {
                 }
                 if (pathIterator.hasNext()) {
 
-                    filePathTreeItem1.recurseAndSelectTreeItems(pathIterator, checkForExpanded, mainController);
+                    filePathTreeItem1.recurseAndSelectTreeItems(pathIterator, checkForExpanded, mainController, select);
                     break;
                 } else {
 
-                    mainController.fileBrowserTreeTable.getSelectionModel().select(child);
-                    mainController.fileBrowserTreeTable.scrollTo(mainController.fileBrowserTreeTable.getSelectionModel().getSelectedIndex() - 10);
-//                    System.out.println("Selecting..." + child);
+                    if (select) {
+
+                        Platform.runLater(() -> {
+                            mainController.fileBrowserTreeTable.getSelectionModel().select(child);
+                            mainController.fileBrowserTreeTable.scrollTo(mainController.fileBrowserTreeTable.getSelectionModel().getSelectedIndex() - 10);
+                        });
+                    } else {
+
+                        Platform.runLater(() -> {
+
+                            if (oldFilePathTreeItem != null) {
+
+                                oldFilePathTreeItem.setGraphic(oldPathGraphic);
+                            }
+
+                            oldPathGraphic = child.getGraphic();
+
+                            oldFilePathTreeItem = (FilePathTreeItem) child;
+
+                            child.setGraphic(new ImageView(FilePathTreeItem.playingImage));
+                            mainController.fileBrowserTreeTable.refresh();
+                        });
+                    }
                     break;
                 }
             } else {
-//                System.out.println("treePathName " + treePathName + " not equal " + nextPath.toString());
             }
         }
     }
 
     static void selectTreeItemRecursively(MainController mainController, Path path, boolean checkForExpanded) {
-
-        Platform.runLater(() -> {
+        Platform.runLater(()->{
             mainController.fileBrowserTreeTable.getRoot().setExpanded(true);
 
             mainController.root = (TreeItem) mainController.fileBrowserTreeTable.getRoot().getChildren().get(0);
@@ -401,8 +328,30 @@ public class FilePathTreeItem extends TreeItem<String> {
             } else {
                 filePathTreeItem.populateSourceAndImmediateChildrenSameThreadCheckingForExpanded(filePathTreeItem);
             }
-            filePathTreeItem.recurseAndSelectTreeItems(path.iterator(), checkForExpanded, mainController);
+            filePathTreeItem.recurseAndSelectTreeItems(path.iterator(), checkForExpanded, mainController, true);
+
         });
+
+    }
+
+    static void selectTreeItemRecursivelyAndChangeGraphic(MainController mainController, Path path, boolean checkForExpanded) {
+        Platform.runLater(()-> {
+            mainController.fileBrowserTreeTable.getRoot().setExpanded(true);
+
+            mainController.root = (TreeItem) mainController.fileBrowserTreeTable.getRoot().getChildren().get(0);
+            mainController.root.setExpanded(true);
+
+            FilePathTreeItem filePathTreeItem = (FilePathTreeItem) mainController.root;
+
+            if (!checkForExpanded) {
+                mainController.root.getChildren().clear();
+                filePathTreeItem.populateSourceAndImmediateChildrenSameThread(filePathTreeItem);
+            } else {
+                filePathTreeItem.populateSourceAndImmediateChildrenSameThreadCheckingForExpanded(filePathTreeItem);
+            }
+            filePathTreeItem.recurseAndSelectTreeItems(path.iterator(), checkForExpanded, mainController, false);
+        });
+
     }
 
     static Image getImageFromType(String type) {

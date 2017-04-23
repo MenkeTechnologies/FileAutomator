@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -53,7 +52,7 @@ public class Utilities {
     public static BooleanProperty maximized = new SimpleBooleanProperty(false);
     static String textContent = null;
     static Image image = null;
-    static  boolean fromAutoPlay = false;
+    static boolean fromAutoPlay = false;
 
     public static void initMenuBar(MenuBar menuBar, Scene scene, Stage stage) {
         Menu file = menuBar.getMenus().get(0);
@@ -62,9 +61,9 @@ public class Utilities {
         VBox group = new VBox();
 
         Button cleanUpButton = new Button("Clean up");
-        cleanUpButton.setOnAction(e->{
+        cleanUpButton.setOnAction(e -> {
             try {
-                Files.walk(Paths.get(System.getProperty("java.io.tmpdir"))).forEach(path->{
+                Files.walk(Paths.get(System.getProperty("java.io.tmpdir"))).forEach(path -> {
                     path.toFile().delete();
                 });
             } catch (IOException e1) {
@@ -87,10 +86,8 @@ public class Utilities {
         TerminalBuilder terminalBuilder1 = new TerminalBuilder(darkConfig);
         TerminalTab terminalTab = terminalBuilder1.newTerminal();
 
-
         TabPane tabPane = new TabPane();
         tabPane.getTabs().addAll(terminal, terminalTab);
-
 
         group.getChildren().addAll(cleanUpButton, menuBar1, tabPane, new Label("cool"));
 //        Scene newScene = new Scene(group, oldScene.getWidth(), oldScene.getHeight());
@@ -374,20 +371,17 @@ public class Utilities {
 
                 if (mainController.autoplayCheckbox.isSelected()) {
                     File currentlyPlayingFile = new FileInfo(mainController.pathLabelContent.getText());
-                    System.out.println(mainController.filesForAutoplay);
-//                    System.out.println("playFile = " + currentlyPlayingFile);
 
                     Integer currentIndex = 0;
 
-                    if (mainController.filesForAutoplay.indexOf(currentlyPlayingFile) >= 0) {
-                        currentIndex = mainController.filesForAutoplay.indexOf(currentlyPlayingFile);
+                    if (mainController.filesForAutoplay.indexOf(currentlyPlayingFile.getAbsolutePath()) >= 0) {
+                        currentIndex = mainController.filesForAutoplay.indexOf(currentlyPlayingFile.getAbsolutePath());
 
                         while (currentIndex + 1 < mainController.filesForAutoplay.size()) {
                             currentIndex++;
-                            FileInfo nextFile = mainController.filesForAutoplay.get(currentIndex);
+                            FileInfo nextFile = new FileInfo(mainController.filesForAutoplay.get(currentIndex));
 
-//                        System.out.println("next file is " + nextFile);
-                            String type = FilePathTreeItem.getFileType(nextFile.getAbsolutePath());
+                            String type = FileTypeUtilities.getFileType(nextFile.getAbsolutePath());
                             if (type.equals("music") || type.equals("video")) {
 
                                 fromAutoPlay = true;
@@ -400,7 +394,8 @@ public class Utilities {
                             }
                         }
                     } else {
-                        mainController.startPlayingMedia(mainController.filesForAutoplay.get(currentIndex), true, false);
+
+                        mainController.startPlayingMedia(new FileInfo(mainController.filesForAutoplay.get(currentIndex)), true, false);
                     }
                 }
             }
@@ -558,7 +553,7 @@ public class Utilities {
 
         rowContextMenu.getItems().add(updateAutoPlaylist);
 
-        updateAutoPlaylist.setOnAction(e->{
+        updateAutoPlaylist.setOnAction(e -> {
             mainController.storeFileList(null);
         });
 

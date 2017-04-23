@@ -73,6 +73,12 @@ public class RegexUtilities {
 
             Files.walk(Paths.get(directory)).forEach(file -> {
 
+                if (MainController.searchingTask.getFuture().isCancelled()) {
+
+                    throw new RuntimeException();
+                }
+
+
                 CommonUtilities.TOTAL_FILE_COUNTER.incrementAndGet();
 
                 String fileName;
@@ -108,10 +114,6 @@ public class RegexUtilities {
                             sb.append(".*").append(next);
                         }
 
-                        if (MainController.searchingTask.getFuture().isCancelled()) {
-
-                            throw new RuntimeException();
-                        }
 
                         String regexString = sb.toString();
 

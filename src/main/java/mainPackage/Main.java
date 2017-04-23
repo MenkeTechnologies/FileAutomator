@@ -67,7 +67,7 @@ public class Main extends Application {
 
         mainController.mainSplitPane.setDividerPositions(sp, sp2);
 
-        //AquaFx.style();
+        AquaFx.style();
 
         scene.getStylesheets().add("stylesheets/styles.css");
         primaryStage.setScene(scene);
