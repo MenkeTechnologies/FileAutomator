@@ -51,6 +51,7 @@ public class Main extends Application {
 
 
         mainController.initBindings();
+
         scene.widthProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {

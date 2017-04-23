@@ -384,6 +384,11 @@
                                 <Tooltip text="Show Line Numbers for Files with Text"/>
                             </tooltip>
                         </CheckBox>
+                        <CheckBox fx:id="showReflectionCheckbox" onAction="#showReflection" id="reflection" selected="true">
+                            <tooltip>
+                                <Tooltip text="Show Reflection For Images and Videos."/>
+                            </tooltip>
+                        </CheckBox>
 
                         <HBox>
                             <children>

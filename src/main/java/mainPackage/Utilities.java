@@ -23,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -151,7 +152,7 @@ public class Utilities {
     public static void updateThumbnailRightSidePane(MainController mainController, FilePathTreeItem filePathTreeItem) {
         System.gc();
 
-        if (!filePathTreeItem.getType().equals("pdf")){
+        if (!filePathTreeItem.getType().equals("pdf")) {
             MainController.loadingTask.updateMessage("Loading File: " + filePathTreeItem.getPath().getFileName());
         }
 
@@ -193,7 +194,6 @@ public class Utilities {
             case "text":
                 try {
                     textContent = CommonUtilities.createLineNumberingFromString(new String(Files.readAllBytes(filePathTreeItem.getPath())), mainController);
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -205,7 +205,6 @@ public class Utilities {
         //UI updates
 
         Platform.runLater(() -> {
-
 
             removeFromView(mainController.mediaStackPane);
             removeFromView(mainController.rightPaneMediaView);
@@ -226,7 +225,6 @@ public class Utilities {
 
             mainController.fileNameLabelMediaControls.setText("Playing " + filePathTreeItem.getPath().getFileName().toString());
 
-
             switch (fileType) {
 
                 case "image":
@@ -236,7 +234,6 @@ public class Utilities {
 
                     mainController.imagesVBox.getChildren().add(mainController.rightPaneImageView);
                     mainController.rightPaneImageView.setImage(image);
-                    mainController.rightPaneImageView.setEffect(new Reflection());
 
                     break;
 
@@ -478,15 +475,22 @@ public class Utilities {
     }
 
     static void initEffectsRightPane(MainController mainController) {
+        if (mainController.showReflectionCheckbox.isSelected()) {
 
-        initEffects(mainController.rightPaneMediaView);
-        initEffects(mainController.rightPaneImageView);
-        initEffects(mainController.playPositionSlider);
-        initEffects(mainController.mediaPlayerControls);
-        initEffects(mainController.volumeAndCurrentTimeSwipeLabel);
+            initEffects(mainController.rightPaneMediaView);
+            initEffects(mainController.rightPaneImageView);
+            initEffects(mainController.playPositionSlider);
+            initEffects(mainController.mediaPlayerControls);
+            initEffects(mainController.volumeAndCurrentTimeSwipeLabel);
+        }
     }
 
-    private static void initEffects(Node node) {
+    public static void removeEffects(Node node) {
+        node.setEffect(null);
+
+    }
+
+    public static void initEffects(Node node) {
         node.setEffect(new Reflection());
         // Tooltip.install(node, new Tooltip("Click to Play or Pause..."));
     }

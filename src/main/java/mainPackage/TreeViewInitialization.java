@@ -72,6 +72,25 @@ public class TreeViewInitialization {
             }
         });
 
+//        mainController.mainTableView.setRowFactory(new Callback() {
+//
+//            @Override
+//            public Object call(Object param) {
+//                TableRow<FileInfo> row = new TableRow<>();
+//
+//                row.setOnMouseClicked(e -> {
+//                    if (e.getButton() == MouseButton.SECONDARY) {
+//
+//                        FileInfo selectedItem = row.getItem();
+//
+
+//                    }
+//                });
+//
+//                return row;
+//            }
+//        });
+
         mainController.fileBrowserTreeTable.setCellFactory(new Callback<TreeView, TreeCell>() {
             @Override
             public TreeCell call(TreeView param) {

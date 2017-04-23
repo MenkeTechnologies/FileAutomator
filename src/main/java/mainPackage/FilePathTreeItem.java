@@ -50,13 +50,24 @@ public class FilePathTreeItem extends TreeItem<String> {
     public static FilePathTreeItem oldFilePathTreeItem = null;
     public static Node oldPathGraphic = null;
     private String fullPath;
-    boolean isDirectory;
+    boolean isDirectory = false;
     private String type;
     String home = System.getProperty("user.home");
     String downloads = System.getProperty("user.home") + File.separator + "Downloads";
     String desktop = System.getProperty("user.home") + File.separator + "Desktop";
     ArrayList<String> specialDirs = new ArrayList<>();
     private boolean isTextual;
+    private boolean isHost;
+
+    @Override
+    public String toString() {
+        return "FilePathTreeItem{" +
+                "fullPath='" + fullPath + '\'' +
+                ", isDirectory=" + isDirectory +
+                ", type='" + type + '\'' +
+                ", isTextual=" + isTextual +
+                "} " + super.toString();
+    }
 
     public boolean isTextual() {
         return isTextual;
@@ -88,8 +99,22 @@ public class FilePathTreeItem extends TreeItem<String> {
         isDirectory = directory;
     }
 
+    public FilePathTreeItem(String fullPath) {
+        super(fullPath);
+        this.fullPath = fullPath;
+        isHost = true;
+        isDirectory = false;
+        type = "host";
+        isTextual = false;
+    }
+
+    public boolean isHost() {
+        return isHost;
+    }
+
     public FilePathTreeItem(Path file, MainController mainController) {
         super(file.toString());
+        isHost = false;
 
         specialDirs.addAll(Arrays.asList(home, desktop, downloads));
 
@@ -176,7 +201,6 @@ public class FilePathTreeItem extends TreeItem<String> {
             }
         });
     }
-
 
     public void populateSourceAndImmediateChildren(FilePathTreeItem source) {
 
@@ -322,7 +346,7 @@ public class FilePathTreeItem extends TreeItem<String> {
     }
 
     static void selectTreeItemRecursively(MainController mainController, Path path, boolean checkForExpanded) {
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
             mainController.fileBrowserTreeTable.getRoot().setExpanded(true);
 
             mainController.root = (TreeItem) mainController.fileBrowserTreeTable.getRoot().getChildren().get(0);
@@ -337,13 +361,11 @@ public class FilePathTreeItem extends TreeItem<String> {
                 filePathTreeItem.populateSourceAndImmediateChildrenSameThreadCheckingForExpanded(filePathTreeItem);
             }
             filePathTreeItem.recurseAndSelectTreeItems(path.iterator(), checkForExpanded, mainController, true);
-
         });
-
     }
 
     static void selectTreeItemRecursivelyAndChangeGraphic(MainController mainController, Path path, boolean checkForExpanded) {
-        Platform.runLater(()-> {
+        Platform.runLater(() -> {
             mainController.fileBrowserTreeTable.getRoot().setExpanded(true);
 
             mainController.root = (TreeItem) mainController.fileBrowserTreeTable.getRoot().getChildren().get(0);
@@ -359,7 +381,6 @@ public class FilePathTreeItem extends TreeItem<String> {
             }
             filePathTreeItem.recurseAndSelectTreeItems(path.iterator(), checkForExpanded, mainController, false);
         });
-
     }
 
     static Image getImageFromType(String type) {
