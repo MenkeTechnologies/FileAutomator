@@ -13,7 +13,9 @@ import java.lang.reflect.Field;
 /**
  * Created by jacobmenke on 4/23/17.
  */
-public class CustomTableRow extends TableRow {
+public class CustomTableRow extends TableRow<FileInfo> {
+
+
 
     public static void changeToolTipTime(Tooltip tooltip, Integer time) {
         try {
@@ -53,13 +55,14 @@ public class CustomTableRow extends TableRow {
     }
 
     @Override
-    protected void updateItem(Object item, boolean empty) {
+    protected void updateItem(FileInfo item, boolean empty) {
         super.updateItem(item, empty);
 
         if (item == null){
             setTooltip(null);
         } else {
-            FileInfo fileInfo = (FileInfo)item;
+            FileInfo fileInfo = item;
+
             changeToolTipTime(tooltip,3);
             tooltip.setText(fileInfo.toString());
             tooltip.setGraphic(new ImageView(fileInfo.getFileImage()));

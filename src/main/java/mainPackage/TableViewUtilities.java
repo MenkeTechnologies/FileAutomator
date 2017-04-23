@@ -15,7 +15,7 @@ import java.util.Comparator;
  * Created by jacobmenke on 4/16/17.
  */
 public class TableViewUtilities {
-    static public void initTableViewColumns(TableView mainTableView, MainController mainController) {
+    static public void initTableViewColumns(TableView<FileInfo> mainTableView, MainController mainController) {
         TableColumn<FileInfo, String> filesColumn = new TableColumn<>("File Name");
         filesColumn.setPrefWidth(150);
         filesColumn.setCellFactory(new Callback<TableColumn<FileInfo, String>, TableCell<FileInfo, String>>() {
@@ -113,6 +113,13 @@ public class TableViewUtilities {
         dateTimeTableColumn.setCellValueFactory(new PropertyValueFactory<FileInfo, String>("lastModified"));
 
         mainTableView.getColumns().addAll(filesColumn, pathColumn, fileSizeColumn, dateTimeTableColumn, fileTypeColumn,hiddenColumn, directoryColumn);
+
+        mainController.mainTableView.setRowFactory(new Callback<TableView<FileInfo>, TableRow<FileInfo>>() {
+            @Override
+            public TableRow<FileInfo> call(TableView<FileInfo> param) {
+                return new CustomTableRow(mainController.mainTableView, mainController.files, mainController);
+            }
+        });
 
     }
 }
