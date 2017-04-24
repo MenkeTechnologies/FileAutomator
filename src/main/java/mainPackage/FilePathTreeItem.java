@@ -47,6 +47,7 @@ public class FilePathTreeItem extends TreeItem<String> {
     public static Image dlImage = new Image(MainController.class.getResourceAsStream("/png/dl.png"));
     public static Image desktopImage = new Image(MainController.class.getResourceAsStream("/png/desktop.png"));
     public static Image playingImage = new Image(MainController.class.getResourceAsStream("/png/playing.png"));
+    public static Image computerImage = new Image(MainController.class.getResourceAsStream("/png/computer.png"));
     public static FilePathTreeItem oldFilePathTreeItem = null;
     public static Node oldPathGraphic = null;
     private String fullPath;
@@ -99,13 +100,22 @@ public class FilePathTreeItem extends TreeItem<String> {
         isDirectory = directory;
     }
 
-    public FilePathTreeItem(String fullPath) {
+    public FilePathTreeItem(String fullPath, boolean isHost) {
         super(fullPath);
-        this.fullPath = fullPath;
-        isHost = true;
-        isDirectory = false;
-        type = "host";
-        isTextual = false;
+        if (isHost) {
+            this.fullPath = fullPath;
+            this.isHost = isHost;
+            isDirectory = false;
+            type = "host";
+            isTextual = false;
+            setGraphic(new ImageView(FilePathTreeItem.computerImage));
+        } else {
+            try {
+                throw new Exception("Must Be Host for this Constructor");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public boolean isHost() {
@@ -323,20 +333,22 @@ public class FilePathTreeItem extends TreeItem<String> {
                         });
                     } else {
 
-                        Platform.runLater(() -> {
+                        if (oldFilePathTreeItem != null && oldPathGraphic != null) {
 
-                            if (oldFilePathTreeItem != null) {
+                            oldFilePathTreeItem.setGraphic(oldPathGraphic);
+                        }
 
-                                oldFilePathTreeItem.setGraphic(oldPathGraphic);
-                            }
+                        oldPathGraphic = child.getGraphic();
 
-                            oldPathGraphic = child.getGraphic();
+                        oldFilePathTreeItem = (FilePathTreeItem) child;
 
-                            oldFilePathTreeItem = (FilePathTreeItem) child;
-
+                        if (mainController.showPlayingIconTreeCheckbox.isSelected()){
                             child.setGraphic(new ImageView(FilePathTreeItem.playingImage));
-                            mainController.fileBrowserTreeTable.refresh();
-                        });
+
+                        } else {
+                            child.setGraphic(oldPathGraphic);
+                        }
+                        mainController.fileBrowserTreeTable.refresh();
                     }
                     break;
                 }
@@ -365,7 +377,9 @@ public class FilePathTreeItem extends TreeItem<String> {
     }
 
     static void selectTreeItemRecursivelyAndChangeGraphic(MainController mainController, Path path, boolean checkForExpanded) {
+
         Platform.runLater(() -> {
+
             mainController.fileBrowserTreeTable.getRoot().setExpanded(true);
 
             mainController.root = (TreeItem) mainController.fileBrowserTreeTable.getRoot().getChildren().get(0);

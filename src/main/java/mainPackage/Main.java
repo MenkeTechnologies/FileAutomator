@@ -40,8 +40,10 @@ public class Main extends Application {
 
         primaryStage.setTitle("File Automator");
         primaryStage.setOnCloseRequest(e -> {
-            Preferences.userRoot().putDouble("dividerPos0", mainController.mainSplitPane.getDividerPositions()[0]);
-            Preferences.userRoot().putDouble("dividerPos1", mainController.mainSplitPane.getDividerPositions()[1]);
+           if (mainController.mainSplitPane.getItems().size() > 1){
+               Preferences.userRoot().putDouble("dividerPos0", mainController.mainSplitPane.getDividerPositions()[0]);
+               Preferences.userRoot().putDouble("dividerPos1", mainController.mainSplitPane.getDividerPositions()[1]);
+           }
 
             Platform.exit();
             System.exit(0);

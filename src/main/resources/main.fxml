@@ -120,9 +120,16 @@
                                                         <Tooltip text="Play Media"/>
                                                     </tooltip>
                                                 </Button>
-                                                <Button onAction="#rewindToStart" id="rewind" styleClass="mediaButtons">
+                                                <Button onMouseClicked="#rewindToStart" id="rewind"
+                                                        styleClass="mediaButtons">
                                                     <tooltip>
-                                                        <Tooltip text="Rewind to Start"/>
+                                                        <Tooltip
+                                                                text="Rewind with Single Click, Previous Media with Double Click"/>
+                                                    </tooltip>
+                                                </Button>
+                                                <Button onAction="#playNext" id="next" styleClass="mediaButtons">
+                                                    <tooltip>
+                                                        <Tooltip text="Play Next Media"/>
                                                     </tooltip>
                                                 </Button>
                                                 <ToggleButton id="loopMedia" fx:id="loopButton"
@@ -143,7 +150,8 @@
                                                         <Tooltip text="Return to Old Pane Sizes"/>
                                                     </tooltip>
                                                 </Button>
-                                                <ToggleButton fx:id="lockMediaView" id="lock" styleClass="mediaButtons">
+                                                <ToggleButton fx:id="lockMediaViewMediaControlsToggle" id="lock"
+                                                              styleClass="mediaButtons">
                                                     <tooltip>
                                                         <Tooltip text="Keep Current Media Playing in Right Pane"/>
                                                     </tooltip>
@@ -161,8 +169,15 @@
                                                         <Tooltip text="Hide Slider"/>
                                                     </tooltip>
                                                 </ToggleButton>
+                                                <ToggleButton fx:id="showReflectionButton" onAction="#showReflection"
+                                                              id="reflection" styleClass="mediaButtons">
+                                                    <tooltip>
+                                                        <Tooltip text="Show Reflection For Images and Videos."/>
+                                                    </tooltip>
+                                                </ToggleButton>
 
-                                                <Label fx:id="fileNameLabelMediaControls" styleClass="blackBoxWhiteText" HBox.hgrow="ALWAYS"
+                                                <Label fx:id="fileNameLabelMediaControls" styleClass="blackBoxWhiteText"
+                                                       HBox.hgrow="ALWAYS"
                                                        visible="false"/>
 
                                             </children>
@@ -359,36 +374,40 @@
                                 <Tooltip text="Filter out Directories from Table"/>
                             </tooltip>
                         </CheckBox>
-                        <CheckBox fx:id="autoplayCheckbox" id="autoplay" onAction="#storeFileList">
+                        <ToggleButton fx:id="autoplayCheckbox" id="autoplay" onAction="#storeFileList">
                             <tooltip>
                                 <Tooltip
                                         text="Automatically Play Next File in Playlist.  Update Playlist to current Table Selection from Right Click Menu"/>
                             </tooltip>
-                        </CheckBox>
-                        <CheckBox fx:id="showPlayingIconCheckbox" onAction="#showPlayingIcon" id="play">
+                        </ToggleButton>
+                        <ToggleButton fx:id="showPlayingIconCheckbox" onAction="#showPlayingIcon" id="play"
+                                      selected="true">
                             <tooltip>
                                 <Tooltip text="Change Icon of Playing File in Table"/>
                             </tooltip>
-                        </CheckBox>
+                        </ToggleButton>
 
-                        <HBox fx:id="showPlayinIconTreeHBox">
-                            <children>
-                                <CheckBox fx:id="showPlayingIconTreeCheckbox" onAction="#showPlayingIcon"/>
-                                <Label id="play"/>
-                                <Label id="tree"/>
-                            </children>
 
-                        </HBox>
-                        <CheckBox fx:id="showLineNumbersCheckbox" onAction="#showLineNumbers" id="lines">
+                        <ToggleButton fx:id="showPlayingIconTreeCheckbox" onAction="#showPlayingIconTree"
+                                      id="playtree"/>
+
+
+                        <ToggleButton fx:id="showLineNumbersCheckbox" onAction="#showLineNumbers" id="lines">
                             <tooltip>
                                 <Tooltip text="Show Line Numbers for Files with Text"/>
                             </tooltip>
-                        </CheckBox>
-                        <CheckBox fx:id="showReflectionCheckbox" onAction="#showReflection" id="reflection" selected="true">
+                        </ToggleButton>
+                        <ToggleButton fx:id="showReflectionCheckbox" onAction="#showReflection" id="reflection"
+                                      selected="true">
                             <tooltip>
                                 <Tooltip text="Show Reflection For Images and Videos."/>
                             </tooltip>
-                        </CheckBox>
+                        </ToggleButton>
+                        <ToggleButton fx:id="lockMediaViewBottomToggle" id="lock">
+                            <tooltip>
+                                <Tooltip text="Keep Current Media Playing in Right Pane"/>
+                            </tooltip>
+                        </ToggleButton>
 
                         <HBox>
                             <children>
