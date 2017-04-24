@@ -160,3 +160,13 @@
     -fx-graphic: url("/png/reflection.png");
 
 }
+
+#next{
+    -fx-graphic: url("/png/next.png");
+
+}
+
+#playtree{
+    -fx-graphic: url("/png/playtree.png");
+
+}

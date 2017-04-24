@@ -6,6 +6,7 @@ import com.terminalfx.config.TerminalConfig;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -23,7 +24,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -31,6 +31,7 @@ import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
 import windows.ServiceWindow;
 
+import javax.naming.Binding;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -359,22 +360,28 @@ public class Utilities {
 
         mainController.mediaPlayer.setOnEndOfMedia(() -> {
 
-            MainController.mediaPlayer.pause();
+            endOfMediaAction(mainController, true);
+        });
+    }
 
-            if (mainController.loopButton.isSelected()) {
-                MainController.mediaPlayer.stop();
-                MainController.mediaPlayer.seek(Duration.ZERO);
-                mainController.mediaPlayer.play();
-            } else {
+    static void endOfMediaAction(MainController mainController, boolean forward) {
+        MainController.mediaPlayer.pause();
 
-                if (mainController.autoplayCheckbox.isSelected()) {
-                    File currentlyPlayingFile = new FileInfo(mainController.pathLabelContent.getText());
+        if (mainController.loopButton.isSelected()) {
+            MainController.mediaPlayer.stop();
+            MainController.mediaPlayer.seek(Duration.ZERO);
+            mainController.mediaPlayer.play();
+        } else {
 
-                    Integer currentIndex = 0;
+            if (mainController.autoplayCheckbox.isSelected()) {
+                File currentlyPlayingFile = new FileInfo(mainController.pathLabelContent.getText());
 
-                    if (mainController.filesForAutoplay.indexOf(currentlyPlayingFile.getAbsolutePath()) >= 0) {
-                        currentIndex = mainController.filesForAutoplay.indexOf(currentlyPlayingFile.getAbsolutePath());
+                Integer currentIndex = 0;
 
+                if (mainController.filesForAutoplay.indexOf(currentlyPlayingFile.getAbsolutePath()) >= 0) {
+                    currentIndex = mainController.filesForAutoplay.indexOf(currentlyPlayingFile.getAbsolutePath());
+
+                    if (forward) {
                         while (currentIndex + 1 < mainController.filesForAutoplay.size()) {
                             currentIndex++;
                             FileInfo nextFile = new FileInfo(mainController.filesForAutoplay.get(currentIndex));
@@ -392,12 +399,50 @@ public class Utilities {
                             }
                         }
                     } else {
+                        while (currentIndex > 0) {
+                            currentIndex--;
+                            FileInfo nextFile = new FileInfo(mainController.filesForAutoplay.get(currentIndex));
 
-                        mainController.startPlayingMedia(new FileInfo(mainController.filesForAutoplay.get(currentIndex)), true, false);
+                            String type = FileTypeUtilities.getFileType(nextFile.getAbsolutePath());
+                            if (type.equals("music") || type.equals("video")) {
+
+                                fromAutoPlay = true;
+
+                                mainController.startPlayingMedia(nextFile, true, false);
+
+                                break;
+                            } else {
+                                System.out.println(nextFile.getFileName() + " no match");
+                            }
+                        }
+                    }
+                } else {
+
+                    mainController.startPlayingMedia(new FileInfo(mainController.filesForAutoplay.get(currentIndex)), true, false);
+                }
+            } else {
+                File currentlyPlayingFile = new FileInfo(mainController.pathLabelContent.getText());
+
+                Integer currentIndex = 0;
+                ObservableList<FileInfo> list = mainController.mainTableView.getItems();
+                for (int i = 0; i < list.size(); i++) {
+                    FileInfo nextFile = list.get(i);
+                    if (nextFile.getAbsolutePath().equals(currentlyPlayingFile.getAbsolutePath())) {
+                        currentIndex = i;
                     }
                 }
+
+                File nextFile;
+
+                if (forward) {
+                    nextFile = new FileInfo(mainController.mainTableView.getItems().get(++currentIndex).getAbsolutePath());
+                } else {
+                    nextFile = new FileInfo(mainController.mainTableView.getItems().get(--currentIndex).getAbsolutePath());
+                }
+
+                mainController.startPlayingMedia(nextFile, true, false);
             }
-        });
+        }
     }
 
     private static void setupSlider(MainController mainController) {
@@ -487,7 +532,6 @@ public class Utilities {
 
     public static void removeEffects(Node node) {
         node.setEffect(null);
-
     }
 
     public static void initEffects(Node node) {
@@ -548,6 +592,9 @@ public class Utilities {
         MenuItem showInTreeView = new MenuItem("Show in Tree View");
         MenuItem playInRightPane = new MenuItem("Play in Right Pane");
         MenuItem updateAutoPlaylist = new MenuItem("Update Auto Playlist With Contents Of Table");
+        MenuItem maximizeThisPane = new MenuItem("Maximize This Pane");
+
+        maximizeThisPane.textProperty().bind(Bindings.when(Utilities.maximized.not()).then("Maximize This Pane").otherwise("Restore Split Pane"));
 
         rowContextMenu.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem, copyAbsolutePathItem, sendToSourceDirectoryTextFieldItem, sendToDestinationDirectoryTextFieldItem);
 
@@ -556,7 +603,27 @@ public class Utilities {
             rowContextMenu.getItems().add(showInTreeView);
         }
 
-        rowContextMenu.getItems().add(updateAutoPlaylist);
+        rowContextMenu.getItems().addAll(updateAutoPlaylist, maximizeThisPane);
+
+        maximizeThisPane.setOnAction(e -> {
+            if (Utilities.maximized.get()) {
+                if (sender.equals("tableView")) {
+                    mainController.addToPane(sender);
+                } else if (sender.equals("treeView")) {
+                    mainController.addToPane(sender);
+                } else {
+                    mainController.addToPane("mediaContextMenu");
+                }
+            } else {
+                if (sender.equals("tableView")) {
+                    mainController.removePanes(sender);
+                } else if (sender.equals("treeView")) {
+                    mainController.removePanes(sender);
+                } else {
+                    mainController.removePanes("mediaContextMenu");
+                }
+            }
+        });
 
         updateAutoPlaylist.setOnAction(e -> {
             mainController.storeFileList(null);

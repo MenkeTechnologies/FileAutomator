@@ -22,7 +22,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.Reflection;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
@@ -85,7 +84,7 @@ public class MainController implements Initializable {
     public Button searchButton;
     public ProgressBar progressIndicator;
     public Slider playPositionSlider;
-    public CheckBox autoplayCheckbox;
+    public ToggleButton autoplayCheckbox;
     public HBox mediaPlayerControls;
     public Button play2XSlowerButton;
     public Button play2XFasterButton;
@@ -103,7 +102,7 @@ public class MainController implements Initializable {
     static MediaPlayer mediaPlayer;
     public VBox rightSidePaneTextVBox;
     public HBox topSecondHBox;
-    public ToggleButton lockMediaView;
+    public ToggleButton lockMediaViewMediaControlsToggle;
     public Label numberResultsLabel;
     public Label loadingFileLabel;
     public Label volumeAndCurrentTimeSwipeLabel;
@@ -116,11 +115,13 @@ public class MainController implements Initializable {
     public Cylinder sphere;
     public PointLight pointLight;
     public VBox imagesVBox;
-    public CheckBox showPlayingIconCheckbox;
-    public CheckBox showPlayingIconTreeCheckbox;
-    public CheckBox showLineNumbersCheckbox;
+    public ToggleButton showPlayingIconCheckbox;
+    public ToggleButton showPlayingIconTreeCheckbox;
+    public ToggleButton showLineNumbersCheckbox;
     public HBox showPlayinIconTreeHBox;
-    public CheckBox showReflectionCheckbox;
+    public ToggleButton showReflectionCheckbox;
+    public ToggleButton showReflectionButton;
+    public ToggleButton lockMediaViewBottomToggle;
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
@@ -135,6 +136,7 @@ public class MainController implements Initializable {
     Timeline timeline;
     Timer disappearTimer;
     ArrayList<String> filesForAutoplay = new ArrayList<>();
+    ObservableList<Node> splitPaneChildren;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -211,7 +213,7 @@ public class MainController implements Initializable {
                 Object item = mainTableView.getSelectionModel().getSelectedItem();
 
                 if (item != null) {
-                    if (lockMediaView.isSelected()) {
+                    if (lockMediaViewMediaControlsToggle.isSelected()) {
                         startPlayingMedia(item, false, false);
                     } else {
                         startPlayingMedia(item, true, false);
@@ -226,7 +228,7 @@ public class MainController implements Initializable {
             if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
                 Object item = mainTableView.getSelectionModel().getSelectedItem();
 
-                if (lockMediaView.isSelected()) {
+                if (lockMediaViewMediaControlsToggle.isSelected()) {
                     startPlayingMedia(item, false, false);
                 } else {
                     startPlayingMedia(item, true, false);
@@ -239,7 +241,7 @@ public class MainController implements Initializable {
 
                 Object item = fileBrowserTreeTable.getSelectionModel().getSelectedItem();
 
-                if (!lockMediaView.isSelected()) {
+                if (!lockMediaViewMediaControlsToggle.isSelected()) {
 
                     startPlayingMediaFromTree(item);
                 }
@@ -250,7 +252,7 @@ public class MainController implements Initializable {
             if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
                 Object item = fileBrowserTreeTable.getSelectionModel().getSelectedItem();
 
-                if (!lockMediaView.isSelected()) {
+                if (!lockMediaViewMediaControlsToggle.isSelected()) {
 
                     startPlayingMediaFromTree(item);
                 }
@@ -280,7 +282,6 @@ public class MainController implements Initializable {
 
     private void initToolTips() {
 
-        Tooltip.install(showPlayinIconTreeHBox, new Tooltip("Change Icon of Playing File in File Browser"));
     }
 
     public void startPlayingMediaFromTree(Object item) {
@@ -296,13 +297,15 @@ public class MainController implements Initializable {
         });
 
         if (showPlayingIconTreeCheckbox.isSelected()) {
-            runInBackgroundThreadSecondary(() -> {
-                FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(filePathTreeItem.getPathString()), true);
-            });
+
+            FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(filePathTreeItem.getPathString()), true);
         }
     }
 
     public void startPlayingMedia(Object item, boolean playInRightPane, boolean fromContext) {
+
+//        System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+//        "___ "+ CommonUtilities.turnBytesIntoHumanReadable(Runtime.getRuntime().freeMemory()) + " Out of " + CommonUtilities.turnBytesIntoHumanReadable(Runtime.getRuntime().maxMemory()));
 
         FileInfo fileInfo = (FileInfo) item;
 
@@ -326,6 +329,7 @@ public class MainController implements Initializable {
 
             if (showPlayingIconTreeCheckbox.isSelected()) {
                 runInBackgroundThreadSecondary(() -> {
+
                     FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(fileInfo.getAbsolutePath()), true);
                 });
             }
@@ -383,8 +387,8 @@ public class MainController implements Initializable {
     public void initBindings() {
 
         mainTextField.setText("mp4");
-        //TODO init refresh
-//        RegexUtilities.searchAndRefresh(this);
+
+        RegexUtilities.searchAndRefresh(this);
         rightPaneMediaView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
         rightPaneImageView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
 //        thinkingIndicator.progressProperty().bind(searchingTask.progressProperty());
@@ -407,6 +411,8 @@ public class MainController implements Initializable {
                 }
             }
         });
+
+        lockMediaViewBottomToggle.selectedProperty().bindBidirectional(lockMediaViewMediaControlsToggle.selectedProperty());
         currentTimeLabel.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(0.15));
 
         ObjectProperty<Font> fontObjectProperty = new SimpleObjectProperty<Font>(Font.font("Helvetica", FontWeight.BOLD, 10));
@@ -451,7 +457,11 @@ public class MainController implements Initializable {
                         double changeTo = changeY * scalingFactor + volumeSlider.getValue();
 
                         if (changeTo < 1 || changeTo > 0) {
-                            volumeSlider.valueProperty().set(changeTo);
+
+                            if (volumeSlider.valueProperty() != null) {
+                                volumeSlider.valueProperty().set(changeTo);
+                            }
+
                             volumeSlider.setValueChanging(true);
                             volumeSlider.setValueChanging(false);
                         }
@@ -664,6 +674,7 @@ public class MainController implements Initializable {
         });
 
         autoPlayMediaControl.selectedProperty().bindBidirectional(autoplayCheckbox.selectedProperty());
+        showReflectionButton.selectedProperty().bindBidirectional(showReflectionCheckbox.selectedProperty());
     }
 
     private void refreshTreeViewFromBottom() {
@@ -818,48 +829,69 @@ public class MainController implements Initializable {
 
     public void maximizeVideo(ActionEvent actionEvent) {
 
-        Preferences.userRoot().putDouble("dividerPos0", mainSplitPane.getDividerPositions()[0]);
-        Preferences.userRoot().putDouble("dividerPos1", mainSplitPane.getDividerPositions()[1]);
-
-        Utilities.removeFromView(rightSidePaneTextVBox);
-        Utilities.removeFromView(topHBox);
-        Utilities.removeFromView(bottomHBox);
-        Utilities.removeFromView(topSecondHBox);
-
-        Utilities.maximized.set(true);
-
-        Utilities.addToView(fileNameLabelMediaControls);
-
-        rightPaneScrollPane.minWidthProperty().bind(mainSplitPane.widthProperty().multiply(0.96));
-//        mainSplitPane.getDividers().get(1).
-
-        mainSplitPane.setDividerPositions(0, 0);
+        removePanes("mediaContextMenu");
     }
 
     public void returnToOldDividers(ActionEvent actionEvent) {
+        addToPane("mediaContextMenu");
+    }
 
-        Utilities.maximized.set(false);
+    public void removePanes(String mediaControl) {
+        Preferences.userRoot().putDouble("dividerPos0", mainSplitPane.getDividerPositions()[0]);
+        Preferences.userRoot().putDouble("dividerPos1", mainSplitPane.getDividerPositions()[1]);
+
+        ObservableList<Node> items = mainSplitPane.getItems();
+
+        if (mediaControl.equals("mediaContextMenu")) {
+
+            Utilities.removeFromView(rightSidePaneTextVBox);
+            Utilities.removeFromView(topHBox);
+            Utilities.removeFromView(bottomHBox);
+            Utilities.removeFromView(topSecondHBox);
+            items.remove(0, 2);
+
+            Utilities.addToView(fileNameLabelMediaControls);
+        } else if (mediaControl.equals("treeView")) {
+            items.remove(1, 3);
+        } else if (mediaControl.equals("tableView")) {
+            items.remove(0);
+            items.remove(1);
+        }
+
+        Utilities.maximized.set(true);
+    }
+
+    public void addToPane(String mediaControl) {
 
         Double sp = Preferences.userRoot().getDouble("dividerPos0", 0.2);
         Double sp2 = Preferences.userRoot().getDouble("dividerPos1", 0.8);
+        ObservableList<Node> items = mainSplitPane.getItems();
 
-        Utilities.addToView(rightSidePaneTextVBox);
-        Utilities.addToView(topHBox);
-        Utilities.addToView(bottomHBox);
-        Utilities.addToView(topSecondHBox);
+        if (mediaControl.equals("mediaContextMenu")) {
+            Utilities.addToView(rightSidePaneTextVBox);
+            Utilities.addToView(topHBox);
+            Utilities.addToView(bottomHBox);
+            Utilities.addToView(topSecondHBox);
+            Utilities.removeFromView(fileNameLabelMediaControls);
 
-        Utilities.removeFromView(fileNameLabelMediaControls);
+            Utilities.addToView(sliderHbox);
 
-        Utilities.addToView(sliderHbox);
+            items.add(0, fileBrowserTreeTable);
+            items.add(1, mainTableView);
+        } else if (mediaControl.equals("treeView")) {
 
-        //allow scroll pane to slider to right, had to lock scroll pane to make sure that video kept maximized during
-        //screen resize from left side stage
-        if (rightPaneScrollPane.minWidthProperty().isBound()) {
-            rightPaneScrollPane.minWidthProperty().unbind();
-            rightPaneScrollPane.minWidthProperty().set(0);
+            items.add(1, mainTableView);
+            items.add(2, rightPaneScrollPane);
+        }else if (mediaControl.equals("tableView")) {
+
+
+            items.add(0, fileBrowserTreeTable);
+            items.add(2, rightPaneScrollPane);
         }
 
         mainSplitPane.setDividerPositions(sp, sp2);
+        Utilities.maximized.set(false);
+
     }
 
     public void goToDownloadsDirectory(ActionEvent actionEvent) {
@@ -870,13 +902,22 @@ public class MainController implements Initializable {
         });
     }
 
-    public void rewindToStart(ActionEvent actionEvent) {
+    public void rewindToStart(MouseEvent actionEvent) {
 
-        mediaPlayer.stop();
-        mediaPlayer.seek(Duration.ZERO);
-        System.out.println(mediaPlayer.currentTimeProperty().get());
-        mediaPlayer.pause();
-        mediaPlayer.play();
+        if (actionEvent.getEventType() == MouseEvent.MOUSE_CLICKED) {
+            if (actionEvent.getButton() == MouseButton.PRIMARY) {
+                if (actionEvent.getClickCount() == 1) {
+
+                    mediaPlayer.stop();
+                    mediaPlayer.seek(Duration.ZERO);
+                    System.out.println(mediaPlayer.currentTimeProperty().get());
+                    mediaPlayer.pause();
+                    mediaPlayer.play();
+                } else {
+                    Utilities.endOfMediaAction(this, false);
+                }
+            }
+        }
     }
 
     public void removeSliderHBox(ActionEvent actionEvent) {
@@ -994,14 +1035,6 @@ public class MainController implements Initializable {
 
     public void showPlayingIcon(ActionEvent actionEvent) {
         mainTableView.refresh();
-
-        if (showPlayingIconTreeCheckbox.isSelected()) {
-            fileBrowserTreeTable.refresh();
-
-            FileInfo fileInfo = new FileInfo(pathLabelContent.getText());
-
-            FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(fileInfo.getAbsolutePath()), true);
-        }
     }
 
     public void showLineNumbers(ActionEvent actionEvent) {
@@ -1024,7 +1057,6 @@ public class MainController implements Initializable {
             Utilities.initEffects(this.playPositionSlider);
             Utilities.initEffects(this.mediaPlayerControls);
             Utilities.initEffects(this.volumeAndCurrentTimeSwipeLabel);
-
         } else {
 
             Utilities.removeEffects(this.rightPaneMediaView);
@@ -1032,6 +1064,36 @@ public class MainController implements Initializable {
             Utilities.removeEffects(this.playPositionSlider);
             Utilities.removeEffects(this.mediaPlayerControls);
             Utilities.removeEffects(this.volumeAndCurrentTimeSwipeLabel);
+        }
+    }
+
+    public void playNext(ActionEvent actionEvent) {
+        mediaPlayer.stop();
+        mediaPlayer.play();
+        if (autoplayCheckbox.isSelected()) {
+            Utilities.endOfMediaAction(this, true);
+        } else {
+            Utilities.endOfMediaAction(this, true);
+        }
+    }
+
+    public void showPlayingIconTree(ActionEvent actionEvent) {
+
+        if (showPlayingIconTreeCheckbox.isSelected()) {
+            fileBrowserTreeTable.refresh();
+
+            FileInfo fileInfo = new FileInfo(pathLabelContent.getText());
+            runInBackgroundThreadSecondary(() -> {
+
+                FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(fileInfo.getAbsolutePath()), true);
+            });
+        } else {
+
+            FileInfo fileInfo = new FileInfo(pathLabelContent.getText());
+            runInBackgroundThreadSecondary(() -> {
+
+                FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(fileInfo.getAbsolutePath()), true);
+            });
         }
     }
 }
