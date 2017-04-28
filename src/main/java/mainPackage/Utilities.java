@@ -6,12 +6,13 @@ import com.terminalfx.config.TerminalConfig;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -31,7 +32,6 @@ import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
 import windows.ServiceWindow;
 
-import javax.naming.Binding;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -520,17 +520,20 @@ public class Utilities {
     }
 
     static void initEffectsRightPane(MainController mainController) {
-        if (mainController.showReflectionCheckbox.isSelected()) {
+        if (mainController.showReflectionBottomButton.isSelected()) {
 
             initEffects(mainController.rightPaneMediaView);
             initEffects(mainController.rightPaneImageView);
             initEffects(mainController.playPositionSlider);
             initEffects(mainController.mediaPlayerControls);
-            initEffects(mainController.volumeAndCurrentTimeSwipeLabel);
+            //initEffects(mainController.volumeAndCurrentTimeSwipeLabel);
+
+            ;
         }
     }
 
     public static void removeEffects(Node node) {
+
         node.setEffect(null);
     }
 
@@ -593,35 +596,54 @@ public class Utilities {
         MenuItem playInRightPane = new MenuItem("Play in Right Pane");
         MenuItem updateAutoPlaylist = new MenuItem("Update Auto Playlist With Contents Of Table");
         MenuItem maximizeThisPane = new MenuItem("Maximize This Pane");
+        MenuItem hideThisPane = new MenuItem("Hide This Pane");
+        MenuItem restorePanes = new MenuItem("Restore Panes");
 
-        maximizeThisPane.textProperty().bind(Bindings.when(Utilities.maximized.not()).then("Maximize This Pane").otherwise("Restore Split Pane"));
+        MenuItem quarterScreen = new MenuItem("Resize to Quarter of Screen");
 
-        rowContextMenu.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem, copyAbsolutePathItem, sendToSourceDirectoryTextFieldItem, sendToDestinationDirectoryTextFieldItem);
+        rowContextMenu.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem, copyAbsolutePathItem
+                ,sendToSourceDirectoryTextFieldItem, sendToDestinationDirectoryTextFieldItem, quarterScreen);
+
+
+        quarterScreen.setOnAction(e->{
+
+            mainController.fitScreenAction(null, 0.25);
+
+        });
 
         if (sender.equals("tableView") || sender.equals("stackPane")) {
 
             rowContextMenu.getItems().add(showInTreeView);
         }
 
-        rowContextMenu.getItems().addAll(updateAutoPlaylist, maximizeThisPane);
+        rowContextMenu.getItems().addAll(updateAutoPlaylist, restorePanes);
+
+        rowContextMenu.getItems().add(maximizeThisPane);
+
+        if (mainController.mainSplitPane.getItems().size() > 1) {
+            rowContextMenu.getItems().add(hideThisPane);
+        }
+
+        hideThisPane.setOnAction(event -> mainController.removePaneSingular(sender));
+
+        restorePanes.setOnAction(e -> {
+            if (sender.equals("tableView")) {
+                mainController.restorePanesToOld(sender);
+            } else if (sender.equals("treeView")) {
+                mainController.restorePanesToOld(sender);
+            } else {
+                mainController.restorePanesToOld("mediaContextMenu");
+            }
+        });
 
         maximizeThisPane.setOnAction(e -> {
-            if (Utilities.maximized.get()) {
-                if (sender.equals("tableView")) {
-                    mainController.addToPane(sender);
-                } else if (sender.equals("treeView")) {
-                    mainController.addToPane(sender);
-                } else {
-                    mainController.addToPane("mediaContextMenu");
-                }
+
+            if (sender.equals("tableView")) {
+                mainController.removePanes(sender);
+            } else if (sender.equals("treeView")) {
+                mainController.removePanes(sender);
             } else {
-                if (sender.equals("tableView")) {
-                    mainController.removePanes(sender);
-                } else if (sender.equals("treeView")) {
-                    mainController.removePanes(sender);
-                } else {
-                    mainController.removePanes("mediaContextMenu");
-                }
+                mainController.removePanes("mediaContextMenu");
             }
         });
 

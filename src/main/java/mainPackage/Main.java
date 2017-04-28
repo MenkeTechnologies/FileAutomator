@@ -9,13 +9,20 @@ import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.aerofx.AeroFX;
 
 import java.io.File;
@@ -29,9 +36,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-
-
-
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
 
         Parent root = loader.load();
@@ -40,10 +44,10 @@ public class Main extends Application {
 
         primaryStage.setTitle("File Automator");
         primaryStage.setOnCloseRequest(e -> {
-           if (mainController.mainSplitPane.getItems().size() > 1){
-               Preferences.userRoot().putDouble("dividerPos0", mainController.mainSplitPane.getDividerPositions()[0]);
-               Preferences.userRoot().putDouble("dividerPos1", mainController.mainSplitPane.getDividerPositions()[1]);
-           }
+            if (mainController.mainSplitPane.getItems().size() > 1) {
+                Preferences.userRoot().putDouble("dividerPos0", mainController.mainSplitPane.getDividerPositions()[0]);
+                Preferences.userRoot().putDouble("dividerPos1", mainController.mainSplitPane.getDividerPositions()[1]);
+            }
 
             Platform.exit();
             System.exit(0);
@@ -51,14 +55,13 @@ public class Main extends Application {
 
         Scene scene = new Scene(root, 1800, 1200);
 
-
         mainController.initBindings();
 
         scene.widthProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                if (Utilities.maximized.get()){
-                    mainController.mainSplitPane.setDividerPositions(0,0);
+                if (Utilities.maximized.get()) {
+                    mainController.mainSplitPane.setDividerPositions(0, 0);
                 }
             }
         });
@@ -75,7 +78,102 @@ public class Main extends Application {
         scene.getStylesheets().add("stylesheets/styles.css");
         primaryStage.setScene(scene);
 
+        initKeyBindings(mainController);
+
         primaryStage.show();
+    }
+
+    public void initKeyBindings(MainController mainController) {
+        mainController.mainSplitPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() == KeyCode.SPACE) {
+                if (MainController.mediaPlayer != null) {
+                    if (MainController.mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                        MainController.mediaPlayer.pause();
+                    } else {
+                        MainController.mediaPlayer.play();
+                    }
+                }
+                e.consume();
+            }
+            if (e.getCode() == KeyCode.F) {
+
+                if (Utilities.maximized.get()) {
+                    mainController.restorePanesToOld("mediaContextMenu");
+                } else {
+                    mainController.maximizeVideo(null);
+                    Utilities.maximized.set(true);
+                }
+                e.consume();
+            }
+
+            if (e.getCode() == KeyCode.Q) {
+                mainController.fitScreenAction(null, 0.25);
+
+            }
+            if (e.getCode() == KeyCode.W) {
+                if (!mainController.fitScreenToggleMediaButton.isSelected()) {
+                    mainController.fitScreenToggleMediaButton.setSelected(true);
+                } else {
+                    mainController.fitScreenToggleMediaButton.setSelected(false);
+                }
+                mainController.fitScreenAction(null, 1.0);
+
+
+            }
+
+            if (MainController.mediaPlayer != null) {
+                if (e.getCode() == KeyCode.N) {
+                    mainController.playNext(null);
+                    mainController.mediaPlayerControls.setVisible(true);
+                    mainController.hideNodeAfterDelay(mainController.mediaPlayerControls);
+                }
+                if (e.getCode() == KeyCode.P) {
+                    Utilities.endOfMediaAction(mainController, false);
+                    mainController.mediaPlayerControls.setVisible(true);
+
+                    mainController.hideNodeAfterDelay(mainController.mediaPlayerControls);
+                }
+
+
+                    if (e.getCode() == KeyCode.DIGIT0) {
+                        MainController.mediaPlayer.seek(Duration.minutes(0));
+                    }
+                    if (e.getCode() == KeyCode.DIGIT1) {
+                        MainController.mediaPlayer.seek(Duration.minutes(1));
+                    }
+                    if (e.getCode() == KeyCode.DIGIT2) {
+                        MainController.mediaPlayer.seek(Duration.minutes(2));
+                    }
+                    if (e.getCode() == KeyCode.DIGIT3) {
+                        MainController.mediaPlayer.seek(Duration.minutes(3));
+                    }
+                    if (e.getCode() == KeyCode.DIGIT4) {
+                        MainController.mediaPlayer.seek(Duration.minutes(4));
+                    }
+                    if (e.getCode() == KeyCode.DIGIT5) {
+                        MainController.mediaPlayer.seek(Duration.minutes(5));
+                    }
+                    if (e.getCode() == KeyCode.DIGIT6) {
+                        MainController.mediaPlayer.seek(Duration.minutes(6));
+                    }
+                    if (e.getCode() == KeyCode.DIGIT7) {
+                        MainController.mediaPlayer.seek(Duration.minutes(7));
+                    }
+                    if (e.getCode() == KeyCode.DIGIT8) {
+                        MainController.mediaPlayer.seek(Duration.minutes(8));
+                    }
+                    if (e.getCode() == KeyCode.DIGIT9) {
+                        MainController.mediaPlayer.seek(Duration.minutes(9));
+                    }
+
+                    if (e.getCode() == KeyCode.B) {
+                        MainController.mediaPlayer.seek(MainController.mediaPlayer.getCurrentTime().subtract(Duration.seconds(15)));
+                    }
+
+
+            }
+            e.consume();
+        });
     }
 
     public static void main(String[] args) {

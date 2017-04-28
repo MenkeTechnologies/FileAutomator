@@ -93,7 +93,7 @@
                                         </VBox>
 
                                         <MediaView fx:id="rightPaneMediaView" preserveRatio="true"/>
-                                        <HBox fx:id="mediaPlayerControls" prefHeight="100.0" prefWidth="200.0"
+                                        <FlowPane fx:id="mediaPlayerControls" prefHeight="100.0" prefWidth="200.0"
                                               visible="false">
                                             <children>
                                                 <Button id="2xslower" fx:id="play2XSlowerButton" mnemonicParsing="false"
@@ -175,13 +175,19 @@
                                                         <Tooltip text="Show Reflection For Images and Videos."/>
                                                     </tooltip>
                                                 </ToggleButton>
+                                                <ToggleButton fx:id="fitScreenToggleMediaButton" id="fitScreen" styleClass="mediaButtons">
+                                                    <tooltip>
+                                                        <Tooltip text="Maximize to fit Screen Dimensions."/>
+
+                                                    </tooltip>
+                                                </ToggleButton>
 
                                                 <Label fx:id="fileNameLabelMediaControls" styleClass="blackBoxWhiteText"
                                                        HBox.hgrow="ALWAYS"
                                                        visible="false"/>
 
                                             </children>
-                                        </HBox>
+                                        </FlowPane>
                                         <Label fx:id="volumeAndCurrentTimeSwipeLabel" styleClass="blackBoxWhiteText"
                                                visible="false"/>
 
@@ -397,7 +403,7 @@
                                 <Tooltip text="Show Line Numbers for Files with Text"/>
                             </tooltip>
                         </ToggleButton>
-                        <ToggleButton fx:id="showReflectionCheckbox" onAction="#showReflection" id="reflection"
+                        <ToggleButton fx:id="showReflectionBottomButton" onAction="#showReflection" id="reflection"
                                       selected="true">
                             <tooltip>
                                 <Tooltip text="Show Reflection For Images and Videos."/>
@@ -406,6 +412,12 @@
                         <ToggleButton fx:id="lockMediaViewBottomToggle" id="lock">
                             <tooltip>
                                 <Tooltip text="Keep Current Media Playing in Right Pane"/>
+                            </tooltip>
+                        </ToggleButton>
+                        <ToggleButton fx:id="fitScreenToggleButton" id="fitScreen">
+                            <tooltip>
+                                <Tooltip text="Maximize to fit Screen Dimensions."/>
+
                             </tooltip>
                         </ToggleButton>
 
