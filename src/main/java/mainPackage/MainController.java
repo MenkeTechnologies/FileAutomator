@@ -12,7 +12,9 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.*;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
@@ -22,9 +24,11 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.Reflection;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -85,7 +89,7 @@ public class MainController implements Initializable {
     public ProgressBar progressIndicator;
     public Slider playPositionSlider;
     public ToggleButton autoplayCheckbox;
-    public HBox mediaPlayerControls;
+    public FlowPane mediaPlayerControls;
     public Button play2XSlowerButton;
     public Button play2XFasterButton;
     public Label mediaPlayerRateLabel;
@@ -119,9 +123,11 @@ public class MainController implements Initializable {
     public ToggleButton showPlayingIconTreeCheckbox;
     public ToggleButton showLineNumbersCheckbox;
     public HBox showPlayinIconTreeHBox;
-    public ToggleButton showReflectionCheckbox;
+    public ToggleButton showReflectionBottomButton;
     public ToggleButton showReflectionButton;
     public ToggleButton lockMediaViewBottomToggle;
+    public ToggleButton fitScreenToggleButton;
+    public ToggleButton fitScreenToggleMediaButton;
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
@@ -267,6 +273,18 @@ public class MainController implements Initializable {
                 ContextMenu cm = Utilities.createContextMenu(new FileInfo(pathLabelContent.getText()), mainTableView, list, this, "stackPane");
                 cm.show(mediaStackPane.getScene().getWindow(), e.getSceneX(), e.getSceneY());
             }
+
+//            if (e.getButton() == MouseButton.PRIMARY) {
+//                if (e.getClickCount() == 1) {
+//                    if (MainController.mediaPlayer != null) {
+//                        if (MainController.mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+//                            MainController.mediaPlayer.pause();
+//                        } else {
+//                            MainController.mediaPlayer.play();
+//                        }
+//                    }
+//                }
+//            }
         });
 
         DraggingInit.initDraggingBindings(this);
@@ -388,6 +406,9 @@ public class MainController implements Initializable {
 
         mainTextField.setText("mp4");
 
+        fitScreenToggleButton.setOnAction(e -> fitScreenAction(e, 1.0));
+        fitScreenToggleMediaButton.setOnAction(e -> fitScreenAction(e, 1.0));
+
         RegexUtilities.searchAndRefresh(this);
         rightPaneMediaView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
         rightPaneImageView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty());
@@ -400,6 +421,7 @@ public class MainController implements Initializable {
 
         fullScreenMediaButton.disableProperty().bind(Utilities.maximized);
         normalScreenMediaButton.disableProperty().bind(Utilities.maximized.not());
+        fitScreenToggleMediaButton.selectedProperty().bindBidirectional(fitScreenToggleButton.selectedProperty());
 
         stopCurrentSearchButton.setOnAction(e -> {
             if (searchingTask.getFuture() != null) {
@@ -421,6 +443,7 @@ public class MainController implements Initializable {
         totalTimeLabel.fontProperty().bind(fontObjectProperty);
 
         volumeAndCurrentTimeSwipeLabel.fontProperty().bind(fontObjectProperty);
+        volumeAndCurrentTimeSwipeLabel.effectProperty().bind(Bindings.when(showReflectionBottomButton.selectedProperty()).then(new Reflection()).otherwise((Reflection) null));
 
         rightPaneScrollPane.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -572,32 +595,6 @@ public class MainController implements Initializable {
                             }, 3000);
                         }
                     }
-                } else if (filePathTreeItem.getType().equals("pdf")) {
-
-                    //TODO full screen pdf
-//                    ObservableList<Node> nodes = mediaPlayerControls.getChildren();
-//                    if (!mediaPlayerControls.isVisible()) {
-//                        System.out.println(mediaPlayerControls.getChildren());
-//                        mediaPlayerControls.getChildren().remove(0,6);
-//                        mediaPlayerControls.getChildren().remove(9,10);
-//                        Utilities.addToView(mediaPlayerControls);
-//                    } else {
-//                        if (disappearTimer != null) {
-//                            disappearTimer.cancel();
-//                            disappearTimer.purge();
-//                            disappearTimer = new Timer();
-//                            disappearTimer.schedule(new TimerTask() {
-//                                @Override
-//                                public void run() {
-//                                    Platform.runLater(() -> {
-//                                        Utilities.removeFromView(mediaPlayerControls);
-//                                        mediaPlayerControls.getChildren().clear();
-//                                        mediaPlayerControls.getChildren().addAll(nodes);
-//                                    });
-//                                }
-//                            }, 3000);
-//                        }
-//                    }
                 }
             });
 
@@ -674,7 +671,7 @@ public class MainController implements Initializable {
         });
 
         autoPlayMediaControl.selectedProperty().bindBidirectional(autoplayCheckbox.selectedProperty());
-        showReflectionButton.selectedProperty().bindBidirectional(showReflectionCheckbox.selectedProperty());
+        showReflectionButton.selectedProperty().bindBidirectional(showReflectionBottomButton.selectedProperty());
     }
 
     private void refreshTreeViewFromBottom() {
@@ -833,39 +830,103 @@ public class MainController implements Initializable {
     }
 
     public void returnToOldDividers(ActionEvent actionEvent) {
-        addToPane("mediaContextMenu");
+        restorePanesToOld("mediaContextMenu");
+    }
+
+    public void removePaneSingular(String pane) {
+        ObservableList<Node> items = mainSplitPane.getItems();
+
+        if (items.size() == 1) {
+            CommonUtilities.showErrorAlert("Cannot Remove Last Pane");
+        } else if (items.size() == 3) {
+            checkForSender(pane, items);
+        } else if (items.size() == 2) {
+
+            if (pane.equals("mediaContextMenu")) {
+                items.remove(rightPaneScrollPane);
+            } else {
+
+                if (pane.equals("tableView")) {
+                    items.remove(mainTableView);
+                } else if (pane.equals("treeView")) {
+                    items.remove(fileBrowserTreeTable);
+                }
+                if (items.get(0) == rightPaneScrollPane) {
+                    //removing all but media view right pane
+                    Utilities.removeFromView(rightSidePaneTextVBox);
+                    Utilities.removeFromView(topHBox);
+                    Utilities.removeFromView(bottomHBox);
+                    Utilities.removeFromView(topSecondHBox);
+                    Utilities.maximized.set(true);
+                }
+            }
+        }
+    }
+
+    public void checkForSender(String pane, ObservableList<Node> items) {
+        if (pane.equals("tableView")) {
+            items.remove(mainTableView);
+        } else if (pane.equals("treeView")) {
+            items.remove(fileBrowserTreeTable);
+        } else {
+            items.remove(rightPaneScrollPane);
+        }
     }
 
     public void removePanes(String mediaControl) {
-        Preferences.userRoot().putDouble("dividerPos0", mainSplitPane.getDividerPositions()[0]);
-        Preferences.userRoot().putDouble("dividerPos1", mainSplitPane.getDividerPositions()[1]);
 
         ObservableList<Node> items = mainSplitPane.getItems();
 
-        if (mediaControl.equals("mediaContextMenu")) {
+        if (items.size() == 3) {
+            Preferences.userRoot().putDouble("dividerPos0", mainSplitPane.getDividerPositions()[0]);
+            Preferences.userRoot().putDouble("dividerPos1", mainSplitPane.getDividerPositions()[1]);
 
-            Utilities.removeFromView(rightSidePaneTextVBox);
-            Utilities.removeFromView(topHBox);
-            Utilities.removeFromView(bottomHBox);
-            Utilities.removeFromView(topSecondHBox);
-            items.remove(0, 2);
+            if (mediaControl.equals("mediaContextMenu")) {
 
-            Utilities.addToView(fileNameLabelMediaControls);
-        } else if (mediaControl.equals("treeView")) {
-            items.remove(1, 3);
-        } else if (mediaControl.equals("tableView")) {
-            items.remove(0);
-            items.remove(1);
+                Utilities.removeFromView(rightSidePaneTextVBox);
+                Utilities.removeFromView(topHBox);
+                Utilities.removeFromView(bottomHBox);
+                Utilities.removeFromView(topSecondHBox);
+                items.remove(0, 2);
+
+                Utilities.addToView(fileNameLabelMediaControls);
+            } else if (mediaControl.equals("treeView")) {
+                items.remove(1, 3);
+            } else if (mediaControl.equals("tableView")) {
+                items.remove(0);
+                items.remove(1);
+            }
+        } else if (items.size() == 2) {
+
+            if (mediaControl.equals("mediaContextMenu")) {
+
+                Utilities.removeFromView(rightSidePaneTextVBox);
+                Utilities.removeFromView(topHBox);
+                Utilities.removeFromView(bottomHBox);
+                Utilities.removeFromView(topSecondHBox);
+                items.remove(0);
+            } else if (mediaControl.equals("treeView")) {
+                items.remove(1);
+            } else if (mediaControl.equals("tableView")) {
+                if (items.get(0) != mainTableView) {
+                    items.remove(0);
+                } else {
+                    items.remove(1);
+                }
+            }
+        } else {
+            CommonUtilities.showErrorAlert("Already Maximized.");
         }
-
         Utilities.maximized.set(true);
     }
 
-    public void addToPane(String mediaControl) {
+    public void restorePanesToOld(String mediaControl) {
 
         Double sp = Preferences.userRoot().getDouble("dividerPos0", 0.2);
         Double sp2 = Preferences.userRoot().getDouble("dividerPos1", 0.8);
         ObservableList<Node> items = mainSplitPane.getItems();
+
+        mainSplitPane.getItems().clear();
 
         if (mediaControl.equals("mediaContextMenu")) {
             Utilities.addToView(rightSidePaneTextVBox);
@@ -875,23 +936,11 @@ public class MainController implements Initializable {
             Utilities.removeFromView(fileNameLabelMediaControls);
 
             Utilities.addToView(sliderHbox);
-
-            items.add(0, fileBrowserTreeTable);
-            items.add(1, mainTableView);
-        } else if (mediaControl.equals("treeView")) {
-
-            items.add(1, mainTableView);
-            items.add(2, rightPaneScrollPane);
-        }else if (mediaControl.equals("tableView")) {
-
-
-            items.add(0, fileBrowserTreeTable);
-            items.add(2, rightPaneScrollPane);
         }
+        items.addAll(Arrays.asList(fileBrowserTreeTable, mainTableView, rightPaneScrollPane));
 
         mainSplitPane.setDividerPositions(sp, sp2);
         Utilities.maximized.set(false);
-
     }
 
     public void goToDownloadsDirectory(ActionEvent actionEvent) {
@@ -1051,19 +1100,19 @@ public class MainController implements Initializable {
 
     public void showReflection(ActionEvent actionEvent) {
 
-        if (showReflectionCheckbox.isSelected()) {
+        if (showReflectionBottomButton.isSelected()) {
             Utilities.initEffects(this.rightPaneMediaView);
             Utilities.initEffects(this.rightPaneImageView);
             Utilities.initEffects(this.playPositionSlider);
             Utilities.initEffects(this.mediaPlayerControls);
-            Utilities.initEffects(this.volumeAndCurrentTimeSwipeLabel);
+//            Utilities.initEffects(this.volumeAndCurrentTimeSwipeLabel);
         } else {
 
             Utilities.removeEffects(this.rightPaneMediaView);
             Utilities.removeEffects(this.rightPaneImageView);
             Utilities.removeEffects(this.playPositionSlider);
             Utilities.removeEffects(this.mediaPlayerControls);
-            Utilities.removeEffects(this.volumeAndCurrentTimeSwipeLabel);
+//            Utilities.removeEffects(this.volumeAndCurrentTimeSwipeLabel);
         }
     }
 
@@ -1094,6 +1143,72 @@ public class MainController implements Initializable {
 
                 FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(fileInfo.getAbsolutePath()), true);
             });
+        }
+    }
+
+    Rectangle2D oldScreenSize;
+
+    ArrayList<Point2D> points = new ArrayList<>();
+    Integer counter = 0;
+
+    {
+        Rectangle2D rect = Screen.getPrimary().getBounds();
+        points.add(new Point2D(rect.getMinX(),rect.getMinY()));
+        points.add(new Point2D(rect.getMinX(), rect.getMaxY()/2));
+        points.add(new Point2D(rect.getMaxX()/2, rect.getMaxY()/2));
+        points.add(new Point2D(rect.getMaxX()/2, rect.getMinY()));
+
+
+
+    }
+
+    public void fitScreenAction(ActionEvent actionEvent, Double size) {
+
+        if (size == 0.25) {
+
+
+
+            Rectangle2D rect = Screen.getPrimary().getBounds();
+
+            Double oldX = mainSplitPane.getScene().getWindow().getX();
+            Double oldY = mainSplitPane.getScene().getWindow().getY();
+
+            Double height = mainSplitPane.getScene().getWindow().getHeight();
+            Double width = mainSplitPane.getScene().getWindow().getWidth();
+            oldScreenSize = new Rectangle2D(oldX, oldY, width, height);
+            mainSplitPane.getScene().getWindow().setHeight(rect.getHeight() / 2);
+            mainSplitPane.getScene().getWindow().setWidth(rect.getWidth() / 2);
+
+            mainSplitPane.getScene().getWindow().setX(points.get(counter%4).getX());
+            mainSplitPane.getScene().getWindow().setY(points.get(counter%4).getY());
+            counter++;
+        } else if (size == 1.0) {
+
+            if (fitScreenToggleButton.isSelected()) {
+                Rectangle2D rect = Screen.getPrimary().getBounds();
+
+                Double oldX = mainSplitPane.getScene().getWindow().getX();
+                Double oldY = mainSplitPane.getScene().getWindow().getY();
+
+                Double height = mainSplitPane.getScene().getWindow().getHeight();
+                Double width = mainSplitPane.getScene().getWindow().getWidth();
+
+                oldScreenSize = new Rectangle2D(oldX, oldY, width, height);
+
+                mainSplitPane.getScene().getWindow().setHeight(rect.getHeight());
+                mainSplitPane.getScene().getWindow().setWidth(rect.getWidth());
+
+                mainSplitPane.getScene().getWindow().setX(rect.getMinX());
+                mainSplitPane.getScene().getWindow().setY(rect.getMinY());
+            } else {
+
+                if (oldScreenSize != null) {
+                    mainSplitPane.getScene().getWindow().setHeight(oldScreenSize.getHeight());
+                    mainSplitPane.getScene().getWindow().setWidth(oldScreenSize.getWidth());
+                    mainSplitPane.getScene().getWindow().setX(oldScreenSize.getMinX());
+                    mainSplitPane.getScene().getWindow().setY(oldScreenSize.getMinY());
+                }
+            }
         }
     }
 }

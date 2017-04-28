@@ -170,3 +170,8 @@
     -fx-graphic: url("/png/playtree.png");
 
 }
+
+#fitScreen{
+    -fx-graphic: url("/png/fitscreen.png");
+
+}
