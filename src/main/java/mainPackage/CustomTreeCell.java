@@ -60,14 +60,9 @@ public class CustomTreeCell extends TreeCell<FilePathTreeItem> {
             if (!item.isDirectory()) {
                 tooltip.setGraphic(new ImageView(fileInfo.getFileImage()));
             } else {
-                if (item.specialDirs.contains(item.getPathString())) {
-                    if (item.getPathString().equals(FilePathTreeItem.home)) {
-                        tooltip.setGraphic(new ImageView(FilePathTreeItem.homeImage));
-                    } else if (item.getPathString().equals(FilePathTreeItem.downloads)) {
-                        tooltip.setGraphic(new ImageView(FilePathTreeItem.dlImage));
-                    } else if (item.getPathString().equals(FilePathTreeItem.desktop)) {
-                        tooltip.setGraphic(new ImageView(FilePathTreeItem.desktopImage));
-                    }
+                if (item.specialDirs.containsKey(item.getPathString())) {
+                    tooltip.setGraphic(new ImageView(item.specialDirs.get(item.getPathString())));
+
                 } else {
                     tooltip.setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
                 }

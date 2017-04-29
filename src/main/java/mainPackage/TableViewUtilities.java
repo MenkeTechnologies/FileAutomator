@@ -51,7 +51,12 @@ public class TableViewUtilities {
 
                     private void setDefaultGraphic(FileInfo fileAtRow) {
                         if (fileAtRow.isDirectory()) {
-                            setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
+                            if (FilePathTreeItem.specialDirs.containsKey(fileAtRow.getAbsolutePath())) {
+                                setGraphic(new ImageView(FilePathTreeItem.specialDirs.get(fileAtRow.getAbsolutePath())));
+                            } else{
+                                setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
+
+                            }
                         } else {
 
                             String type = FileTypeUtilities.getFileType(fileAtRow.getAbsolutePath());

@@ -148,6 +148,7 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+
         mediaPlayer = new MediaPlayer(new Media(getClass().getResource("/ClosedHH.wav").toExternalForm()));
         Double scalingFactor = 7d;
 
@@ -288,7 +289,6 @@ public class MainController implements Initializable {
                     startPlayingMedia(item, true, false);
                 }
             }
-
         });
     }
 
@@ -748,7 +748,7 @@ public class MainController implements Initializable {
         if (searchingTask.getState() != Task.State.RUNNING) {
             Utilities.addToView(sphere);
             timeline.play();
-            System.out.println("started secondary");
+           // System.out.println("started secondary");
             stopCurrentSearchButton.setText("Stop Load");
             loadingTask = new CustomTask<String>(this, r, false);
         } else {
@@ -957,16 +957,18 @@ public class MainController implements Initializable {
 
     public void rewindToStart(MouseEvent actionEvent) {
 
-        if (actionEvent.getEventType() == MouseEvent.MOUSE_CLICKED) {
-            if (actionEvent.getButton() == MouseButton.PRIMARY) {
-                if (actionEvent.getClickCount() == 1) {
+        if (MainController.mediaPlayer != null) {
+            if (actionEvent.getEventType() == MouseEvent.MOUSE_CLICKED) {
+                if (actionEvent.getButton() == MouseButton.PRIMARY) {
+                    if (actionEvent.getClickCount() == 1) {
 
-                    mediaPlayer.stop();
-                    mediaPlayer.seek(Duration.ZERO);
-                    mediaPlayer.pause();
-                    mediaPlayer.play();
-                } else {
-                    Utilities.endOfMediaAction(this, false);
+                        mediaPlayer.stop();
+                        mediaPlayer.seek(Duration.ZERO);
+                        mediaPlayer.pause();
+                        mediaPlayer.play();
+                    } else {
+                        Utilities.endOfMediaAction(this, false);
+                    }
                 }
             }
         }
@@ -1120,12 +1122,14 @@ public class MainController implements Initializable {
     }
 
     public void playNext(ActionEvent actionEvent) {
-        mediaPlayer.stop();
-        mediaPlayer.play();
-        if (autoplayCheckbox.isSelected()) {
-            Utilities.endOfMediaAction(this, true);
-        } else {
-            Utilities.endOfMediaAction(this, true);
+        if (MainController.mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.play();
+            if (autoplayCheckbox.isSelected()) {
+                Utilities.endOfMediaAction(this, true);
+            } else {
+                Utilities.endOfMediaAction(this, true);
+            }
         }
     }
 

@@ -160,7 +160,7 @@ public class FileInfo extends File {
                 ", lastModified=" + lastModified.get() +
                 ", fileType=" + fileType.get() +
                 ", hiddenProperty=" + hiddenProperty.get() +
-                "} " + super.toString();
+                "} ";
     }
 
     public SimpleStringProperty fileNameProperty() {
