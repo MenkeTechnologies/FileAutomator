@@ -64,12 +64,12 @@ public class CustomTask<T> extends Task<String> {
 
         executorService = Executors.newSingleThreadExecutor();
         future = executorService.submit(r);
-        System.out.println("called and submitting to executor");
+        //System.out.println("called and submitting to executor");
 
         try {
-            System.out.println("waiting on future");
+            //System.out.println("waiting on future");
             future.get();
-            System.out.println("future done");
+            //System.out.println("future done");
 
 
 

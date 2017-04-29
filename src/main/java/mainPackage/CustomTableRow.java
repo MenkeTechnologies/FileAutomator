@@ -68,7 +68,14 @@ public class CustomTableRow extends TableRow<FileInfo> {
             if (!item.isDirectory()){
                 tooltip.setGraphic(new ImageView(fileInfo.getFileImage()));
             } else {
-                tooltip.setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
+
+                if (FilePathTreeItem.specialDirs.containsKey(item.getAbsolutePath())) {
+                    tooltip.setGraphic(new ImageView(FilePathTreeItem.specialDirs.get(item.getAbsolutePath())));
+
+                } else {
+                    tooltip.setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
+                }
+
             }
 
             setTooltip(tooltip);

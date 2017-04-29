@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -57,13 +58,16 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> {
     static String home = System.getProperty("user.home");
     static String downloads = System.getProperty("user.home") + File.separator + "Downloads";
     static String desktop = System.getProperty("user.home") + File.separator + "Desktop";
-    public ArrayList<String> specialDirs = new ArrayList<>();
+    static public HashMap<String, Image> specialDirs = new HashMap<>();
     private boolean isTextual;
     private boolean isHost;
     private String fileName;
 
     {
-        specialDirs.addAll(Arrays.asList(home, desktop, downloads));
+
+        FilePathTreeItem.specialDirs.put(FilePathTreeItem.home, FilePathTreeItem.homeImage);
+        FilePathTreeItem.specialDirs.put(FilePathTreeItem.downloads, FilePathTreeItem.dlImage);
+        FilePathTreeItem.specialDirs.put(FilePathTreeItem.desktop, FilePathTreeItem.desktopImage);
     }
 
     @Override
@@ -173,7 +177,8 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> {
 
                     boolean isSpecial = false;
                     for (int i = 0; i < specialDirs.size(); i++) {
-                        if (specialDirs.get(i).equals(source.getPathString())) {
+
+                        if (specialDirs.containsKey(source.getPathString())) {
                             isSpecial = true;
                         }
                     }
@@ -196,7 +201,7 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> {
 
                     boolean isSpecial = false;
                     for (int i = 0; i < specialDirs.size(); i++) {
-                        if (specialDirs.get(i).equals(source.getPathString())) {
+                        if (specialDirs.containsKey(source.getPathString())) {
                             isSpecial = true;
                         }
                     }
