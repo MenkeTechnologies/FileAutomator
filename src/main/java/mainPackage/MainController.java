@@ -1159,6 +1159,10 @@ public class MainController implements Initializable {
         points.add(new Point2D(rect.getMaxX()/2, rect.getMinY()));
 
 
+    }
+
+
+    {
 
     }
 
