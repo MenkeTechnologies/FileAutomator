@@ -24,16 +24,16 @@ public class TreeViewInitialization {
             e.printStackTrace();
         }
 
-        Image image = new Image(mainController.getClass().getResourceAsStream("/png/computer.png"));
+        Image hostImage = new Image(mainController.getClass().getResourceAsStream("/png/computer.png"));
 
-        TreeItem<String> rootnode = new TreeItem<>(hostName, new ImageView(image));
+        TreeItem<FilePathTreeItem> rootnode = new TreeItem<>(new FilePathTreeItem(hostName, true), new ImageView(hostImage));
+
         Iterable<Path> rootDirectories = FileSystems.getDefault().getRootDirectories();
 
         for (Path name : rootDirectories) {
             FilePathTreeItem treeNode = new FilePathTreeItem(name, mainController);
 
             rootnode.getChildren().add(treeNode);
-
             try {
                 treeNode.populateTreeItem(treeNode);
                 treeNode.setExpanded(true);
@@ -64,30 +64,9 @@ public class TreeViewInitialization {
         });
 
 
-
-
-//        mainController.mainTableView.setRowFactory(new Callback() {
-//
-//            @Override
-//            public Object call(Object param) {
-//                TableRow<FileInfo> row = new TableRow<>();
-//
-//                row.setOnMouseClicked(e -> {
-//                    if (e.getButton() == MouseButton.SECONDARY) {
-//
-//                        FileInfo selectedItem = row.getItem();
-//
-
-//                    }
-//                });
-//
-//                return row;
-//            }
-//        });
-
-        mainController.fileBrowserTreeTable.setCellFactory(new Callback<TreeView, TreeCell>() {
+        mainController.fileBrowserTreeTable.setCellFactory(new Callback<TreeView<FilePathTreeItem>, TreeCell<FilePathTreeItem>>() {
             @Override
-            public TreeCell call(TreeView param) {
+            public TreeCell<FilePathTreeItem> call(TreeView param) {
 
                 return new CustomTreeCell(mainController.fileBrowserTreeTable, mainController.mainTableView, mainController.files, mainController);
 

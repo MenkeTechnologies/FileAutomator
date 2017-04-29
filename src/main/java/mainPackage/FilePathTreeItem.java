@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +23,7 @@ import java.util.Iterator;
 /**
  * Created by jacobmenke on 4/13/17.
  */
-public class FilePathTreeItem extends TreeItem<String> {
+public class FilePathTreeItem extends TreeItem<FilePathTreeItem> {
     public static Image folderCollapseImage = new Image(MainController.class.getResourceAsStream("/png/folderClosed.png"));
     public static Image folderExpandImage = new Image(MainController.class.getResourceAsStream("/png/folderOpen.png"));
     public static Image fileImage = new Image(MainController.class.getResourceAsStream("/png/file.png"));
@@ -53,21 +54,21 @@ public class FilePathTreeItem extends TreeItem<String> {
     private String fullPath;
     boolean isDirectory = false;
     private String type;
-    String home = System.getProperty("user.home");
-    String downloads = System.getProperty("user.home") + File.separator + "Downloads";
-    String desktop = System.getProperty("user.home") + File.separator + "Desktop";
-    ArrayList<String> specialDirs = new ArrayList<>();
+    static String home = System.getProperty("user.home");
+    static String downloads = System.getProperty("user.home") + File.separator + "Downloads";
+    static String desktop = System.getProperty("user.home") + File.separator + "Desktop";
+    public ArrayList<String> specialDirs = new ArrayList<>();
     private boolean isTextual;
     private boolean isHost;
+    private String fileName;
+
+    {
+        specialDirs.addAll(Arrays.asList(home, desktop, downloads));
+    }
 
     @Override
     public String toString() {
-        return "FilePathTreeItem{" +
-                "fullPath='" + fullPath + '\'' +
-                ", isDirectory=" + isDirectory +
-                ", type='" + type + '\'' +
-                ", isTextual=" + isTextual +
-                "} " + super.toString();
+        return fullPath;
     }
 
     public boolean isTextual() {
@@ -101,9 +102,9 @@ public class FilePathTreeItem extends TreeItem<String> {
     }
 
     public FilePathTreeItem(String fullPath, boolean isHost) {
-        super(fullPath);
         if (isHost) {
             this.fullPath = fullPath;
+            this.fileName = fullPath;
             this.isHost = isHost;
             isDirectory = false;
             type = "host";
@@ -122,12 +123,18 @@ public class FilePathTreeItem extends TreeItem<String> {
         return isHost;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
     public FilePathTreeItem(Path file, MainController mainController) {
-        super(file.toString());
         isHost = false;
 
-        specialDirs.addAll(Arrays.asList(home, desktop, downloads));
-
+        if (file.getFileName() != null) {
+            this.fileName = file.getFileName().toString();
+        } else {
+            this.fileName = "/";
+        }
         this.fullPath = file.toString();
         this.mainController = mainController;
 
@@ -156,15 +163,7 @@ public class FilePathTreeItem extends TreeItem<String> {
             setGraphic(new ImageView(FilePathTreeItem.getImageFromType(type)));
         }
 
-        if (!fullPath.endsWith(File.separator)) {
-            String value = file.toString();
-            int indexOf = value.lastIndexOf(File.separator);
-            if (indexOf > 0) {
-                setValue(value.substring(indexOf + 1));
-            } else {
-                setValue(value);
-            }
-        }
+        setValue(this);
 
         addEventHandler(TreeItem.branchExpandedEvent(), new EventHandler() {
             @Override
@@ -210,6 +209,7 @@ public class FilePathTreeItem extends TreeItem<String> {
                 }
             }
         });
+
     }
 
     public void populateSourceAndImmediateChildren(FilePathTreeItem source) {
@@ -307,7 +307,7 @@ public class FilePathTreeItem extends TreeItem<String> {
     public void recurseAndSelectTreeItems(Iterator pathIterator, boolean checkForExpanded, MainController mainController, boolean select) {
         Path nextPath = (Path) pathIterator.next();
 
-        for (TreeItem<String> child : getChildren()) {
+        for (TreeItem<FilePathTreeItem> child : getChildren()) {
             String treePathName = child.getValue().toString().replace("/", "");
 
             if (treePathName.equals(nextPath.toString())) {
@@ -342,9 +342,8 @@ public class FilePathTreeItem extends TreeItem<String> {
 
                         oldFilePathTreeItem = (FilePathTreeItem) child;
 
-                        if (mainController.showPlayingIconTreeCheckbox.isSelected()){
+                        if (mainController.showPlayingIconTreeCheckbox.isSelected()) {
                             child.setGraphic(new ImageView(FilePathTreeItem.playingImage));
-
                         } else {
                             child.setGraphic(oldPathGraphic);
                         }

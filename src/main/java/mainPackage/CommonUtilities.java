@@ -3,10 +3,7 @@ package mainPackage;
 import com.apple.eio.FileManager;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
@@ -36,6 +33,10 @@ public class CommonUtilities {
     public static AtomicLong TOTAL_FILE_COUNTER = new AtomicLong(0);
     public static AtomicLong MATCHING_FILE_COUNTER = new AtomicLong(0);
 
+    public static void formatTooltip(Tooltip tooltip) {
+        tooltip.setWrapText(true);
+        tooltip.setMaxSize(1000,1000);
+    }
     public static String createLineNumberingFromString(String s, MainController mainController) {
 
         Scanner scanner = new Scanner(s);

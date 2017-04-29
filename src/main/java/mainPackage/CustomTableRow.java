@@ -15,8 +15,6 @@ import java.lang.reflect.Field;
  */
 public class CustomTableRow extends TableRow<FileInfo> {
 
-
-
     public static void changeToolTipTime(Tooltip tooltip, Integer time) {
         try {
             Field fieldBehavior = tooltip.getClass().getDeclaredField("BEHAVIOR");
@@ -39,8 +37,7 @@ public class CustomTableRow extends TableRow<FileInfo> {
 
 
     public CustomTableRow(TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
-        tooltip.setWrapText(true);
-        tooltip.setMaxSize(1000,1000);
+        CommonUtilities.formatTooltip(tooltip);
 
 
         this.setOnMouseClicked(e-> {
@@ -54,6 +51,8 @@ public class CustomTableRow extends TableRow<FileInfo> {
         });
     }
 
+
+
     @Override
     protected void updateItem(FileInfo item, boolean empty) {
         super.updateItem(item, empty);
@@ -65,7 +64,12 @@ public class CustomTableRow extends TableRow<FileInfo> {
 
             changeToolTipTime(tooltip,3);
             tooltip.setText(fileInfo.toString());
-            tooltip.setGraphic(new ImageView(fileInfo.getFileImage()));
+
+            if (!item.isDirectory()){
+                tooltip.setGraphic(new ImageView(fileInfo.getFileImage()));
+            } else {
+                tooltip.setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
+            }
 
             setTooltip(tooltip);
         }

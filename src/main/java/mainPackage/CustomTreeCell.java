@@ -6,9 +6,11 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.effect.Glow;
 import javafx.scene.effect.Reflection;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 
+import java.io.File;
 import java.nio.file.Paths;
 
 import static mainPackage.CustomTableRow.changeToolTipTime;
@@ -16,14 +18,13 @@ import static mainPackage.CustomTableRow.changeToolTipTime;
 /**
  * Created by jacobmenke on 4/15/17.
  */
-public class CustomTreeCell extends TreeCell {
-
+public class CustomTreeCell extends TreeCell<FilePathTreeItem> {
     public CustomTreeCell(TreeView fileBrowserTreeTable, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
 
-        this.setOnMouseClicked(e->{
-            if (e.getButton() == MouseButton.SECONDARY){
+        this.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
 
-                FilePathTreeItem filePathTreeItem = (FilePathTreeItem)this.getTreeItem();
+                FilePathTreeItem filePathTreeItem = (FilePathTreeItem) this.getTreeItem();
 
                 ContextMenu cm = Utilities.createContextMenu(new FileInfo(filePathTreeItem.getPathString()), mainTableView, files, mainController, "treeView");
 
@@ -35,29 +36,44 @@ public class CustomTreeCell extends TreeCell {
     private Tooltip tooltip = new Tooltip();
 
     @Override
-    protected void updateItem(Object item, boolean empty) {
+    protected void updateItem(FilePathTreeItem item, boolean empty) {
         super.updateItem(item, empty);
 
         if (empty) {
             setText(null);
             setGraphic(null);
         } else {
-            setText(item.toString());
-            setGraphic(getTreeItem().getGraphic());
-            changeToolTipTime(tooltip,3);
+            setText(item.getFileName());
 
-            if (item instanceof FilePathTreeItem){
-                FilePathTreeItem filePathTreeItem = (FilePathTreeItem)item;
-                FileInfo fileInfo = new FileInfo(filePathTreeItem.getPathString());
+            ImageView imageView = (ImageView) getTreeItem().getGraphic();
 
-                tooltip.setText(fileInfo.toString());
+            setGraphic(item.getGraphic());
+
+            CommonUtilities.formatTooltip(tooltip);
+
+            changeToolTipTime(tooltip, 1);
+
+            FileInfo fileInfo = new FileInfo(item.getPathString());
+
+            tooltip.setText(fileInfo.toString());
+
+            if (!item.isDirectory()) {
                 tooltip.setGraphic(new ImageView(fileInfo.getFileImage()));
-            } else{
-                tooltip.setText(item.toString());
+            } else {
+                if (item.specialDirs.contains(item.getPathString())) {
+                    if (item.getPathString().equals(FilePathTreeItem.home)) {
+                        tooltip.setGraphic(new ImageView(FilePathTreeItem.homeImage));
+                    } else if (item.getPathString().equals(FilePathTreeItem.downloads)) {
+                        tooltip.setGraphic(new ImageView(FilePathTreeItem.dlImage));
+                    } else if (item.getPathString().equals(FilePathTreeItem.desktop)) {
+                        tooltip.setGraphic(new ImageView(FilePathTreeItem.desktopImage));
+                    }
+                } else {
+                    tooltip.setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
+                }
             }
 
             setTooltip(tooltip);
-
         }
     }
 }
