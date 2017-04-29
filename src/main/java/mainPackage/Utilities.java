@@ -89,9 +89,11 @@ public class Utilities {
         TerminalTab terminalTab = terminalBuilder1.newTerminal();
 
         TabPane tabPane = new TabPane();
-        tabPane.getTabs().addAll(terminal, terminalTab);
+        tabPane.getTabs().addAll(terminalTab);
 
-        group.getChildren().addAll(cleanUpButton, menuBar1, tabPane, new Label("cool"));
+        tabPane.prefHeightProperty().bind(scene.heightProperty());
+
+        group.getChildren().addAll(cleanUpButton, menuBar1, tabPane);
 //        Scene newScene = new Scene(group, oldScene.getWidth(), oldScene.getHeight());
         Parent root = scene.getRoot();
 
