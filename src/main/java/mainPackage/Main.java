@@ -83,8 +83,12 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    public void initKeyBindings(MainController mainController) {
+    public static void initKeyBindings(MainController mainController) {
         mainController.mainSplitPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+
+            mainController.initMainTableViewKeyBindings();
+            mainController.initTreeViewKeyBindings();
+
             if (e.getCode() == KeyCode.SPACE) {
                 if (MainController.mediaPlayer != null) {
                     if (MainController.mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
@@ -95,6 +99,7 @@ public class Main extends Application {
                 }
                 e.consume();
             }
+
             if (e.getCode() == KeyCode.F) {
 
                 if (Utilities.maximized.get()) {
@@ -103,12 +108,13 @@ public class Main extends Application {
                     mainController.maximizeVideo(null);
                     Utilities.maximized.set(true);
                 }
+
                 e.consume();
             }
 
             if (e.getCode() == KeyCode.Q) {
                 mainController.fitScreenAction(null, 0.25);
-
+                e.consume();
             }
             if (e.getCode() == KeyCode.W) {
                 if (!mainController.fitScreenToggleMediaButton.isSelected()) {
@@ -117,8 +123,7 @@ public class Main extends Application {
                     mainController.fitScreenToggleMediaButton.setSelected(false);
                 }
                 mainController.fitScreenAction(null, 1.0);
-
-
+                e.consume();
             }
 
             if (MainController.mediaPlayer != null) {
@@ -126,54 +131,65 @@ public class Main extends Application {
                     mainController.playNext(null);
                     mainController.mediaPlayerControls.setVisible(true);
                     mainController.hideNodeAfterDelay(mainController.mediaPlayerControls);
+                    e.consume();
                 }
                 if (e.getCode() == KeyCode.P) {
                     Utilities.endOfMediaAction(mainController, false);
                     mainController.mediaPlayerControls.setVisible(true);
 
                     mainController.hideNodeAfterDelay(mainController.mediaPlayerControls);
+                    e.consume();
                 }
 
+                if (e.getCode() == KeyCode.DIGIT0) {
+                    MainController.mediaPlayer.seek(Duration.minutes(0));
+                    e.consume();
+                }
+                if (e.getCode() == KeyCode.DIGIT1) {
+                    MainController.mediaPlayer.seek(Duration.minutes(1));
+                    e.consume();
+                }
+                if (e.getCode() == KeyCode.DIGIT2) {
+                    MainController.mediaPlayer.seek(Duration.minutes(2));
+                    e.consume();
+                }
+                if (e.getCode() == KeyCode.DIGIT3) {
+                    MainController.mediaPlayer.seek(Duration.minutes(3));
+                    e.consume();
+                }
+                if (e.getCode() == KeyCode.DIGIT4) {
+                    MainController.mediaPlayer.seek(Duration.minutes(4));
+                    e.consume();
+                }
+                if (e.getCode() == KeyCode.DIGIT5) {
+                    MainController.mediaPlayer.seek(Duration.minutes(5));
+                    e.consume();
+                }
+                if (e.getCode() == KeyCode.DIGIT6) {
+                    MainController.mediaPlayer.seek(Duration.minutes(6));
+                    e.consume();
+                }
+                if (e.getCode() == KeyCode.DIGIT7) {
+                    MainController.mediaPlayer.seek(Duration.minutes(7));
+                    e.consume();
+                }
+                if (e.getCode() == KeyCode.DIGIT8) {
+                    MainController.mediaPlayer.seek(Duration.minutes(8));
+                    e.consume();
+                }
+                if (e.getCode() == KeyCode.DIGIT9) {
+                    MainController.mediaPlayer.seek(Duration.minutes(9));
+                    e.consume();
+                }
 
-                    if (e.getCode() == KeyCode.DIGIT0) {
-                        MainController.mediaPlayer.seek(Duration.minutes(0));
-                    }
-                    if (e.getCode() == KeyCode.DIGIT1) {
-                        MainController.mediaPlayer.seek(Duration.minutes(1));
-                    }
-                    if (e.getCode() == KeyCode.DIGIT2) {
-                        MainController.mediaPlayer.seek(Duration.minutes(2));
-                    }
-                    if (e.getCode() == KeyCode.DIGIT3) {
-                        MainController.mediaPlayer.seek(Duration.minutes(3));
-                    }
-                    if (e.getCode() == KeyCode.DIGIT4) {
-                        MainController.mediaPlayer.seek(Duration.minutes(4));
-                    }
-                    if (e.getCode() == KeyCode.DIGIT5) {
-                        MainController.mediaPlayer.seek(Duration.minutes(5));
-                    }
-                    if (e.getCode() == KeyCode.DIGIT6) {
-                        MainController.mediaPlayer.seek(Duration.minutes(6));
-                    }
-                    if (e.getCode() == KeyCode.DIGIT7) {
-                        MainController.mediaPlayer.seek(Duration.minutes(7));
-                    }
-                    if (e.getCode() == KeyCode.DIGIT8) {
-                        MainController.mediaPlayer.seek(Duration.minutes(8));
-                    }
-                    if (e.getCode() == KeyCode.DIGIT9) {
-                        MainController.mediaPlayer.seek(Duration.minutes(9));
-                    }
-
-                    if (e.getCode() == KeyCode.B) {
-                        MainController.mediaPlayer.seek(MainController.mediaPlayer.getCurrentTime().subtract(Duration.seconds(15)));
-                    }
-
-
+                if (e.getCode() == KeyCode.B) {
+                    MainController.mediaPlayer.seek(MainController.mediaPlayer.getCurrentTime().subtract(Duration.seconds(15)));
+                    e.consume();
+                }
             }
-            e.consume();
+
         });
+
     }
 
     public static void main(String[] args) {

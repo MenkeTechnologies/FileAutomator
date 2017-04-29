@@ -81,6 +81,7 @@ public class Utilities {
         TerminalTab terminal = terminalBuilder.newTerminal();
 
         TerminalConfig darkConfig = new TerminalConfig();
+
         darkConfig.setBackgroundColor(Color.rgb(16, 16, 16));
         darkConfig.setForegroundColor(Color.rgb(240, 240, 240));
         darkConfig.setCursorColor(Color.rgb(255, 0, 0, 0.5));
@@ -226,8 +227,9 @@ public class Utilities {
 
             mainController.imagesVBox.getChildren().clear();
 
-            mainController.fileNameLabelMediaControls.setText("Playing " + filePathTreeItem.getPath().getFileName().toString());
-
+            if (filePathTreeItem.getPath().getFileName() != null) {
+                mainController.fileNameLabelMediaControls.setText("Playing " + filePathTreeItem.getPath().getFileName().toString());
+            }
             switch (fileType) {
 
                 case "image":
@@ -472,6 +474,7 @@ public class Utilities {
         class SliderListener implements InvalidationListener {
             @Override
             public void invalidated(Observable observable) {
+
                 Platform.runLater(() -> {
                     updatePositonSlider(mainController);
                 });
@@ -582,7 +585,6 @@ public class Utilities {
     public static ContextMenu createContextMenu(FileInfo fileInfo, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController, String sender) {
         ContextMenu rowContextMenu = new ContextMenu();
         String name = "Open \"" + fileInfo.getFileName() + "\"";
-        System.out.println(name);
 
         MenuItem openItem = new MenuItem(name);
         MenuItem openInEnclosingItem = new MenuItem("Open Parent Directory");
@@ -604,13 +606,10 @@ public class Utilities {
         MenuItem quarterScreen = new MenuItem("Resize to Quarter of Screen");
 
         rowContextMenu.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem, copyAbsolutePathItem
-                ,sendToSourceDirectoryTextFieldItem, sendToDestinationDirectoryTextFieldItem, quarterScreen);
+                , sendToSourceDirectoryTextFieldItem, sendToDestinationDirectoryTextFieldItem, quarterScreen);
 
-
-        quarterScreen.setOnAction(e->{
-
+        quarterScreen.setOnAction(e -> {
             mainController.fitScreenAction(null, 0.25);
-
         });
 
         if (sender.equals("tableView") || sender.equals("stackPane")) {

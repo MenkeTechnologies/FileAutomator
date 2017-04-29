@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.*;
+import javafx.event.Event;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
@@ -228,34 +229,8 @@ public class MainController implements Initializable {
             }
         });
 
-        mainTableView.setOnKeyReleased(e -> {
-            Utilities.fromAutoPlay = false;
-
-            if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
-                Object item = mainTableView.getSelectionModel().getSelectedItem();
-
-                if (lockMediaViewMediaControlsToggle.isSelected()) {
-                    startPlayingMedia(item, false, false);
-                } else {
-                    startPlayingMedia(item, true, false);
-                }
-            }
-        });
-
         fileBrowserTreeTable.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
-
-                Object item = fileBrowserTreeTable.getSelectionModel().getSelectedItem();
-
-                if (!lockMediaViewMediaControlsToggle.isSelected()) {
-
-                    startPlayingMediaFromTree(item);
-                }
-            }
-        });
-
-        fileBrowserTreeTable.setOnKeyReleased(e -> {
-            if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
                 Object item = fileBrowserTreeTable.getSelectionModel().getSelectedItem();
 
                 if (!lockMediaViewMediaControlsToggle.isSelected()) {
@@ -273,18 +248,6 @@ public class MainController implements Initializable {
                 ContextMenu cm = Utilities.createContextMenu(new FileInfo(pathLabelContent.getText()), mainTableView, list, this, "stackPane");
                 cm.show(mediaStackPane.getScene().getWindow(), e.getSceneX(), e.getSceneY());
             }
-
-//            if (e.getButton() == MouseButton.PRIMARY) {
-//                if (e.getClickCount() == 1) {
-//                    if (MainController.mediaPlayer != null) {
-//                        if (MainController.mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-//                            MainController.mediaPlayer.pause();
-//                        } else {
-//                            MainController.mediaPlayer.play();
-//                        }
-//                    }
-//                }
-//            }
         });
 
         DraggingInit.initDraggingBindings(this);
@@ -298,6 +261,37 @@ public class MainController implements Initializable {
         initToolTips();
     }
 
+    public void initTreeViewKeyBindings() {
+        fileBrowserTreeTable.setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
+                Object item = fileBrowserTreeTable.getSelectionModel().getSelectedItem();
+
+                if (!lockMediaViewMediaControlsToggle.isSelected()) {
+
+                    startPlayingMediaFromTree(item);
+                }
+            }
+        });
+    }
+
+    public void initMainTableViewKeyBindings() {
+        mainTableView.setOnKeyReleased(e -> {
+            Utilities.fromAutoPlay = false;
+
+            if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
+
+                Object item = mainTableView.getSelectionModel().getSelectedItem();
+
+                if (lockMediaViewMediaControlsToggle.isSelected()) {
+                    startPlayingMedia(item, false, false);
+                } else {
+                    startPlayingMedia(item, true, false);
+                }
+            }
+
+        });
+    }
+
     private void initToolTips() {
 
     }
@@ -308,22 +302,23 @@ public class MainController implements Initializable {
 
         currentlySelectedFilePathTreeItem = filePathTreeItem;
 
-        updateRightSidePane(new FileInfo(filePathTreeItem.getPathString()));
+        if (filePathTreeItem.getPathString() != null) {
+            FileInfo file = new FileInfo(filePathTreeItem.getPathString());
 
-        runInBackgroundThreadSecondary(() -> {
-            Utilities.updateThumbnailRightSidePane(MainController.this, filePathTreeItem);
-        });
+            updateRightSidePane(file);
 
-        if (showPlayingIconTreeCheckbox.isSelected()) {
+            runInBackgroundThreadSecondary(() -> {
+                Utilities.updateThumbnailRightSidePane(MainController.this, filePathTreeItem);
+            });
 
-            FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(filePathTreeItem.getPathString()), true);
+            if (showPlayingIconTreeCheckbox.isSelected()) {
+
+                FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(this, Paths.get(filePathTreeItem.getPathString()), true);
+            }
         }
     }
 
     public void startPlayingMedia(Object item, boolean playInRightPane, boolean fromContext) {
-
-//        System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-//        "___ "+ CommonUtilities.turnBytesIntoHumanReadable(Runtime.getRuntime().freeMemory()) + " Out of " + CommonUtilities.turnBytesIntoHumanReadable(Runtime.getRuntime().maxMemory()));
 
         FileInfo fileInfo = (FileInfo) item;
 
@@ -883,7 +878,12 @@ public class MainController implements Initializable {
 
             if (mediaControl.equals("mediaContextMenu")) {
 
-                Utilities.removeFromView(rightSidePaneTextVBox);
+                FileInfo fileInfo = new FileInfo(pathLabelContent.getText());
+                String type = FileTypeUtilities.getFileType(fileInfo.getAbsolutePath());
+
+                if (type.equals("video") || type.equals("music") || type.equals("image")) {
+                    Utilities.removeFromView(rightSidePaneTextVBox);
+                }
                 Utilities.removeFromView(topHBox);
                 Utilities.removeFromView(bottomHBox);
                 Utilities.removeFromView(topSecondHBox);
@@ -929,7 +929,11 @@ public class MainController implements Initializable {
         mainSplitPane.getItems().clear();
 
         if (mediaControl.equals("mediaContextMenu")) {
-            Utilities.addToView(rightSidePaneTextVBox);
+
+            if (!rightSidePaneTextVBox.isVisible()) {
+                Utilities.addToView(rightSidePaneTextVBox);
+            }
+
             Utilities.addToView(topHBox);
             Utilities.addToView(bottomHBox);
             Utilities.addToView(topSecondHBox);
@@ -959,7 +963,6 @@ public class MainController implements Initializable {
 
                     mediaPlayer.stop();
                     mediaPlayer.seek(Duration.ZERO);
-                    System.out.println(mediaPlayer.currentTimeProperty().get());
                     mediaPlayer.pause();
                     mediaPlayer.play();
                 } else {
@@ -1147,20 +1150,16 @@ public class MainController implements Initializable {
     }
 
     Rectangle2D oldScreenSize;
-
     ArrayList<Point2D> points = new ArrayList<>();
     Integer counter = 0;
 
     {
         Rectangle2D rect = Screen.getPrimary().getBounds();
-        points.add(new Point2D(rect.getMinX(),rect.getMinY()));
-        points.add(new Point2D(rect.getMinX(), rect.getMaxY()/2));
-        points.add(new Point2D(rect.getMaxX()/2, rect.getMaxY()/2));
-        points.add(new Point2D(rect.getMaxX()/2, rect.getMinY()));
-
-
+        points.add(new Point2D(rect.getMinX(), rect.getMinY()));
+        points.add(new Point2D(rect.getMinX(), rect.getMaxY() / 2));
+        points.add(new Point2D(rect.getMaxX() / 2, rect.getMaxY() / 2));
+        points.add(new Point2D(rect.getMaxX() / 2, rect.getMinY()));
     }
-
 
     {
 
@@ -1169,8 +1168,6 @@ public class MainController implements Initializable {
     public void fitScreenAction(ActionEvent actionEvent, Double size) {
 
         if (size == 0.25) {
-
-
 
             Rectangle2D rect = Screen.getPrimary().getBounds();
 
@@ -1183,8 +1180,8 @@ public class MainController implements Initializable {
             mainSplitPane.getScene().getWindow().setHeight(rect.getHeight() / 2);
             mainSplitPane.getScene().getWindow().setWidth(rect.getWidth() / 2);
 
-            mainSplitPane.getScene().getWindow().setX(points.get(counter%4).getX());
-            mainSplitPane.getScene().getWindow().setY(points.get(counter%4).getY());
+            mainSplitPane.getScene().getWindow().setX(points.get(counter % 4).getX());
+            mainSplitPane.getScene().getWindow().setY(points.get(counter % 4).getY());
             counter++;
         } else if (size == 1.0) {
 
