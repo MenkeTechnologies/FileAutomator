@@ -25,8 +25,6 @@ public class Main extends Application {
 
         Parent root = loader.load();
 
-        root.setStyle("-fx-base: #000000");
-
         MainController mainController = loader.getController();
 
         primaryStage.setTitle("File Automator");
@@ -46,15 +44,6 @@ public class Main extends Application {
         Scene scene = new Scene(root, 1800, 1200);
 
         mainController.initBindings();
-
-        scene.widthProperty().addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                if (Utilities.maximized.get()) {
-                    mainController.mainSplitPane.setDividerPositions(0, 0);
-                }
-            }
-        });
 
         Utilities.initMenuBar(mainController, scene, primaryStage);
 

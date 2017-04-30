@@ -10,7 +10,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -45,6 +44,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.prefs.Preferences;
 
 import static mainPackage.CommonUtilities.toWebColor;
 
@@ -60,8 +60,12 @@ public class Utilities {
     static String textContent = null;
     static Image image = null;
     static boolean fromAutoPlay = false;
-
     static StringProperty mainStyleProp = new SimpleStringProperty("");
+
+    public static void saveColors() {
+
+
+    }
 
     public static void initMenuBar(MainController mainController, Scene scene, Stage stage) {
         Menu file = mainController.menuBar.getMenus().get(0);
@@ -98,7 +102,10 @@ public class Utilities {
         mainStyleProp.bind(bp.styleProperty());
 
         ColorPicker backgroundColorPicker = new ColorPicker();
-
+        ColorPicker textColorPicker = new ColorPicker();
+        ColorPicker treeColorPicker = new ColorPicker();
+        ColorPicker tableColorPicker = new ColorPicker();
+        ColorPicker rightScrollPaneColorColorPicker = new ColorPicker();
 
         listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -107,7 +114,7 @@ public class Utilities {
                 try {
                     Integer size = Integer.parseInt(textSizeTextField.getText());
 
-                    bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField));
+                    bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField, textColorPicker));
                 } catch (Exception e) {
                     CommonUtilities.showErrorAlert("Font Size was not Valid.");
                 }
@@ -119,7 +126,7 @@ public class Utilities {
             try {
                 Integer.parseInt(textSizeTextField.getText());
 
-                bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField));
+                bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField, textColorPicker));
             } catch (Exception ex) {
                 CommonUtilities.showErrorAlert("Font Size was not Valid.");
             }
@@ -130,7 +137,7 @@ public class Utilities {
 
         backgroundColorPicker.setOnAction(e -> {
 
-            bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField));
+            bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField, textColorPicker));
         });
 
         backgroundColorVBox.getChildren().addAll(backgroundColorLabel, backgroundColorPicker);
@@ -139,7 +146,7 @@ public class Utilities {
 
         Label treeBackgroundColorLabel = new Label("Choose A Background Tree Color");
 
-        ColorPicker treeColorPicker = new ColorPicker();
+
 
         treeColorPicker.setOnAction(e -> {
 
@@ -155,7 +162,7 @@ public class Utilities {
 
         Label textColorLabel = new Label("Choose A Text Color");
 
-        ColorPicker textColorPicker = new ColorPicker();
+
 
         textColorPicker.setOnAction(e -> {
 
@@ -163,7 +170,7 @@ public class Utilities {
 
             String webColor = fill.toString().replace("0x", "#").substring(0, 7);
 
-            mainController.rightPaneScrollPane.setStyle("-fx-text-fill: " + webColor);
+            bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField, textColorPicker));
         });
 
         textColorVBox.getChildren().addAll(textColorLabel, textColorPicker);
@@ -172,7 +179,6 @@ public class Utilities {
 
         Label tableBackgroundColorLabel = new Label("Choose A Background Table Color");
 
-        ColorPicker tableColorPicker = new ColorPicker();
 
         tableColorPicker.setOnAction(e -> {
 
@@ -188,7 +194,6 @@ public class Utilities {
 
         Label rightScrollPaneColorLabel = new Label("Choose A Background Scroll Pane Color");
 
-        ColorPicker rightScrollPaneColorColorPicker = new ColorPicker();
 
         rightScrollPaneColorColorPicker.setOnAction(e -> {
 
@@ -206,6 +211,12 @@ public class Utilities {
         Scene newScene = new Scene(group);
         newStage.setScene(newScene);
 
+        newStage.setOnCloseRequest(e->{
+            Preferences.userRoot().put("backgroundColorPicker", backgroundColorPicker.getValue().toString());
+
+
+        });
+
         Parent root = scene.getRoot();
 
         file.getItems().get(0).setOnAction(e -> {
@@ -215,6 +226,7 @@ public class Utilities {
         file.getItems().get(1).setOnAction(e -> {
 
             newStage.showAndWait();
+
 //
 //            Double width = stage.getWidth();
 //            Double height = stage.getHeight();
@@ -236,11 +248,18 @@ public class Utilities {
         });
     }
 
-    public static String getStringBuilderStyle(ColorPicker backgroundColorPicker, ListView<String> listView, TextField textField) {
+    public static String getStringBuilderStyle(ColorPicker backgroundColorPicker, ListView<String> listView, TextField textField, ColorPicker textColorPicker) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("-fx-base: ").append(toWebColor(backgroundColorPicker.getValue())).append(";")
-                .append("-fx-font-family: ").append(listView.getSelectionModel().getSelectedItem()).append(";").append(" -fx-font-size: ").append(textField.getText()).append(";");
+        stringBuilder.append("-fx-base: ").append(toWebColor(backgroundColorPicker.getValue())).append(";");
+
+        if (listView.getSelectionModel().getSelectedItem() != null) {
+            stringBuilder.append("-fx-font-family: ").append(listView.getSelectionModel().getSelectedItem()).append(";");
+        }
+        stringBuilder.append(" -fx-font-size: ").append(textField.getText()).append(";");
+
+        stringBuilder.append(" -fx-mid-text-color: ").append(toWebColor(textColorPicker.getValue())).append("; -fx-light-text-color: ").append(toWebColor(textColorPicker.getValue()));
+
         return stringBuilder.toString();
     }
 

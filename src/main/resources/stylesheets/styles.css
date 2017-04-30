@@ -3,6 +3,7 @@
     -fx-font-family: Avenir;
     -fx-font-size: 12pt;
 }
+
 .detailLabels {
     /*-fx-font-weight: bold;*/
     /*-fx-font-size: 1.7em;*/
@@ -182,6 +183,30 @@
 #fitScreen{
     -fx-graphic: url("/png/fitscreen.png");
 
+}
+
+#case{
+    -fx-graphic: url("/png/case.png");
+
+}
+
+#path{
+    -fx-graphic: url("/png/path.png");
+
+}
+
+#hidden{
+    -fx-graphic: url("/png/hidden.png");
+
+}
+
+#hide-directories{
+    -fx-graphic: url("/png/hide-dir.png");
+
+}
+
+#automatic-filter{
+    -fx-graphic: url("/png/automatic-filter.png");
 }
 
 .hboxes {
