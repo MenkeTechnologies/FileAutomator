@@ -2,16 +2,8 @@ package mainPackage;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.GaussianBlur;
-import javafx.scene.effect.Glow;
-import javafx.scene.effect.Reflection;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-
-import java.io.File;
-import java.nio.file.Paths;
 
 import static mainPackage.CustomTableRow.changeToolTipTime;
 
@@ -44,6 +36,8 @@ public class CustomTreeCell extends TreeCell<FilePathTreeItem> {
             setGraphic(null);
         } else {
             setText(item.getFileName());
+
+            styleProperty().bind(CommonUtilities.treeViewColorProperty);
 
             ImageView imageView = (ImageView) getTreeItem().getGraphic();
 

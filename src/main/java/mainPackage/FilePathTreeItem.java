@@ -1,6 +1,7 @@
 package mainPackage;
 
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -24,7 +25,7 @@ import java.util.Iterator;
 /**
  * Created by jacobmenke on 4/13/17.
  */
-public class FilePathTreeItem extends TreeItem<FilePathTreeItem> {
+public class FilePathTreeItem extends TreeItem<FilePathTreeItem> implements CommonFileInterface {
     public static Image folderCollapseImage = new Image(MainController.class.getResourceAsStream("/png/folderClosed.png"));
     public static Image folderExpandImage = new Image(MainController.class.getResourceAsStream("/png/folderOpen.png"));
     public static Image fileImage = new Image(MainController.class.getResourceAsStream("/png/file.png"));
@@ -313,22 +314,29 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> {
         Path nextPath = (Path) pathIterator.next();
 
         for (TreeItem<FilePathTreeItem> child : getChildren()) {
-            String treePathName = child.getValue().toString().replace("/", "");
+
+
+            String treePathName = child.getValue().getFileName().replace("/", "");
 
             if (treePathName.equals(nextPath.toString())) {
 
                 FilePathTreeItem filePathTreeItem1 = (FilePathTreeItem) child;
                 child.setExpanded(true);
+
                 if (!checkForExpanded) {
                     filePathTreeItem1.populateSourceAndImmediateChildrenSameThread(filePathTreeItem1);
                 } else {
                     filePathTreeItem1.populateSourceAndImmediateChildrenSameThreadCheckingForExpanded(filePathTreeItem1);
                 }
+
+
+
                 if (pathIterator.hasNext()) {
 
                     filePathTreeItem1.recurseAndSelectTreeItems(pathIterator, checkForExpanded, mainController, select);
                     break;
                 } else {
+
 
                     if (select) {
 
@@ -361,12 +369,14 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> {
         }
     }
 
+
     static void selectTreeItemRecursively(MainController mainController, Path path, boolean checkForExpanded) {
         Platform.runLater(() -> {
             mainController.fileBrowserTreeTable.getRoot().setExpanded(true);
 
             mainController.root = (TreeItem) mainController.fileBrowserTreeTable.getRoot().getChildren().get(0);
             mainController.root.setExpanded(true);
+
 
             FilePathTreeItem filePathTreeItem = (FilePathTreeItem) mainController.root;
 

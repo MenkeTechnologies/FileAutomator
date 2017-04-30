@@ -2,9 +2,14 @@ package mainPackage;
 
 import com.apple.eio.FileManager;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.paint.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -32,6 +37,13 @@ public class CommonUtilities {
     public static Integer index = 0;
     public static AtomicLong TOTAL_FILE_COUNTER = new AtomicLong(0);
     public static AtomicLong MATCHING_FILE_COUNTER = new AtomicLong(0);
+    static StringProperty treeViewColorProperty = new SimpleStringProperty();
+    static StringProperty tableViewColorProperty = new SimpleStringProperty();
+
+    public static String toWebColor(Color value) {
+
+        return  value.toString().replace("0x", "#").substring(0, 7);
+    }
 
     public static void formatTooltip(Tooltip tooltip) {
         tooltip.setWrapText(true);
@@ -334,6 +346,7 @@ public class CommonUtilities {
     public static void showErrorAlert(String error) {
 
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.getDialogPane().setStyle(Utilities.mainStyleProp.getValue());
         alert.setHeaderText(error);
         alert.showAndWait();
     }

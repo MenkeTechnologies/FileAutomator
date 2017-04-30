@@ -29,6 +29,7 @@ public class TableViewUtilities {
 
                             FileInfo fileAtRow = (FileInfo) this.getTableRow().getItem();
 
+
                             FileInfo playingFile = null;
                             if (mainController.pathLabelContent != null && mainController.pathLabelContent.getText() != "") {
                                 playingFile = new FileInfo(mainController.pathLabelContent.getText());

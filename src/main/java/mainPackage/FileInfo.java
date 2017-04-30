@@ -8,7 +8,7 @@ import java.io.File;
 /**
  * Created by jacobmenke on 4/13/17.
  */
-public class FileInfo extends File {
+public class FileInfo extends File implements CommonFileInterface {
     private SimpleStringProperty fileName;
     private SimpleStringProperty filePath;
     private SimpleBooleanProperty directoryProperty;

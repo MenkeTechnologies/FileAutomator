@@ -1,5 +1,8 @@
 package mainPackage;
 
+import com.terminalfx.TerminalBuilder;
+import com.terminalfx.TerminalTab;
+import com.terminalfx.config.TerminalConfig;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.*;
@@ -11,7 +14,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.*;
-import javafx.event.Event;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
@@ -59,28 +61,28 @@ public class MainController implements Initializable {
     public TextField mainTextField;
     public TextField directoryToSearchTextField;
     public SplitPane mainSplitPane;
-    public Text sizeLabel;
-    public Text lastModifiedLabel;
-    public Text pathLabel;
+    public Label sizeLabel;
+    public Label lastModifiedLabel;
+    public Label pathLabel;
     public TextField destinationCopyAllTextField;
-    public Text fileNamDetailLabel;
+    public Label fileNamDetailLabel;
     public CheckBox caseInsensitiveMatchingCheckbox;
     public TreeView fileBrowserTreeTable;
     public CheckBox automaticSearchCheckBox;
     public CheckBox showHiddenFilesCheckBox;
-    public CheckBox selectInTreeViewCheckBox;
+    public ToggleButton selectInTreeViewCheckBox;
     public CheckBox hideDirectoriesCheckBox;
     public CheckBox pathMatchingCheckbox;
     public ImageView rightPaneImageView;
     public VBox rightSidePaneVBox;
     public ScrollPane rightPaneScrollPane;
-    public Text fileNamDetailLabelContent;
-    public Text sizeDetailLabelContent;
-    public Text pathLabelContent;
-    public Text lastModifiedLabelContent;
+    public Label fileNamDetailLabelContent;
+    public Label sizeDetailLabelContent;
+    public Label pathLabelContent;
+    public Label lastModifiedLabelContent;
     public TextFlow textFlowRightPane;
-    public Text textLabel;
-    public Text textContent;
+    public Label textLabel;
+    public Label textContent;
     public MediaView rightPaneMediaView;
     public MenuBar menuBar;
     public ProgressIndicator thinkingIndicator;
@@ -129,6 +131,7 @@ public class MainController implements Initializable {
     public ToggleButton lockMediaViewBottomToggle;
     public ToggleButton fitScreenToggleButton;
     public ToggleButton fitScreenToggleMediaButton;
+    public TabPane terminalTabPane;
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
@@ -143,13 +146,15 @@ public class MainController implements Initializable {
     Timeline timeline;
     Timer disappearTimer;
     ArrayList<String> filesForAutoplay = new ArrayList<>();
-    ObservableList<Node> splitPaneChildren;
+    ObservableList<Node> splitPaneChildren = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        addTerminalPane();
 
         mediaPlayer = new MediaPlayer(new Media(getClass().getResource("/ClosedHH.wav").toExternalForm()));
+
         Double scalingFactor = 7d;
 
         sphere = new Cylinder(2 * scalingFactor, 2 * scalingFactor);
@@ -157,7 +162,6 @@ public class MainController implements Initializable {
         material.setSpecularColor(Color.LIGHTBLUE);
         material.setSpecularPower(10.0d);
         sphere.setMaterial(material);
-//        sphere.setEffect(new DropShadow());
 
         pointLight = new PointLight(Color.WHITE);
         sphere.setMaterial(material);
@@ -191,7 +195,7 @@ public class MainController implements Initializable {
 
         TreeViewInitialization.initTreeView(this);
 
-        Utilities.initEffectsRightPane(this);
+
 
         mainSplitPane.setDividerPositions(0.2, 0.9);
 
@@ -260,6 +264,41 @@ public class MainController implements Initializable {
         initTasks();
 
         initToolTips();
+
+    }
+
+    public void addTerminalPane() {
+        TerminalConfig darkConfig = new TerminalConfig();
+
+        darkConfig.setBackgroundColor(Color.rgb(16, 16, 16));
+        darkConfig.setForegroundColor(Color.rgb(240, 240, 240));
+        darkConfig.setCursorColor(Color.rgb(255, 0, 0, 0.5));
+
+        TerminalBuilder terminalBuilder1 = new TerminalBuilder(darkConfig);
+        TerminalTab terminalTab = terminalBuilder1.newTerminal();
+
+        terminalTabPane = new TabPane();
+        terminalTabPane.getTabs().addAll(terminalTab);
+
+        ContextMenu cm = new ContextMenu();
+        MenuItem maximizeThisPane = new MenuItem("Maximize This Pane");
+        MenuItem hideThisPane = new MenuItem("Hide This Pane");
+        MenuItem restorePanes = new MenuItem("Restore Panes");
+
+        terminalTab.getContextMenu().getItems().addAll(maximizeThisPane, hideThisPane, restorePanes);
+
+        maximizeThisPane.setOnAction(e -> {
+            removePanes(terminalTabPane);
+        });
+
+        hideThisPane.setOnAction(e -> {
+            removePaneSingular("terminal");
+        });
+
+        restorePanes.setOnAction(e -> {
+            restorePanesToOriginal("terminal");
+        });
+        mainSplitPane.getItems().add(terminalTabPane);
     }
 
     public void initTreeViewKeyBindings() {
@@ -417,6 +456,15 @@ public class MainController implements Initializable {
         fullScreenMediaButton.disableProperty().bind(Utilities.maximized);
         normalScreenMediaButton.disableProperty().bind(Utilities.maximized.not());
         fitScreenToggleMediaButton.selectedProperty().bindBidirectional(fitScreenToggleButton.selectedProperty());
+
+
+        showReflectionBottomButton.setSelected(true);
+
+        autoPlayMediaControl.selectedProperty().bindBidirectional(autoplayCheckbox.selectedProperty());
+
+        showReflectionButton.selectedProperty().bindBidirectional(showReflectionBottomButton.selectedProperty());
+        showReflection(null);
+
 
         stopCurrentSearchButton.setOnAction(e -> {
             if (searchingTask.getFuture() != null) {
@@ -665,8 +713,6 @@ public class MainController implements Initializable {
             RegexUtilities.searchAndRefresh(this);
         });
 
-        autoPlayMediaControl.selectedProperty().bindBidirectional(autoplayCheckbox.selectedProperty());
-        showReflectionButton.selectedProperty().bindBidirectional(showReflectionBottomButton.selectedProperty());
     }
 
     private void refreshTreeViewFromBottom() {
@@ -748,7 +794,7 @@ public class MainController implements Initializable {
         if (searchingTask.getState() != Task.State.RUNNING) {
             Utilities.addToView(sphere);
             timeline.play();
-           // System.out.println("started secondary");
+            // System.out.println("started secondary");
             stopCurrentSearchButton.setText("Stop Load");
             loadingTask = new CustomTask<String>(this, r, false);
         } else {
@@ -821,11 +867,11 @@ public class MainController implements Initializable {
 
     public void maximizeVideo(ActionEvent actionEvent) {
 
-        removePanes("mediaContextMenu");
+        removePanes(rightPaneScrollPane);
     }
 
     public void returnToOldDividers(ActionEvent actionEvent) {
-        restorePanesToOld("mediaContextMenu");
+        restorePanesToOriginal("mediaContextMenu");
     }
 
     public void removePaneSingular(String pane) {
@@ -833,19 +879,11 @@ public class MainController implements Initializable {
 
         if (items.size() == 1) {
             CommonUtilities.showErrorAlert("Cannot Remove Last Pane");
-        } else if (items.size() == 3) {
+        } else if (items.size() >= 2) {
             checkForSender(pane, items);
-        } else if (items.size() == 2) {
 
-            if (pane.equals("mediaContextMenu")) {
-                items.remove(rightPaneScrollPane);
-            } else {
+            if (items.size() == 1) {
 
-                if (pane.equals("tableView")) {
-                    items.remove(mainTableView);
-                } else if (pane.equals("treeView")) {
-                    items.remove(fileBrowserTreeTable);
-                }
                 if (items.get(0) == rightPaneScrollPane) {
                     //removing all but media view right pane
                     Utilities.removeFromView(rightSidePaneTextVBox);
@@ -859,91 +897,113 @@ public class MainController implements Initializable {
     }
 
     public void checkForSender(String pane, ObservableList<Node> items) {
+
         if (pane.equals("tableView")) {
             items.remove(mainTableView);
         } else if (pane.equals("treeView")) {
             items.remove(fileBrowserTreeTable);
+        } else if (pane.equals("terminal")) {
+            items.remove(terminalTabPane);
         } else {
             items.remove(rightPaneScrollPane);
         }
     }
 
-    public void removePanes(String mediaControl) {
+    public void removePanes(Node node) {
+
+        splitPaneChildren.clear();
+        splitPaneChildren.addAll(mainSplitPane.getItems());
 
         ObservableList<Node> items = mainSplitPane.getItems();
 
-        if (items.size() == 3) {
-            Preferences.userRoot().putDouble("dividerPos0", mainSplitPane.getDividerPositions()[0]);
-            Preferences.userRoot().putDouble("dividerPos1", mainSplitPane.getDividerPositions()[1]);
+        if (items.size() == 1) {
+            CommonUtilities.showErrorAlert("Already Maximized.");
+        } else {
 
-            if (mediaControl.equals("mediaContextMenu")) {
+            for (int i = 0; i < mainSplitPane.getDividers().size(); i++) {
+                Preferences.userRoot().putDouble("dividerPos" + i, mainSplitPane.getDividerPositions()[i]);
+            }
 
+            items.clear();
+            items.add(node);
+
+            if (node == rightPaneScrollPane) {
                 FileInfo fileInfo = new FileInfo(pathLabelContent.getText());
                 String type = FileTypeUtilities.getFileType(fileInfo.getAbsolutePath());
+                Utilities.removeFromView(topHBox);
+                Utilities.removeFromView(bottomHBox);
+                Utilities.removeFromView(topSecondHBox);
 
-                if (type.equals("video") || type.equals("music") || type.equals("image")) {
+                if (type.equals("video") || type.equals("music") || type.equals("image") || type.equals("pdf")) {
+
+                    Utilities.addToView(fileNameLabelMediaControls);
                     Utilities.removeFromView(rightSidePaneTextVBox);
                 }
-                Utilities.removeFromView(topHBox);
-                Utilities.removeFromView(bottomHBox);
-                Utilities.removeFromView(topSecondHBox);
-                items.remove(0, 2);
-
-                Utilities.addToView(fileNameLabelMediaControls);
-            } else if (mediaControl.equals("treeView")) {
-                items.remove(1, 3);
-            } else if (mediaControl.equals("tableView")) {
-                items.remove(0);
-                items.remove(1);
             }
-        } else if (items.size() == 2) {
 
-            if (mediaControl.equals("mediaContextMenu")) {
-
-                Utilities.removeFromView(rightSidePaneTextVBox);
-                Utilities.removeFromView(topHBox);
-                Utilities.removeFromView(bottomHBox);
-                Utilities.removeFromView(topSecondHBox);
-                items.remove(0);
-            } else if (mediaControl.equals("treeView")) {
-                items.remove(1);
-            } else if (mediaControl.equals("tableView")) {
-                if (items.get(0) != mainTableView) {
-                    items.remove(0);
-                } else {
-                    items.remove(1);
-                }
-            }
-        } else {
-            CommonUtilities.showErrorAlert("Already Maximized.");
+            Utilities.maximized.set(true);
         }
-        Utilities.maximized.set(true);
     }
 
-    public void restorePanesToOld(String mediaControl) {
-
-        Double sp = Preferences.userRoot().getDouble("dividerPos0", 0.2);
-        Double sp2 = Preferences.userRoot().getDouble("dividerPos1", 0.8);
-        ObservableList<Node> items = mainSplitPane.getItems();
-
+    public void restorePanesToOld(String mediaContextMenu) {
         mainSplitPane.getItems().clear();
+        mainSplitPane.getItems().addAll(splitPaneChildren);
 
-        if (mediaControl.equals("mediaContextMenu")) {
-
-            if (!rightSidePaneTextVBox.isVisible()) {
-                Utilities.addToView(rightSidePaneTextVBox);
-            }
+        if (!topHBox.isVisible()) {
 
             Utilities.addToView(topHBox);
             Utilities.addToView(bottomHBox);
             Utilities.addToView(topSecondHBox);
             Utilities.removeFromView(fileNameLabelMediaControls);
-
-            Utilities.addToView(sliderHbox);
+            //case of music or video
+            if (!rightSidePaneTextVBox.isVisible()) {
+                Utilities.addToView(rightSidePaneTextVBox);
+            }
         }
-        items.addAll(Arrays.asList(fileBrowserTreeTable, mainTableView, rightPaneScrollPane));
 
-        mainSplitPane.setDividerPositions(sp, sp2);
+        double[] sps = {0, 0, 0};
+
+        for (int i = 0; i < mainSplitPane.getDividers().size(); i++) {
+
+            Double sp = Preferences.userRoot().getDouble("dividerPos" + i, mainSplitPane.getDividerPositions()[i]);
+            sps[i] = sp;
+        }
+
+        mainSplitPane.setDividerPositions(sps);
+
+        Utilities.maximized.set(false);
+    }
+
+    public void restorePanesToOriginal(String mediaControl) {
+
+        ObservableList<Node> items = mainSplitPane.getItems();
+
+        if (!topHBox.isVisible()) {
+
+            Utilities.addToView(topHBox);
+            Utilities.addToView(bottomHBox);
+            Utilities.addToView(topSecondHBox);
+            Utilities.removeFromView(fileNameLabelMediaControls);
+            //case of music or video
+            if (!rightSidePaneTextVBox.isVisible()) {
+                Utilities.addToView(rightSidePaneTextVBox);
+            }
+        }
+
+        mainSplitPane.getItems().clear();
+
+        items.addAll(Arrays.asList(fileBrowserTreeTable, mainTableView, rightPaneScrollPane, terminalTabPane));
+
+        double[] sps = {0, 0, 0};
+
+        for (int i = 0; i < mainSplitPane.getDividers().size(); i++) {
+
+            Double sp = Preferences.userRoot().getDouble("dividerPos" + i, mainSplitPane.getDividerPositions()[i]);
+            sps[i] = sp;
+        }
+
+        mainSplitPane.setDividerPositions(sps);
+
         Utilities.maximized.set(false);
     }
 
