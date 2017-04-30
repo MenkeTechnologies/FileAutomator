@@ -358,34 +358,37 @@
                                 <Tooltip text="Refresh Tree Items"/>
                             </tooltip>
                         </Button>
-                        <CheckBox fx:id="caseInsensitiveMatchingCheckbox" mnemonicParsing="false"
-                                  text="Case Insensitive Matching">
+                        <ToggleButton fx:id="caseInsensitiveMatchingCheckbox" mnemonicParsing="false" id="case" styleClass="mediaButtons">
                             <tooltip>
                                 <Tooltip text="Ignore Case in Filtering Files"/>
                             </tooltip>
-                        </CheckBox>
-                        <CheckBox fx:id="pathMatchingCheckbox" mnemonicParsing="false" text="Path Matching"/>
+                        </ToggleButton>
+                        <ToggleButton fx:id="pathMatchingCheckbox" mnemonicParsing="false" id="path" styleClass="mediaButtons">
+                            <tooltip>
+                                <Tooltip text="Search in Path of file."/>
+                            </tooltip>
+                        </ToggleButton>
 
-                        <CheckBox fx:id="automaticSearchCheckBox" mnemonicParsing="false" text="Automatic Filtering">
+                        <ToggleButton fx:id="automaticSearchCheckBox" mnemonicParsing="false" id="automatic-filter" styleClass="mediaButtons">
                             <tooltip>
                                 <Tooltip text="Automatically FilterFiles when Selecting Directory in File Browser"/>
                             </tooltip>
-                        </CheckBox>
+                        </ToggleButton>
                         <ToggleButton id="tree" fx:id="selectInTreeViewCheckBox" styleClass="bottomMediaButtons">
                             <tooltip>
                                 <Tooltip text="Select Files in File Browser when Selecting in Table"/>
                             </tooltip>
                         </ToggleButton>
-                        <CheckBox fx:id="showHiddenFilesCheckBox" mnemonicParsing="false" text="Show Hidden Files">
+                        <ToggleButton fx:id="showHiddenFilesCheckBox" mnemonicParsing="false" id="hidden" styleClass="mediaButtons">
                             <tooltip>
                                 <Tooltip text="Show Hidden Files in Table and File Browser"/>
                             </tooltip>
-                        </CheckBox>
-                        <CheckBox fx:id="hideDirectoriesCheckBox" text="Hide Directories">
+                        </ToggleButton>
+                        <ToggleButton fx:id="hideDirectoriesCheckBox" id="hide-directories" styleClass="mediaButtons">
                             <tooltip>
                                 <Tooltip text="Filter out Directories from Table"/>
                             </tooltip>
-                        </CheckBox>
+                        </ToggleButton>
                         <ToggleButton id="autoplay" fx:id="autoplayCheckbox" onAction="#storeFileList"
                                       styleClass="bottomMediaButtons">
                             <tooltip>

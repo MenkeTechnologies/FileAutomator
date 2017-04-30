@@ -66,13 +66,13 @@ public class MainController implements Initializable {
     public Label pathLabel;
     public TextField destinationCopyAllTextField;
     public Label fileNamDetailLabel;
-    public CheckBox caseInsensitiveMatchingCheckbox;
+    public ToggleButton caseInsensitiveMatchingCheckbox;
     public TreeView fileBrowserTreeTable;
-    public CheckBox automaticSearchCheckBox;
-    public CheckBox showHiddenFilesCheckBox;
+    public ToggleButton automaticSearchCheckBox;
+    public ToggleButton showHiddenFilesCheckBox;
     public ToggleButton selectInTreeViewCheckBox;
-    public CheckBox hideDirectoriesCheckBox;
-    public CheckBox pathMatchingCheckbox;
+    public ToggleButton hideDirectoriesCheckBox;
+    public ToggleButton pathMatchingCheckbox;
     public ImageView rightPaneImageView;
     public VBox rightSidePaneVBox;
     public ScrollPane rightPaneScrollPane;
@@ -195,8 +195,6 @@ public class MainController implements Initializable {
 
         TreeViewInitialization.initTreeView(this);
 
-
-
         mainSplitPane.setDividerPositions(0.2, 0.9);
 
         mainTableView.setEditable(false);
@@ -264,7 +262,6 @@ public class MainController implements Initializable {
         initTasks();
 
         initToolTips();
-
     }
 
     public void addTerminalPane() {
@@ -457,14 +454,12 @@ public class MainController implements Initializable {
         normalScreenMediaButton.disableProperty().bind(Utilities.maximized.not());
         fitScreenToggleMediaButton.selectedProperty().bindBidirectional(fitScreenToggleButton.selectedProperty());
 
-
         showReflectionBottomButton.setSelected(true);
 
         autoPlayMediaControl.selectedProperty().bindBidirectional(autoplayCheckbox.selectedProperty());
 
         showReflectionButton.selectedProperty().bindBidirectional(showReflectionBottomButton.selectedProperty());
         showReflection(null);
-
 
         stopCurrentSearchButton.setOnAction(e -> {
             if (searchingTask.getFuture() != null) {
@@ -712,7 +707,6 @@ public class MainController implements Initializable {
         pathMatchingCheckbox.setOnAction(e -> {
             RegexUtilities.searchAndRefresh(this);
         });
-
     }
 
     private void refreshTreeViewFromBottom() {
