@@ -47,6 +47,8 @@ public class ServiceWindow extends Stage {
         this.model = model;
         View view = new View();
         this.view = view;
+
+        root.styleProperty().bind(mainTableView.getScene().getRoot().styleProperty());
         hookupEvents();
         setScene(new Scene(root, 550, 330));
         Service myservice = (Service) model.worker;

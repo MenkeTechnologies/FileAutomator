@@ -1,31 +1,34 @@
 package mainPackage;
 
-import com.terminalfx.TerminalBuilder;
-import com.terminalfx.TerminalTab;
-import com.terminalfx.config.TerminalConfig;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -43,6 +46,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import static mainPackage.CommonUtilities.toWebColor;
+
 /**
  * Created by jacobmenke on 4/13/17.
  */
@@ -56,10 +61,12 @@ public class Utilities {
     static Image image = null;
     static boolean fromAutoPlay = false;
 
-    public static void initMenuBar(MenuBar menuBar, Scene scene, Stage stage) {
-        Menu file = menuBar.getMenus().get(0);
+    static StringProperty mainStyleProp = new SimpleStringProperty("");
 
-        Scene oldScene = menuBar.getScene();
+    public static void initMenuBar(MainController mainController, Scene scene, Stage stage) {
+        Menu file = mainController.menuBar.getMenus().get(0);
+
+        Scene oldScene = mainController.menuBar.getScene();
         VBox group = new VBox();
 
         Button cleanUpButton = new Button("Clean up");
@@ -75,52 +82,166 @@ public class Utilities {
         });
 
         MenuBar menuBar1 = new MenuBar();
-        menuBar1.getMenus().addAll(menuBar.getMenus());
+        menuBar1.getMenus().addAll(mainController.menuBar.getMenus());
 
-        TerminalBuilder terminalBuilder = new TerminalBuilder();
-        TerminalTab terminal = terminalBuilder.newTerminal();
+        menuBar1.setUseSystemMenuBar(true);
 
-        TerminalConfig darkConfig = new TerminalConfig();
+        Label label = new Label("Font Size:");
+        TextField textSizeTextField = new TextField("12");
 
-        darkConfig.setBackgroundColor(Color.rgb(16, 16, 16));
-        darkConfig.setForegroundColor(Color.rgb(240, 240, 240));
-        darkConfig.setCursorColor(Color.rgb(255, 0, 0, 0.5));
+        ListView<String> listView = new ListView();
 
-        TerminalBuilder terminalBuilder1 = new TerminalBuilder(darkConfig);
-        TerminalTab terminalTab = terminalBuilder1.newTerminal();
+        BorderPane bp = (BorderPane) scene.getRoot();
+        listView.getItems().addAll(Font.getFamilies());
 
-        TabPane tabPane = new TabPane();
-        tabPane.getTabs().addAll(terminalTab);
+        group.styleProperty().bind(bp.styleProperty());
+        mainStyleProp.bind(bp.styleProperty());
 
-        tabPane.prefHeightProperty().bind(scene.heightProperty());
+        ColorPicker backgroundColorPicker = new ColorPicker();
 
-        group.getChildren().addAll(cleanUpButton, menuBar1, tabPane);
-//        Scene newScene = new Scene(group, oldScene.getWidth(), oldScene.getHeight());
+
+        listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+
+                try {
+                    Integer size = Integer.parseInt(textSizeTextField.getText());
+
+                    bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField));
+                } catch (Exception e) {
+                    CommonUtilities.showErrorAlert("Font Size was not Valid.");
+                }
+            }
+        });
+
+        textSizeTextField.setOnAction(e -> {
+
+            try {
+                Integer.parseInt(textSizeTextField.getText());
+
+                bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField));
+            } catch (Exception ex) {
+                CommonUtilities.showErrorAlert("Font Size was not Valid.");
+            }
+        });
+        VBox backgroundColorVBox = new VBox();
+
+        Label backgroundColorLabel = new Label("Choose A Background Color");
+
+        backgroundColorPicker.setOnAction(e -> {
+
+            bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField));
+        });
+
+        backgroundColorVBox.getChildren().addAll(backgroundColorLabel, backgroundColorPicker);
+
+        VBox treeColorVBox = new VBox();
+
+        Label treeBackgroundColorLabel = new Label("Choose A Background Tree Color");
+
+        ColorPicker treeColorPicker = new ColorPicker();
+
+        treeColorPicker.setOnAction(e -> {
+
+            Paint fill = treeColorPicker.getValue();
+            String webColor = fill.toString().replace("0x", "#").substring(0, 7);
+            CommonUtilities.treeViewColorProperty.set("-fx-control-inner-background: " + webColor);
+            mainController.fileBrowserTreeTable.setStyle("-fx-control-inner-background: " + webColor);
+        });
+
+        treeColorVBox.getChildren().addAll(treeBackgroundColorLabel, treeColorPicker);
+
+        VBox textColorVBox = new VBox();
+
+        Label textColorLabel = new Label("Choose A Text Color");
+
+        ColorPicker textColorPicker = new ColorPicker();
+
+        textColorPicker.setOnAction(e -> {
+
+            Paint fill = textColorPicker.getValue();
+
+            String webColor = fill.toString().replace("0x", "#").substring(0, 7);
+
+            mainController.rightPaneScrollPane.setStyle("-fx-text-fill: " + webColor);
+        });
+
+        textColorVBox.getChildren().addAll(textColorLabel, textColorPicker);
+
+        VBox tableColorVBox = new VBox();
+
+        Label tableBackgroundColorLabel = new Label("Choose A Background Table Color");
+
+        ColorPicker tableColorPicker = new ColorPicker();
+
+        tableColorPicker.setOnAction(e -> {
+
+            Paint fill = tableColorPicker.getValue();
+            String webColor = fill.toString().replace("0x", "#").substring(0, 7);
+            CommonUtilities.tableViewColorProperty.set("-fx-control-inner-background:" + webColor);
+            mainController.mainTableView.setStyle("-fx-control-inner-background: " + webColor);
+        });
+
+        tableColorVBox.getChildren().addAll(tableBackgroundColorLabel, tableColorPicker);
+
+        VBox rightScrollPaneColorVBox = new VBox();
+
+        Label rightScrollPaneColorLabel = new Label("Choose A Background Scroll Pane Color");
+
+        ColorPicker rightScrollPaneColorColorPicker = new ColorPicker();
+
+        rightScrollPaneColorColorPicker.setOnAction(e -> {
+
+            Paint fill = rightScrollPaneColorColorPicker.getValue();
+            String webColor = fill.toString().replace("0x", "#").substring(0, 7);
+            mainController.rightPaneScrollPane.setStyle("-fx-background-color: " + webColor);
+        });
+
+        rightScrollPaneColorVBox.getChildren().addAll(rightScrollPaneColorLabel, rightScrollPaneColorColorPicker);
+
+        group.getChildren().addAll(cleanUpButton, menuBar1, listView, label, textSizeTextField, backgroundColorVBox, textColorVBox, treeColorVBox, tableColorVBox, rightScrollPaneColorVBox);
+
+        Stage newStage = new Stage();
+        newStage.initModality(Modality.APPLICATION_MODAL);
+        Scene newScene = new Scene(group);
+        newStage.setScene(newScene);
+
         Parent root = scene.getRoot();
 
         file.getItems().get(0).setOnAction(e -> {
             Platform.exit();
         });
+
         file.getItems().get(1).setOnAction(e -> {
 
-            Double width = stage.getWidth();
-            Double height = stage.getHeight();
-            Double x = stage.getX();
-            Double y = stage.getY();
-            System.out.println("WIDTH:" + width);
-
-            if (!toggle) {
-
-                scene.setRoot(group);
-
-                toggle = true;
-            } else {
-
-                scene.setRoot(root);
-
-                toggle = false;
-            }
+            newStage.showAndWait();
+//
+//            Double width = stage.getWidth();
+//            Double height = stage.getHeight();
+//            Double x = stage.getX();
+//            Double y = stage.getY();
+//            System.out.println("WIDTH:" + width);
+//
+//            if (!toggle) {
+//
+//                scene.setRoot(group);
+//
+//                toggle = true;
+//            } else {
+//
+//                scene.setRoot(root);
+//
+//                toggle = false;
+//            }
         });
+    }
+
+    public static String getStringBuilderStyle(ColorPicker backgroundColorPicker, ListView<String> listView, TextField textField) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("-fx-base: ").append(toWebColor(backgroundColorPicker.getValue())).append(";")
+                .append("-fx-font-family: ").append(listView.getSelectionModel().getSelectedItem()).append(";").append(" -fx-font-size: ").append(textField.getText()).append(";");
+        return stringBuilder.toString();
     }
 
     public static boolean isText(File file) throws IOException {
@@ -583,7 +704,7 @@ public class Utilities {
     }
 
     public static ContextMenu createContextMenu(FileInfo fileInfo, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController, String sender) {
-        ContextMenu rowContextMenu = new ContextMenu();
+        ContextMenu cm = new ContextMenu();
         String name = "Open \"" + fileInfo.getFileName() + "\"";
 
         MenuItem openItem = new MenuItem(name);
@@ -605,7 +726,7 @@ public class Utilities {
 
         MenuItem quarterScreen = new MenuItem("Resize to Quarter of Screen");
 
-        rowContextMenu.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem, copyAbsolutePathItem
+        cm.getItems().addAll(openItem, openInEnclosingItem, deleteItem, secureDeleteItem, renameItem, copyItem, copyAbsolutePathItem
                 , sendToSourceDirectoryTextFieldItem, sendToDestinationDirectoryTextFieldItem, quarterScreen);
 
         quarterScreen.setOnAction(e -> {
@@ -614,37 +735,37 @@ public class Utilities {
 
         if (sender.equals("tableView") || sender.equals("stackPane")) {
 
-            rowContextMenu.getItems().add(showInTreeView);
+            cm.getItems().add(showInTreeView);
         }
 
-        rowContextMenu.getItems().addAll(updateAutoPlaylist, restorePanes);
+        cm.getItems().addAll(updateAutoPlaylist, restorePanes);
 
-        rowContextMenu.getItems().add(maximizeThisPane);
+        cm.getItems().add(maximizeThisPane);
 
         if (mainController.mainSplitPane.getItems().size() > 1) {
-            rowContextMenu.getItems().add(hideThisPane);
+            cm.getItems().add(hideThisPane);
         }
 
         hideThisPane.setOnAction(event -> mainController.removePaneSingular(sender));
 
         restorePanes.setOnAction(e -> {
             if (sender.equals("tableView")) {
-                mainController.restorePanesToOld(sender);
+                mainController.restorePanesToOriginal(sender);
             } else if (sender.equals("treeView")) {
-                mainController.restorePanesToOld(sender);
+                mainController.restorePanesToOriginal(sender);
             } else {
-                mainController.restorePanesToOld("mediaContextMenu");
+                mainController.restorePanesToOriginal("mediaContextMenu");
             }
         });
 
         maximizeThisPane.setOnAction(e -> {
 
             if (sender.equals("tableView")) {
-                mainController.removePanes(sender);
+                mainController.removePanes(mainController.mainTableView);
             } else if (sender.equals("treeView")) {
-                mainController.removePanes(sender);
+                mainController.removePanes(mainController.fileBrowserTreeTable);
             } else {
-                mainController.removePanes("mediaContextMenu");
+                mainController.removePanes(mainController.rightPaneScrollPane);
             }
         });
 
@@ -652,7 +773,7 @@ public class Utilities {
             mainController.storeFileList(null);
         });
 
-        rowContextMenu.getItems().addAll(playInRightPane);
+        cm.getItems().addAll(playInRightPane);
 
         playInRightPane.setOnAction(e -> {
             if (sender.equals("tableView")) {
@@ -669,7 +790,7 @@ public class Utilities {
         });
 
         if (fileInfo.isDirectory()) {
-            rowContextMenu.getItems().add(createNewFile);
+            cm.getItems().add(createNewFile);
         }
 
         copyAbsolutePathItem.setOnAction(e -> {
@@ -715,6 +836,6 @@ public class Utilities {
             mainController.destinationCopyAllTextField.setText(fileInfo.getAbsolutePath());
         });
 
-        return rowContextMenu;
+        return cm;
     }
 }

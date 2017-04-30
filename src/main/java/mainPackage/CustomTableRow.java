@@ -39,7 +39,7 @@ public class CustomTableRow extends TableRow<FileInfo> {
     public CustomTableRow(TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
         CommonUtilities.formatTooltip(tooltip);
 
-
+        styleProperty().bind(CommonUtilities.tableViewColorProperty);
         this.setOnMouseClicked(e-> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 FileInfo fileInfo = (FileInfo)this.getItem();
@@ -51,7 +51,13 @@ public class CustomTableRow extends TableRow<FileInfo> {
         });
     }
 
+    @Override
+    protected double computePrefHeight(double width) {
 
+        Double size = this.getFont().getSize();
+        return size*2.5;
+
+    }
 
     @Override
     protected void updateItem(FileInfo item, boolean empty) {
@@ -64,6 +70,7 @@ public class CustomTableRow extends TableRow<FileInfo> {
 
             changeToolTipTime(tooltip,3);
             tooltip.setText(fileInfo.toString());
+
 
             if (!item.isDirectory()){
                 tooltip.setGraphic(new ImageView(fileInfo.getFileImage()));
