@@ -18,20 +18,17 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mainPackage.CommonUtilities;
 import mainPackage.MainController;
+import mainPackage.StylesheetUtilities.Modify;
 import mainPackage.Utilities;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
 
 /**
  * Created by jacobmenke on 4/30/17.
@@ -84,6 +81,7 @@ public class Settings {
         tableColorPicker.setId("tableColorPicker");
         ColorPicker rightScrollPaneBackroundColorPicker = new ColorPicker();
         rightScrollPaneBackroundColorPicker.setId("rightScrollPaneBackroundColorPicker");
+        ColorPicker accentColorPicker = new ColorPicker();
 
         VBox tableColorVBox = new VBox();
 
@@ -151,16 +149,29 @@ public class Settings {
 
             changeStyles(textSizeTextField, bp, backgroundColorPicker, fontFamilyListView, textColorPicker, tableEH, scrollPaneEH, treeColorEH);
         });
+
         VBox backgroundColorVBox = new VBox();
 
-        Label backgroundColorLabel = new Label("Choose A Background Color");
+        Label backgroundColorLabel = new Label("Choose An Background Color");
 
         backgroundColorPicker.setOnAction(e -> {
             bp.setStyle("-fx-base: " + CommonUtilities.toWebColor(backgroundColorPicker.getValue()));
+
             //changeStyles(textSizeTextField, bp, backgroundColorPicker, fontFamilyListView, textColorPicker, tableEH, scrollPaneEH, treeColorEH);
         });
 
         backgroundColorVBox.getChildren().addAll(backgroundColorLabel, backgroundColorPicker);
+
+        VBox accentColorVBox = new VBox();
+
+        Label accentColorLabel = new Label("Choose An Accent Color");
+
+        accentColorPicker.setOnAction(e -> {
+
+            Modify.modifyStylesheet(mainController, "*", "-fx-base", false, CommonUtilities.toWebColor(accentColorPicker.getValue()));
+        });
+
+        accentColorVBox.getChildren().addAll(accentColorLabel, accentColorPicker);
 
         VBox textColorVBox = new VBox();
 
@@ -207,7 +218,6 @@ public class Settings {
 
         ColorPicker rowHoveredColorPicker = new ColorPicker();
 
-
         rowHoveredColorPicker.setOnAction(e -> {
 
             String tempCssFile = System.getProperty("java.io.tmpdir") + "modify.css";
@@ -218,31 +228,41 @@ public class Settings {
                         "    -fx-background: " + CommonUtilities.toWebColor(rowHoveredColorPicker.getValue()) + ";\n" +
                         "}");
 
+                mainController.mainTableView.getScene().getStylesheets().clear();
+                mainController.mainTableView.getScene().getStylesheets().add("stylesheets/styles.css");
 
-            mainController.mainTableView.getScene().getStylesheets().clear();
-            mainController.mainTableView.getScene().getStylesheets().add("stylesheets/styles.css");
+                URL url = new File(tempCssFile).toURI().toURL();
 
-            URL url  = new File(tempCssFile).toURI().toURL();
-
-            mainController.mainTableView.getScene().getStylesheets().add(url.toExternalForm());
-
-
+                mainController.mainTableView.getScene().getStylesheets().add(url.toExternalForm());
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-
         });
 
         VBox rowHoveredColorVBox = new VBox();
 
         rowHoveredColorVBox.getChildren().addAll(rowHoveredColorLabel, rowHoveredColorPicker);
 
-        group.getChildren().addAll(cleanUpButton, menuBar1, fontFamilyListView, label, textSizeTextField, backgroundColorVBox, textColorVBox, treeColorVBox, tableColorVBox, rightScrollPaneColorVBox,
+        group.getChildren().addAll(cleanUpButton, menuBar1, fontFamilyListView, label, textSizeTextField, backgroundColorVBox, accentColorVBox, textColorVBox, treeColorVBox, tableColorVBox, rightScrollPaneColorVBox,
                 rowSelectedColorVBox, rowUnfocusedColorVBox, rowHoveredColorVBox, save, resetToBase);
-
         Stage newStage = new Stage();
+
+        CSSVBox exportVBox = new CSSVBox("export", newStage);
+
+        CSSVBox importVBox = new CSSVBox("import", newStage);
+
+
+        group.getChildren().addAll(exportVBox, importVBox);
+
+
         newStage.initModality(Modality.APPLICATION_MODAL);
+
         Scene newScene = new Scene(group);
+
+
+
+        Modify.scenes.add(newScene);
+
         newStage.setScene(newScene);
 
         loadPreferences(newScene, backgroundColorPicker, treeColorPicker, textColorPicker, tableColorPicker, rightScrollPaneBackroundColorPicker, textSizeTextField, fontFamilyListView, mainController.directoryToSearchTextField, mainController.mainTextField);
@@ -279,25 +299,6 @@ public class Settings {
         file.getItems().get(1).setOnAction(e -> {
 
             newStage.showAndWait();
-
-//
-//            Double width = stage.getWidth();
-//            Double height = stage.getHeight();
-//            Double x = stage.getX();
-//            Double y = stage.getY();
-//            System.out.println("WIDTH:" + width);
-//
-//            if (!toggle) {
-//
-//                scene.setRoot(group);
-//
-//                toggle = true;
-//            } else {
-//
-//                scene.setRoot(root);
-//
-//                toggle = false;
-//            }
         });
     }
 
