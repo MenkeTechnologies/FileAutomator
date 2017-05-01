@@ -20,10 +20,18 @@ import mainPackage.CommonUtilities;
 import mainPackage.MainController;
 import mainPackage.Utilities;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 
 /**
  * Created by jacobmenke on 4/30/17.
@@ -175,14 +183,62 @@ public class Settings {
 
         ColorPicker rowSelectedColorPicker = new ColorPicker();
 
-        rowSelectedColorPicker.setOnAction(e->{
-
+        rowSelectedColorPicker.setOnAction(e -> {
+            bp.setStyle("-fx-selection-bar: " + CommonUtilities.toWebColor(rowSelectedColorPicker.getValue()));
         });
 
         VBox rowSelectedColorVBox = new VBox();
-      rowSelectedColorVBox.getChildren().addAll(  rowSelectedColorLabel, rowSelectedColorPicker);
 
-        group.getChildren().addAll(cleanUpButton, menuBar1, fontFamilyListView, label, textSizeTextField, backgroundColorVBox, textColorVBox, treeColorVBox, tableColorVBox, rightScrollPaneColorVBox, rowSelectedColorVBox, save, resetToBase);
+        rowSelectedColorVBox.getChildren().addAll(rowSelectedColorLabel, rowSelectedColorPicker);
+
+        Label rowUnfocusedColorLabel = new Label("Select the Row Caret Unfocused Color");
+
+        ColorPicker rowUnfocusedColorColorPicker = new ColorPicker();
+
+        rowUnfocusedColorColorPicker.setOnAction(e -> {
+            bp.setStyle("-fx-selection-bar-non-focused: " + CommonUtilities.toWebColor(rowUnfocusedColorColorPicker.getValue()));
+        });
+
+        VBox rowUnfocusedColorVBox = new VBox();
+
+        rowUnfocusedColorVBox.getChildren().addAll(rowUnfocusedColorLabel, rowUnfocusedColorColorPicker);
+
+        Label rowHoveredColorLabel = new Label("Select the Row Caret Hovered Color");
+
+        ColorPicker rowHoveredColorPicker = new ColorPicker();
+
+
+        rowHoveredColorPicker.setOnAction(e -> {
+
+            String tempCssFile = System.getProperty("java.io.tmpdir") + "modify.css";
+
+            try (PrintWriter pw = new PrintWriter(new FileOutputStream(tempCssFile))) {
+                pw.println("\n" +
+                        ".table-row-cell:hover {\n" +
+                        "    -fx-background: " + CommonUtilities.toWebColor(rowHoveredColorPicker.getValue()) + ";\n" +
+                        "}");
+
+
+            mainController.mainTableView.getScene().getStylesheets().clear();
+            mainController.mainTableView.getScene().getStylesheets().add("stylesheets/styles.css");
+
+            URL url  = new File(tempCssFile).toURI().toURL();
+
+            mainController.mainTableView.getScene().getStylesheets().add(url.toExternalForm());
+
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+        });
+
+        VBox rowHoveredColorVBox = new VBox();
+
+        rowHoveredColorVBox.getChildren().addAll(rowHoveredColorLabel, rowHoveredColorPicker);
+
+        group.getChildren().addAll(cleanUpButton, menuBar1, fontFamilyListView, label, textSizeTextField, backgroundColorVBox, textColorVBox, treeColorVBox, tableColorVBox, rightScrollPaneColorVBox,
+                rowSelectedColorVBox, rowUnfocusedColorVBox, rowHoveredColorVBox, save, resetToBase);
 
         Stage newStage = new Stage();
         newStage.initModality(Modality.APPLICATION_MODAL);
@@ -198,7 +254,7 @@ public class Settings {
             savePrefs(mainController, textSizeTextField, fontFamilyListView, backgroundColorPicker, textColorPicker, treeColorPicker, tableColorPicker, rightScrollPaneBackroundColorPicker, newScene);
         });
 
-        resetToBase.setOnAction(e->{
+        resetToBase.setOnAction(e -> {
             String style = "-fx-base: " + CommonUtilities.toWebColor(backgroundColorPicker.getValue());
 
             bp.setStyle(style);
@@ -207,7 +263,6 @@ public class Settings {
             CommonUtilities.treeViewColorProperty.set("-fx-control-inner-background: transparent");
             mainController.rightPaneScrollPane.setStyle(style + "; -fx-background-color: transparent");
             mainController.fileBrowserTreeTable.setStyle("-fx-control-inner-background: transparent");
-
         });
 
         newStage.setOnCloseRequest(e -> {

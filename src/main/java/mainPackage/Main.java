@@ -25,6 +25,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -32,7 +33,15 @@ import javafx.util.Duration;
 import windows.Settings;
 import windows.Splash;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.prefs.Preferences;
 
 public class Main extends Application {
@@ -48,6 +57,7 @@ public class Main extends Application {
 
     @Override
     public void init() throws Exception {
+
         ImageView splash = new ImageView(SPLASH_IMAGE);
         mainVBox = new VBox();
         splash.setPreserveRatio(true);
@@ -61,9 +71,10 @@ public class Main extends Application {
         stackpane.setPrefWidth(mainVBox.getWidth());
         splash.fitWidthProperty().bind(stackpane.widthProperty());
 
-        Label label = new Label("File Automator");
+        Text label = new Text("File Automator");
         label.setFont(Font.font("MARSNEVENEKSK",170));
-        label.setTextFill(Color.WHITE);
+
+        label.setFill(Color.WHITE);
 
         label.setEffect(new Reflection());
 
@@ -85,9 +96,6 @@ public class Main extends Application {
         if (color != null) {
             style += "-fx-base: " + color;
         }
-
-        System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-                "___ style" + style);
 
         bottomVbox.setStyle(style+";-fx-background-color: "+color+";");
 
@@ -129,8 +137,6 @@ public class Main extends Application {
         initStage.setAlwaysOnTop(true);
         initStage.show();
 
-        System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-                "___ here");
 
         loadingTask.stateProperty().addListener((observableValue, oldState, newState) -> {
 
@@ -250,9 +256,12 @@ public class Main extends Application {
 
         mainScene.getStylesheets().add("stylesheets/styles.css");
 
+
         initKeyBindings(mainController);
 
         primaryStage.setScene(mainScene);
+
+
         primaryStage.show();
     }
 

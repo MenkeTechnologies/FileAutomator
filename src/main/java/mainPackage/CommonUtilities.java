@@ -146,6 +146,7 @@ public class CommonUtilities {
         return String.format("%.2f %s", length / factor, suffix);
     }
 
+
     public static String formatDuration(Duration duration) {
         double millis = duration.toMillis();
         int seconds = (int) (millis / 1000) % 60;
