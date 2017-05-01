@@ -48,6 +48,9 @@ import javafx.stage.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import com.sun.management.OperatingSystemMXBean;
+
+import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
@@ -132,12 +135,14 @@ public class MainController implements Initializable {
     public ToggleButton fitScreenToggleButton;
     public ToggleButton fitScreenToggleMediaButton;
     public TabPane terminalTabPane;
+    public Label systemStatsLabel;
+
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
     boolean hidden = false;
-    static CustomTask<String> searchingTask;
-    static CustomTask<String> loadingTask;
+    public static CustomTask<String> searchingTask;
+    public static CustomTask<String> loadingTask;
     static CustomTask<String> rasterizingTask;
     public DoubleProperty mediaPlayerRateProperty = new SimpleDoubleProperty(1);
     public DoubleProperty mediaPlayerVolumeProperty = new SimpleDoubleProperty(1);
@@ -150,6 +155,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
 
         addTerminalPane();
 
@@ -255,13 +261,93 @@ public class MainController implements Initializable {
 
         DraggingInit.initDraggingBindings(this);
 
-        directoryToSearchTextField.setText("/Users/jacobmenke/Desktop");
 
         initCheckBoxes();
 
         initTasks();
 
         initToolTips();
+
+        initUsageMonitoring();
+
+        initFileSystemChangesMonitoring();
+    }
+
+    private void initFileSystemChangesMonitoring() {
+
+        try {
+            WatchService watchService = FileSystems.getDefault().newWatchService();
+
+            new Thread(()->{
+
+                try {
+
+                    //todo register tree table and
+                    Paths.get(directoryToSearchTextField.getText()).register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE,
+                            StandardWatchEventKinds.ENTRY_MODIFY);
+
+                    WatchKey watchKey= watchService.take();
+
+                    do{
+                        watchKey.pollEvents().forEach(e->{
+
+//                            if (e.context().toString().charAt(0) != '.'){
+//
+//                                    runInBackgroundThreadSecondary(()->{
+//                                        RegexUtilities.searchAndRefresh(this);
+//                                    });
+//                            }
+
+
+                            System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+                            "___ " + e.context());
+
+                        });
+
+
+                    } while (watchKey.reset());
+
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+
+    }
+
+    private void initUsageMonitoring() {
+
+        OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory
+                .getOperatingSystemMXBean();
+
+       new Thread(()->{
+           while (true){
+               try {
+                   Thread.sleep(1000);
+                   Platform.runLater(()->{
+
+                       Long memUsed = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                       systemStatsLabel.setText(String.format("CPU %05.2f%% MEM %s", operatingSystemMXBean.getProcessCpuLoad()*100, CommonUtilities.turnBytesIntoHumanReadable(memUsed)));
+
+                   });
+
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+               }
+
+           }
+       }).start();
+
     }
 
     public void addTerminalPane() {
@@ -435,7 +521,6 @@ public class MainController implements Initializable {
 
     public void initBindings() {
 
-        mainTextField.setText("mp4");
 
         fitScreenToggleButton.setOnAction(e -> fitScreenAction(e, 1.0));
         fitScreenToggleMediaButton.setOnAction(e -> fitScreenAction(e, 1.0));

@@ -39,7 +39,7 @@ public class CustomTask<T> extends Task<String> {
     }
 
     @Override
-    protected void updateMessage(String message) {
+    public void updateMessage(String message) {
         super.updateMessage(message);
     }
 
@@ -97,6 +97,9 @@ public class CustomTask<T> extends Task<String> {
 
     public CustomTask(MainController mainController) {
         this.mainController = mainController;
+    }
+
+    public CustomTask() {
     }
 
     public CustomTask(MainController mainController, Runnable r) {

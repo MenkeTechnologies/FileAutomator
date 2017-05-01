@@ -254,14 +254,14 @@
                         <Button onAction="#removeFilter" text="-"/>
                         <HBox fx:id="filterHBox">
                             <children>
-                                <TextField fx:id="mainTextField" prefWidth="100.0" promptText="Search For File"/>
+                                <TextField fx:id="mainTextField" prefWidth="100.0" promptText="Search For File" id="mainTextField"/>
                             </children>
                         </HBox>
 
 
                         <Label layoutX="10.0" layoutY="10.0" text="Directory:"/>
                         <TextField fx:id="directoryToSearchTextField" prefHeight="27.0" prefWidth="300.0"
-                                   promptText="Source Directory">
+                                   promptText="Source Directory" id="directoryToSearchTextField">
                             <tooltip>
                                 <Tooltip text="Search For Files in This Directory"/>
                             </tooltip>
@@ -467,8 +467,10 @@
                         <Label fx:id="loadingFileLabel" text="Activity" visible="true"/>
                         <Separator/>
 
-
                         <Label fx:id="numberResultsLabel" text="Results"/>
+                        <Separator/>
+
+                        <Label fx:id="systemStatsLabel"/>
                     </children>
                 </HBox>
             </children>
