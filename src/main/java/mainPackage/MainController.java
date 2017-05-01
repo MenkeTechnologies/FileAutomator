@@ -337,7 +337,7 @@ public class MainController implements Initializable {
                    Platform.runLater(()->{
 
                        Long memUsed = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                       systemStatsLabel.setText(String.format("CPU %05.2f%% MEM %s", operatingSystemMXBean.getProcessCpuLoad()*100, CommonUtilities.turnBytesIntoHumanReadable(memUsed)));
+                       systemStatsLabel.setText(String.format("CPU %.2f%% MEM %s", operatingSystemMXBean.getProcessCpuLoad()*100, CommonUtilities.turnBytesIntoHumanReadable(memUsed)));
 
                    });
 
@@ -799,9 +799,9 @@ public class MainController implements Initializable {
     }
 
     public void chooseDir(ActionEvent actionEvent) {
-        FileChooser fc = new FileChooser();
-        File newDirToSearch = fc.showOpenDialog(mainTableView.getScene().getWindow());
-        directoryToSearchTextField.setText(newDirToSearch.getParent());
+        DirectoryChooser dc = new DirectoryChooser();
+        File newDirToSearch = dc.showDialog(mainTableView.getScene().getWindow());
+        directoryToSearchTextField.setText(newDirToSearch.getAbsolutePath());
     }
 
     public void refreshTreeView(ActionEvent actionEvent) {

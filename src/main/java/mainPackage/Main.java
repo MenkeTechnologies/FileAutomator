@@ -1,5 +1,6 @@
 package mainPackage;
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -30,6 +31,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import mainPackage.StylesheetUtilities.Modify;
 import windows.Settings;
 import windows.Splash;
 
@@ -57,6 +59,11 @@ public class Main extends Application {
 
     @Override
     public void init() throws Exception {
+
+        File newFile = new File(System.getProperty("user.home") + File.separator + "modify.css");
+        if (!newFile.exists()){
+            newFile.createNewFile();
+        }
 
         ImageView splash = new ImageView(SPLASH_IMAGE);
         mainVBox = new VBox();
@@ -254,12 +261,13 @@ public class Main extends Application {
 
         //AquaFx.style();
 
-        mainScene.getStylesheets().add("stylesheets/styles.css");
-
-
         initKeyBindings(mainController);
 
         primaryStage.setScene(mainScene);
+
+        Modify.scenes.add(mainScene);
+
+        Modify.addStyleSheets(Modify.scenes, Modify.tempCssFile);
 
 
         primaryStage.show();
