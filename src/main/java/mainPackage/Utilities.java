@@ -10,6 +10,8 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -44,6 +46,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.prefs.Preferences;
 
 import static mainPackage.CommonUtilities.toWebColor;
@@ -60,193 +63,7 @@ public class Utilities {
     static String textContent = null;
     static Image image = null;
     static boolean fromAutoPlay = false;
-    static StringProperty mainStyleProp = new SimpleStringProperty("");
-
-    public static void saveColors() {
-
-
-    }
-
-    public static void initMenuBar(MainController mainController, Scene scene, Stage stage) {
-        Menu file = mainController.menuBar.getMenus().get(0);
-
-        Scene oldScene = mainController.menuBar.getScene();
-        VBox group = new VBox();
-
-        Button cleanUpButton = new Button("Clean up");
-        cleanUpButton.setOnAction(e -> {
-            try {
-                Files.walk(Paths.get(System.getProperty("java.io.tmpdir"))).forEach(path -> {
-                    path.toFile().delete();
-                });
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            MainController.loadingTask.updateMessage("Cleaning old resources.");
-        });
-
-        MenuBar menuBar1 = new MenuBar();
-        menuBar1.getMenus().addAll(mainController.menuBar.getMenus());
-
-        menuBar1.setUseSystemMenuBar(true);
-
-        Label label = new Label("Font Size:");
-        TextField textSizeTextField = new TextField("12");
-
-        ListView<String> listView = new ListView();
-
-        BorderPane bp = (BorderPane) scene.getRoot();
-        listView.getItems().addAll(Font.getFamilies());
-
-        group.styleProperty().bind(bp.styleProperty());
-        mainStyleProp.bind(bp.styleProperty());
-
-        ColorPicker backgroundColorPicker = new ColorPicker();
-        ColorPicker textColorPicker = new ColorPicker();
-        ColorPicker treeColorPicker = new ColorPicker();
-        ColorPicker tableColorPicker = new ColorPicker();
-        ColorPicker rightScrollPaneColorColorPicker = new ColorPicker();
-
-        listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-
-                try {
-                    Integer size = Integer.parseInt(textSizeTextField.getText());
-
-                    bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField, textColorPicker));
-                } catch (Exception e) {
-                    CommonUtilities.showErrorAlert("Font Size was not Valid.");
-                }
-            }
-        });
-
-        textSizeTextField.setOnAction(e -> {
-
-            try {
-                Integer.parseInt(textSizeTextField.getText());
-
-                bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField, textColorPicker));
-            } catch (Exception ex) {
-                CommonUtilities.showErrorAlert("Font Size was not Valid.");
-            }
-        });
-        VBox backgroundColorVBox = new VBox();
-
-        Label backgroundColorLabel = new Label("Choose A Background Color");
-
-        backgroundColorPicker.setOnAction(e -> {
-
-            bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField, textColorPicker));
-        });
-
-        backgroundColorVBox.getChildren().addAll(backgroundColorLabel, backgroundColorPicker);
-
-        VBox treeColorVBox = new VBox();
-
-        Label treeBackgroundColorLabel = new Label("Choose A Background Tree Color");
-
-
-
-        treeColorPicker.setOnAction(e -> {
-
-            Paint fill = treeColorPicker.getValue();
-            String webColor = fill.toString().replace("0x", "#").substring(0, 7);
-            CommonUtilities.treeViewColorProperty.set("-fx-control-inner-background: " + webColor);
-            mainController.fileBrowserTreeTable.setStyle("-fx-control-inner-background: " + webColor);
-        });
-
-        treeColorVBox.getChildren().addAll(treeBackgroundColorLabel, treeColorPicker);
-
-        VBox textColorVBox = new VBox();
-
-        Label textColorLabel = new Label("Choose A Text Color");
-
-
-
-        textColorPicker.setOnAction(e -> {
-
-            Paint fill = textColorPicker.getValue();
-
-            String webColor = fill.toString().replace("0x", "#").substring(0, 7);
-
-            bp.setStyle(getStringBuilderStyle(backgroundColorPicker, listView, textSizeTextField, textColorPicker));
-        });
-
-        textColorVBox.getChildren().addAll(textColorLabel, textColorPicker);
-
-        VBox tableColorVBox = new VBox();
-
-        Label tableBackgroundColorLabel = new Label("Choose A Background Table Color");
-
-
-        tableColorPicker.setOnAction(e -> {
-
-            Paint fill = tableColorPicker.getValue();
-            String webColor = fill.toString().replace("0x", "#").substring(0, 7);
-            CommonUtilities.tableViewColorProperty.set("-fx-control-inner-background:" + webColor);
-            mainController.mainTableView.setStyle("-fx-control-inner-background: " + webColor);
-        });
-
-        tableColorVBox.getChildren().addAll(tableBackgroundColorLabel, tableColorPicker);
-
-        VBox rightScrollPaneColorVBox = new VBox();
-
-        Label rightScrollPaneColorLabel = new Label("Choose A Background Scroll Pane Color");
-
-
-        rightScrollPaneColorColorPicker.setOnAction(e -> {
-
-            Paint fill = rightScrollPaneColorColorPicker.getValue();
-            String webColor = fill.toString().replace("0x", "#").substring(0, 7);
-            mainController.rightPaneScrollPane.setStyle("-fx-background-color: " + webColor);
-        });
-
-        rightScrollPaneColorVBox.getChildren().addAll(rightScrollPaneColorLabel, rightScrollPaneColorColorPicker);
-
-        group.getChildren().addAll(cleanUpButton, menuBar1, listView, label, textSizeTextField, backgroundColorVBox, textColorVBox, treeColorVBox, tableColorVBox, rightScrollPaneColorVBox);
-
-        Stage newStage = new Stage();
-        newStage.initModality(Modality.APPLICATION_MODAL);
-        Scene newScene = new Scene(group);
-        newStage.setScene(newScene);
-
-        newStage.setOnCloseRequest(e->{
-            Preferences.userRoot().put("backgroundColorPicker", backgroundColorPicker.getValue().toString());
-
-
-        });
-
-        Parent root = scene.getRoot();
-
-        file.getItems().get(0).setOnAction(e -> {
-            Platform.exit();
-        });
-
-        file.getItems().get(1).setOnAction(e -> {
-
-            newStage.showAndWait();
-
-//
-//            Double width = stage.getWidth();
-//            Double height = stage.getHeight();
-//            Double x = stage.getX();
-//            Double y = stage.getY();
-//            System.out.println("WIDTH:" + width);
-//
-//            if (!toggle) {
-//
-//                scene.setRoot(group);
-//
-//                toggle = true;
-//            } else {
-//
-//                scene.setRoot(root);
-//
-//                toggle = false;
-//            }
-        });
-    }
+    public  static StringProperty mainStyleProp = new SimpleStringProperty("");
 
     public static String getStringBuilderStyle(ColorPicker backgroundColorPicker, ListView<String> listView, TextField textField, ColorPicker textColorPicker) {
         StringBuilder stringBuilder = new StringBuilder();

@@ -37,8 +37,9 @@ public class CommonUtilities {
     public static Integer index = 0;
     public static AtomicLong TOTAL_FILE_COUNTER = new AtomicLong(0);
     public static AtomicLong MATCHING_FILE_COUNTER = new AtomicLong(0);
-    static StringProperty treeViewColorProperty = new SimpleStringProperty();
-    static StringProperty tableViewColorProperty = new SimpleStringProperty();
+    public static StringProperty treeViewColorProperty = new SimpleStringProperty();
+    public  static StringProperty tableViewColorProperty = new SimpleStringProperty();
+    public static StringProperty terminalBackgroundColor = new SimpleStringProperty();
 
     public static String toWebColor(Color value) {
 
@@ -155,6 +156,7 @@ public class CommonUtilities {
     public static void createNewFile(FileInfo fileInfo, MainController mainController) {
         TextInputDialog textInputDialog = new TextInputDialog("");
         textInputDialog.setHeaderText("Create New File");
+        textInputDialog.getDialogPane().setStyle(Utilities.mainStyleProp.getValue());
 
         Optional<String> result = textInputDialog.showAndWait();
         if (result.isPresent()) {
@@ -189,6 +191,7 @@ public class CommonUtilities {
 
     public static void secureDelete(FileInfo fileInfo, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.getDialogPane().setStyle(Utilities.mainStyleProp.getValue());
 
         alert.setHeaderText("Are you sure you want to delete \"" + fileInfo.getFileName() + "\" permanently?");
 
@@ -257,9 +260,12 @@ public class CommonUtilities {
 
         textInputDialog.setContentText("New File: ");
 
+        textInputDialog.getDialogPane().setStyle(Utilities.mainStyleProp.get());
+
         textInputDialog.headerTextProperty().bind(Bindings.concat("Copy ", quote(fileInfo.getAbsolutePath()), " to \"", textInputDialog.getEditor().textProperty(), "\""));
 
         Optional<String> result = textInputDialog.showAndWait();
+        textInputDialog.getDialogPane().setStyle(Utilities.mainStyleProp.getValue());
 
         if (result.isPresent()) {
             try {
@@ -286,6 +292,7 @@ public class CommonUtilities {
     public static void moveToTrash(FileInfo fileInfo, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.getDialogPane().setStyle(Utilities.mainStyleProp.getValue());
 
         alert.setHeaderText("Are you sure you want to delete \"" + fileInfo.getFileName() + "\"?");
 
@@ -312,6 +319,8 @@ public class CommonUtilities {
     public static void renameFile(FileInfo fileInfo, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
         TextInputDialog dialog = new TextInputDialog(fileInfo.getFileName());
         dialog.setHeaderText("Rename " + "\"" + fileInfo.getFileName() + "\"");
+        dialog.getDialogPane().setStyle(Utilities.mainStyleProp.getValue());
+
 
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
