@@ -32,6 +32,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import mainPackage.StylesheetUtilities.Modify;
+import org.controlsfx.control.BreadCrumbBar;
+import org.controlsfx.control.HiddenSidesPane;
+import org.controlsfx.control.NotificationPane;
+import org.controlsfx.control.PropertySheet;
 import windows.Settings;
 import windows.Splash;
 
@@ -247,9 +251,11 @@ public class Main extends Application {
 
         mainController.initBindings();
 
+
+
         Settings.initMenuBar(mainController, mainScene, primaryStage);
 
-        double[] sps = {0, 0, 0};
+        double[] sps = {0, 0, 0,0};
 
         for (int i = 0; i < mainController.mainSplitPane.getDividers().size(); i++) {
 

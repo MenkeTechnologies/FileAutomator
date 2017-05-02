@@ -10,6 +10,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -38,7 +40,7 @@ public class Settings {
         Menu file = mainController.menuBar.getMenus().get(0);
 
         Scene oldScene = mainController.menuBar.getScene();
-        VBox group = new VBox();
+        HBox group = new HBox();
 
         Button cleanUpButton = new Button("Clean up");
         cleanUpButton.setOnAction(e -> {
@@ -57,7 +59,7 @@ public class Settings {
 
         menuBar1.setUseSystemMenuBar(true);
 
-        Label label = new Label("Font Size:");
+        Label fontSizeLabel = new Label("Font Size:");
         TextField textSizeTextField = new TextField("12");
 
         ListView<String> fontFamilyListView = new ListView();
@@ -70,6 +72,8 @@ public class Settings {
 
         group.styleProperty().bind(bp.styleProperty());
         Utilities.mainStyleProp.bind(bp.styleProperty());
+
+        VBox textSizeVBox = new VBox(fontFamilyListView, fontSizeLabel, textSizeTextField);
 
         ColorPicker backgroundColorPicker = new ColorPicker();
         backgroundColorPicker.setId("backgroundColorPicker");
@@ -112,6 +116,7 @@ public class Settings {
                 Paint fill = rightScrollPaneBackroundColorPicker.getValue();
                 String webColor = fill.toString().replace("0x", "#").substring(0, 7);
                 mainController.rightPaneScrollPane.setStyle("-fx-background-color: " + webColor);
+
             }
         };
 
@@ -243,23 +248,23 @@ public class Settings {
 
         rowHoveredColorVBox.getChildren().addAll(rowHoveredColorLabel, rowHoveredColorPicker);
 
-        group.getChildren().addAll(cleanUpButton, menuBar1, fontFamilyListView, label, textSizeTextField, backgroundColorVBox, accentColorVBox, textColorVBox, treeColorVBox, tableColorVBox, rightScrollPaneColorVBox,
-                rowSelectedColorVBox, rowUnfocusedColorVBox, rowHoveredColorVBox, save, resetToBase);
+        FlowPane colorFlowPane = new FlowPane();
+
+        colorFlowPane.getChildren().addAll(backgroundColorVBox, accentColorVBox, textColorVBox, treeColorVBox, tableColorVBox, rightScrollPaneColorVBox,
+                rowSelectedColorVBox, rowUnfocusedColorVBox, rowHoveredColorVBox, new HBox(save, resetToBase, cleanUpButton));
+
+        group.getChildren().addAll(menuBar1, textSizeVBox, colorFlowPane);
         Stage newStage = new Stage();
 
         CSSVBox exportVBox = new CSSVBox("export", newStage);
 
         CSSVBox importVBox = new CSSVBox("import", newStage);
 
-
         group.getChildren().addAll(exportVBox, importVBox);
-
 
         newStage.initModality(Modality.APPLICATION_MODAL);
 
         Scene newScene = new Scene(group);
-
-
 
         Modify.scenes.add(newScene);
 

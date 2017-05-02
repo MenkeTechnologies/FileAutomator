@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.shape.*?>
@@ -17,7 +18,7 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainPackage.MainController">
     <center>
-        <SplitPane fx:id="mainSplitPane" dividerPositions="0.5, 0.5">
+        <SplitPane fx:id="mainSplitPane" dividerPositions="0.5, 0.5, 0.5">
             <items>
                 <TreeView fx:id="fileBrowserTreeTable" prefHeight="200.0" prefWidth="200.0">
                 </TreeView>
@@ -39,8 +40,8 @@
                                         <TextFlow fx:id="textFlowRightPane">
                                             <children>
 
-                                                <Label fx:id="fileNamDetailLabel" styleClass="detailLabels" text="File: " />
-                                                <Label fx:id="fileNamDetailLabelContent" />
+                                                <Label fx:id="fileNamDetailLabel" styleClass="detailLabels" text="File: " wrapText="true"/>
+                                                <Label fx:id="fileNamDetailLabelContent" wrapText="true"/>
                                             </children>
                                         </TextFlow>
                                         <TextFlow>
@@ -67,13 +68,6 @@
                                         <TextFlow>
                                             <children>
                                                 <Label fx:id="textLabel" styleClass="detailLabels" />
-                                            </children>
-                                        </TextFlow>
-
-
-                                        <TextFlow>
-                                            <children>
-                                                <Label fx:id="textContent" />
                                             </children>
                                         </TextFlow>
 
@@ -188,6 +182,18 @@
                         </VBox>
                     </content>
                 </ScrollPane>
+            <VBox>
+               <children>
+                  <HBox>
+                     <children>
+                        <Button mnemonicParsing="false" text="Back" fx:id="webViewBackButton"/>
+                        <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Forward" fx:id="webViewForwardButton"/>
+                        <TextField promptText="url" fx:id="webViewTextField" prefWidth="400"/>
+                     </children>
+                  </HBox>
+                  <WebView fx:id="splitPaneWebView"/>
+               </children>
+            </VBox>
 
             </items>
         </SplitPane>
@@ -399,6 +405,12 @@
 
                         <HBox>
                             <children>
+                                <Button text="Restore Panes" fx:id="restorePanesButton">
+                                    <tooltip>
+                                        <Tooltip text="Restore Panes To Default Config" />
+                                    </tooltip>
+                                </Button>
+
                                 <Button onAction="#openFromRightSidePane" text="Open File">
                                     <tooltip>
                                         <Tooltip text="Open File with Default Program" />
@@ -431,10 +443,7 @@
                         <Region HBox.hgrow="ALWAYS" />
                         <Label fx:id="loadingFileLabel" text="Activity" visible="true" />
 
-                        <Label fx:id="numberResultsLabel" text="Results">
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin></Label>
+                        <Label fx:id="numberResultsLabel" text="Results"/>
 
                         <Label fx:id="systemStatsLabel" alignment="CENTER_RIGHT" prefWidth="170.0" HBox.hgrow="NEVER">
                      <HBox.margin>

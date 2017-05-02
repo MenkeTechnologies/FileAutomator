@@ -3,9 +3,11 @@ package mainPackage;
 import javafx.application.Platform;
 
 import java.awt.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
@@ -64,6 +66,17 @@ public class RegexUtilities {
         });
     }
 
+   static class CustomFileVisitor extends SimpleFileVisitor<Path>{
+
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+            return FileVisitResult.SKIP_SUBTREE;
+        }
+
+
+
+    }
+
     public static void findFilesWithRegex(MainController mainController, String directory, ArrayList<String> andTerms, ArrayList<String> orTerms) {
 
         try {
@@ -71,80 +84,104 @@ public class RegexUtilities {
             CommonUtilities.TOTAL_FILE_COUNTER.set(0);
             CommonUtilities.MATCHING_FILE_COUNTER.set(0);
 
-            Files.walk(Paths.get(directory)).forEach(file -> {
 
-                if (MainController.searchingTask.getFuture().isCancelled()) {
+            Files.walkFileTree(Paths.get(directory), new SimpleFileVisitor<Path>() {
 
-                    throw new RuntimeException();
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+
+                    System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+                    "___ Permissions error at" + file);
+                    return FileVisitResult.SKIP_SUBTREE;
                 }
 
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
-                CommonUtilities.TOTAL_FILE_COUNTER.incrementAndGet();
+                    if (MainController.searchingTask.getFuture().isCancelled()) {
 
-                String fileName;
+                        throw new RuntimeException();
+                    }
 
-                if (mainController.pathMatchingCheckbox.isSelected()) {
-                    fileName = file.toAbsolutePath().toString();
-                } else {
-                    fileName = file.toAbsolutePath().getFileName().toString();
-                }
+                    CommonUtilities.TOTAL_FILE_COUNTER.incrementAndGet();
 
-                if (!orTerms.get(0).equals("")) {
+                    String fileName;
 
-                    orTerms.forEach(fileString->{
+                    if (mainController.pathMatchingCheckbox.isSelected()) {
+                        fileName = file.toAbsolutePath().toString();
+                    } else {
+                        fileName = file.toAbsolutePath().getFileName().toString();
+                    }
 
-                        Pattern pattern;
+                    if (!orTerms.get(0).equals("")) {
 
-                        StringBuilder andTermsBuilder = new StringBuilder(fileString);
+                        orTerms.forEach(fileString -> {
 
-                        andTerms.forEach(term->{
-                            andTermsBuilder.append(" ").append(term).append(" ");
-                        });
+                            Pattern pattern;
 
-                        StringTokenizer st = new StringTokenizer(andTermsBuilder.toString());
+                            StringBuilder andTermsBuilder = new StringBuilder(fileString);
+
+                            andTerms.forEach(term -> {
+                                andTermsBuilder.append(" ").append(term).append(" ");
+                            });
+
+                            StringTokenizer st = new StringTokenizer(andTermsBuilder.toString());
 
 //                        System.out.println("compound searcher = " + andTermsBuilder.toString());
 
-                        StringBuilder sb = new StringBuilder();
+                            StringBuilder sb = new StringBuilder();
 
-                        while (st.hasMoreTokens()) {
+                            while (st.hasMoreTokens()) {
 
-                            String next = Pattern.quote(st.nextToken());
+                                String next = Pattern.quote(st.nextToken());
 
-                            sb.append(".*").append(next);
-                        }
+                                sb.append(".*").append(next);
+                            }
 
+                            String regexString = sb.toString();
 
-                        String regexString = sb.toString();
+                            if (mainController.caseInsensitiveMatchingCheckbox.isSelected()) {
+                                pattern = Pattern.compile(regexString, Pattern.CASE_INSENSITIVE);
+                            } else {
+                                pattern = Pattern.compile(regexString);
+                            }
 
-                        if (mainController.caseInsensitiveMatchingCheckbox.isSelected()) {
-                            pattern = Pattern.compile(regexString, Pattern.CASE_INSENSITIVE);
-                        } else {
-                            pattern = Pattern.compile(regexString);
-                        }
+                            if (pattern.matcher(fileName).find()) {
 
-                        if (pattern.matcher(fileName).find()) {
+                                CommonUtilities.MATCHING_FILE_COUNTER.incrementAndGet();
 
-                            CommonUtilities.MATCHING_FILE_COUNTER.incrementAndGet();
+                                mainController.checkToShowHiddenFiles(file);
+                            }
+                        });
+                    } else {
 
-                            mainController.checkToShowHiddenFiles(file);
-                        }
+                        mainController.checkToShowHiddenFiles(file);
+                    }
 
-                    });
+                    String message = "Filtered " + CommonUtilities.MATCHING_FILE_COUNTER + " files of " + CommonUtilities.TOTAL_FILE_COUNTER + " files : Processing " + file.getFileName();
 
-                } else {
+                    MainController.searchingTask.updateMessage(message);
 
-                    mainController.checkToShowHiddenFiles(file);
+                    return FileVisitResult.CONTINUE;
                 }
-
-                String message = "Filtered " + CommonUtilities.MATCHING_FILE_COUNTER + " files of " + CommonUtilities.TOTAL_FILE_COUNTER + " files : Processing " + file.getFileName();
-
-                MainController.searchingTask.updateMessage(message);
             });
-        } catch (Exception e) {
-            e.printStackTrace();
 
-            System.out.println("Stopped indexing.");
-        }
+
+            } catch (IOException fse) {
+                System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+                        "___ Swallowing IOException....");
+            } catch (RuntimeException e){
+
+                e.printStackTrace();
+
+                System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+                        "___ Exiting Loop.");
+
+            }
+
+
+
+
+
     }
 }
