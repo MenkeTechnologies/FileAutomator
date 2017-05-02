@@ -34,7 +34,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by jacobmenke on 4/15/17.
  */
 public class CommonUtilities {
+
     public static Integer index = 0;
+
     public static AtomicLong TOTAL_FILE_COUNTER = new AtomicLong(0);
     public static AtomicLong MATCHING_FILE_COUNTER = new AtomicLong(0);
     public static StringProperty treeViewColorProperty = new SimpleStringProperty();

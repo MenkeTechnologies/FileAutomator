@@ -26,6 +26,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.Reflection;
 import javafx.scene.image.*;
@@ -43,11 +44,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.text.*;
+import javafx.scene.web.WebView;
 import javafx.stage.*;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+
 import com.sun.management.OperatingSystemMXBean;
 
 import java.lang.management.ManagementFactory;
@@ -58,6 +61,7 @@ import java.util.prefs.Preferences;
 
 import javafx.scene.text.Font;
 import javafx.util.Duration;
+import windows.CustomTextArea;
 
 public class MainController implements Initializable {
     public TableView<FileInfo> mainTableView;
@@ -85,7 +89,7 @@ public class MainController implements Initializable {
     public Label lastModifiedLabelContent;
     public TextFlow textFlowRightPane;
     public Label textLabel;
-    public Label textContent;
+    public CodeTextArea textContent;
     public MediaView rightPaneMediaView;
     public MenuBar menuBar;
     public ProgressIndicator thinkingIndicator;
@@ -136,7 +140,12 @@ public class MainController implements Initializable {
     public ToggleButton fitScreenToggleMediaButton;
     public TabPane terminalTabPane;
     public Label systemStatsLabel;
-
+    public TextField webViewTextField;
+    public Button webViewBackButton;
+    public Button webViewForwardButton;
+    public WebView splitPaneWebView;
+    public Button restorePanesButton;
+    public TextFlow textFlowFinalFinalRightPane;
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
@@ -156,8 +165,23 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        splitPaneWebView.prefHeightProperty().bind(mainSplitPane.heightProperty());
 
-        addTerminalPane();
+        webViewBackButton.setOnAction(e -> {
+            splitPaneWebView.getEngine().getHistory().go(-1);
+        });
+
+        webViewForwardButton.setOnAction(e -> {
+            splitPaneWebView.getEngine().getHistory().go(1);
+        });
+
+
+        webViewTextField.setText("http://www.youtube.com");
+        webViewTextField.setOnAction(e -> {
+            splitPaneWebView.getEngine().load(webViewTextField.getText());
+        });
+
+        //addTerminalPane();
 
         mediaPlayer = new MediaPlayer(new Media(getClass().getResource("/ClosedHH.wav").toExternalForm()));
 
@@ -259,8 +283,13 @@ public class MainController implements Initializable {
             }
         });
 
-        DraggingInit.initDraggingBindings(this);
+        splitPaneChildren.addAll(mainSplitPane.getItems());
 
+        restorePanesButton.setOnAction(e->{
+            restorePanesToOld(null);
+        });
+
+        DraggingInit.initDraggingBindings(this);
 
         initCheckBoxes();
 
@@ -278,7 +307,7 @@ public class MainController implements Initializable {
         try {
             WatchService watchService = FileSystems.getDefault().newWatchService();
 
-            new Thread(()->{
+            new Thread(() -> {
 
                 try {
 
@@ -286,10 +315,10 @@ public class MainController implements Initializable {
                     Paths.get(directoryToSearchTextField.getText()).register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE,
                             StandardWatchEventKinds.ENTRY_MODIFY);
 
-                    WatchKey watchKey= watchService.take();
+                    WatchKey watchKey = watchService.take();
 
-                    do{
-                        watchKey.pollEvents().forEach(e->{
+                    do {
+                        watchKey.pollEvents().forEach(e -> {
 
 //                            if (e.context().toString().charAt(0) != '.'){
 //
@@ -298,31 +327,17 @@ public class MainController implements Initializable {
 //                                    });
 //                            }
 
-
-                            System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-                            "___ " + e.context());
-
+                            System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+                                    "___ " + e.context());
                         });
-
-
                     } while (watchKey.reset());
-
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }).start();
-
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-
-
     }
 
     private void initUsageMonitoring() {
@@ -330,24 +345,20 @@ public class MainController implements Initializable {
         OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean();
 
-       new Thread(()->{
-           while (true){
-               try {
-                   Thread.sleep(1000);
-                   Platform.runLater(()->{
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                    Platform.runLater(() -> {
 
-                       Long memUsed = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                       systemStatsLabel.setText(String.format("CPU %.2f%% MEM %s", operatingSystemMXBean.getProcessCpuLoad()*100, CommonUtilities.turnBytesIntoHumanReadable(memUsed)));
-
-                   });
-
-               } catch (InterruptedException e) {
-                   e.printStackTrace();
-               }
-
-           }
-       }).start();
-
+                        Long memUsed = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                        systemStatsLabel.setText(String.format("CPU %.2f%% MEM %s", operatingSystemMXBean.getProcessCpuLoad() * 100, CommonUtilities.turnBytesIntoHumanReadable(memUsed)));
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public void addTerminalPane() {
@@ -522,6 +533,11 @@ public class MainController implements Initializable {
     public void initBindings() {
 
 
+        textContent = new CodeTextArea(this);
+
+        mainSplitPane.getItems().add(textContent.getCodeArea());
+
+
         fitScreenToggleButton.setOnAction(e -> fitScreenAction(e, 1.0));
         fitScreenToggleMediaButton.setOnAction(e -> fitScreenAction(e, 1.0));
 
@@ -541,10 +557,10 @@ public class MainController implements Initializable {
 
         showReflectionBottomButton.setSelected(true);
 
-        autoPlayMediaControl.selectedProperty().bindBidirectional(autoplayCheckbox.selectedProperty());
 
         showReflectionButton.selectedProperty().bindBidirectional(showReflectionBottomButton.selectedProperty());
         showReflection(null);
+
 
         stopCurrentSearchButton.setOnAction(e -> {
             if (searchingTask.getFuture() != null) {
@@ -556,6 +572,7 @@ public class MainController implements Initializable {
                 }
             }
         });
+
 
         lockMediaViewBottomToggle.selectedProperty().bindBidirectional(lockMediaViewMediaControlsToggle.selectedProperty());
         currentTimeLabel.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(0.15));
@@ -1040,7 +1057,7 @@ public class MainController implements Initializable {
             }
         }
 
-        double[] sps = {0, 0, 0};
+        double[] sps = {0, 0, 0,0};
 
         for (int i = 0; i < mainSplitPane.getDividers().size(); i++) {
 

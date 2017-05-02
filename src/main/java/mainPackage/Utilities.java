@@ -506,7 +506,7 @@ public class Utilities {
 
     public static void removeTextFromRightPane(MainController mainController) {
         mainController.textLabel.setText("");
-        mainController.textContent.setText("");
+//        mainController.textContent.codeArea.clear();
     }
 
     public static void copyFilesFromTableViewToDirectory(TableView mainTableView, String destinationPathString) {
