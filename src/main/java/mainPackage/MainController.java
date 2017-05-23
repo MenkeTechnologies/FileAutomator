@@ -14,7 +14,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.*;
+import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
 import javafx.geometry.Rectangle2D;
@@ -26,12 +28,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.Reflection;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -56,12 +59,16 @@ import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.prefs.Preferences;
 
 import javafx.scene.text.Font;
 import javafx.util.Duration;
-import windows.CustomTextArea;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
+
+import static javafx.scene.input.KeyCode.*;
 
 public class MainController implements Initializable {
     public TableView<FileInfo> mainTableView;
@@ -146,6 +153,7 @@ public class MainController implements Initializable {
     public WebView splitPaneWebView;
     public Button restorePanesButton;
     public TextFlow textFlowFinalFinalRightPane;
+    public VBox webViewVBox;
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
@@ -161,27 +169,14 @@ public class MainController implements Initializable {
     Timer disappearTimer;
     ArrayList<String> filesForAutoplay = new ArrayList<>();
     ObservableList<Node> splitPaneChildren = FXCollections.observableArrayList();
+    AutoCompletionBinding<String> binding;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        splitPaneWebView.prefHeightProperty().bind(mainSplitPane.heightProperty());
+        addWebViewPane();
 
-        webViewBackButton.setOnAction(e -> {
-            splitPaneWebView.getEngine().getHistory().go(-1);
-        });
-
-        webViewForwardButton.setOnAction(e -> {
-            splitPaneWebView.getEngine().getHistory().go(1);
-        });
-
-
-        webViewTextField.setText("http://www.youtube.com");
-        webViewTextField.setOnAction(e -> {
-            splitPaneWebView.getEngine().load(webViewTextField.getText());
-        });
-
-        //addTerminalPane();
+        addTerminalPane();
 
         mediaPlayer = new MediaPlayer(new Media(getClass().getResource("/ClosedHH.wav").toExternalForm()));
 
@@ -285,7 +280,7 @@ public class MainController implements Initializable {
 
         splitPaneChildren.addAll(mainSplitPane.getItems());
 
-        restorePanesButton.setOnAction(e->{
+        restorePanesButton.setOnAction(e -> {
             restorePanesToOld(null);
         });
 
@@ -300,6 +295,152 @@ public class MainController implements Initializable {
         initUsageMonitoring();
 
         initFileSystemChangesMonitoring();
+
+        initAutoComplete();
+    }
+
+    ContextMenu contextMenu;
+
+    public void addWebViewPane() {
+        splitPaneWebView.prefHeightProperty().bind(mainSplitPane.heightProperty());
+
+        splitPaneWebView.setContextMenuEnabled(false);
+
+        splitPaneWebView.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.SECONDARY){
+
+
+                MenuItem reload = new MenuItem("Reload page");
+
+                MenuItem closePaneWeb = new MenuItem("Close this pane.");
+
+                reload.setOnAction(e->{
+                    splitPaneWebView.getEngine().reload();
+                });
+
+                closePaneWeb.setOnAction(e->{
+                    removePaneSingular("webView");
+
+                });
+
+                if (contextMenu != null){
+                    contextMenu.hide();
+                }
+
+                 contextMenu = new ContextMenu();
+
+
+                contextMenu.getItems().addAll(reload, closePaneWeb);
+
+
+                contextMenu.show(splitPaneWebView, event.getScreenX(), event.getScreenY());
+
+            } else {
+
+                contextMenu.hide();
+
+            }
+        });
+
+        webViewBackButton.setOnAction(e -> {
+            splitPaneWebView.getEngine().getHistory().go(-1);
+        });
+
+        webViewForwardButton.setOnAction(e -> {
+            splitPaneWebView.getEngine().getHistory().go(1);
+        });
+
+        webViewTextField.setText("http://www.youtube.com");
+        webViewTextField.setOnAction(e -> {
+            splitPaneWebView.getEngine().load(webViewTextField.getText());
+        });
+    }
+
+    private void initAutoComplete() {
+        ArrayList<String> autoCompleteDirectoriesArrayList = new ArrayList<>();
+
+        EventHandler<KeyEvent> autoCompleteHandler = new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent e) {
+
+                switch (e.getCode()) {
+                    case SLASH:
+                    case BACK_SLASH:
+                    case BACK_SPACE:
+                    case DOWN:
+                    case UP:
+                    case LEFT:
+                    case RIGHT:
+                        break;
+
+                    default:
+                        TextField tf = (TextField) e.getSource();
+
+                        File possiblePath = new File(tf.getText());
+
+                        if (possiblePath.exists()) {
+                            autoCompleteDirectoriesArrayList.clear();
+
+                            try {
+                                Files.walkFileTree(Paths.get(possiblePath.getAbsolutePath()), new HashSet<FileVisitOption>(), 1, new FileVisitor<Path>() {
+                                    @Override
+                                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                                        return FileVisitResult.CONTINUE;
+                                    }
+
+                                    @Override
+                                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                                        if (file.toFile().isDirectory()) {
+                                            autoCompleteDirectoriesArrayList.add(file.toFile().getAbsolutePath());
+                                        }
+                                        return FileVisitResult.CONTINUE;
+                                    }
+
+                                    @Override
+                                    public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                                        return FileVisitResult.SKIP_SUBTREE;
+                                    }
+
+                                    @Override
+                                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                                        return FileVisitResult.CONTINUE;
+                                    }
+                                });
+
+                                if (binding != null) {
+                                    binding.dispose();
+//                                    try {
+//                                        new Robot().keyPress(java.awt.event.KeyEvent.VK_ESCAPE);
+//                                    } catch (AWTException e1) {
+//                                        e1.printStackTrace();
+//                                    }
+                                }
+
+
+                                System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+                                        "___ " + binding);
+
+                                binding = TextFields.bindAutoCompletion(directoryToSearchTextField, autoCompleteDirectoriesArrayList);
+                                binding.setMinWidth(500);
+                                binding.setHideOnEscape(true);
+                                binding.setDelay(0);
+
+                                binding.setOnAutoCompleted(ex -> {
+                                    binding.dispose();
+                                });
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+
+                            break;
+                        }
+                }
+            }
+        };
+
+        directoryToSearchTextField.setOnKeyReleased(autoCompleteHandler);
+
+        destinationCopyAllTextField.setOnKeyReleased(autoCompleteHandler);
     }
 
     private void initFileSystemChangesMonitoring() {
@@ -352,7 +493,7 @@ public class MainController implements Initializable {
                     Platform.runLater(() -> {
 
                         Long memUsed = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                        systemStatsLabel.setText(String.format("CPU %.2f%% MEM %s", operatingSystemMXBean.getProcessCpuLoad() * 100, CommonUtilities.turnBytesIntoHumanReadable(memUsed)));
+                        systemStatsLabel.setText(String.format("CPU %.2f%% MEM %s", operatingSystemMXBean.getProcessCpuLoad() * 100, PortableFileUtilities.turnBytesIntoHumanReadable(memUsed)));
                     });
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -397,7 +538,7 @@ public class MainController implements Initializable {
 
     public void initTreeViewKeyBindings() {
         fileBrowserTreeTable.setOnKeyReleased(e -> {
-            if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
+            if (e.getCode() == DOWN || e.getCode() == UP) {
                 Object item = fileBrowserTreeTable.getSelectionModel().getSelectedItem();
 
                 if (!lockMediaViewMediaControlsToggle.isSelected()) {
@@ -412,7 +553,7 @@ public class MainController implements Initializable {
         mainTableView.setOnKeyReleased(e -> {
             Utilities.fromAutoPlay = false;
 
-            if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
+            if (e.getCode() == DOWN || e.getCode() == UP) {
 
                 Object item = mainTableView.getSelectionModel().getSelectedItem();
 
@@ -532,11 +673,9 @@ public class MainController implements Initializable {
 
     public void initBindings() {
 
-
         textContent = new CodeTextArea(this);
 
         mainSplitPane.getItems().add(textContent.getCodeArea());
-
 
         fitScreenToggleButton.setOnAction(e -> fitScreenAction(e, 1.0));
         fitScreenToggleMediaButton.setOnAction(e -> fitScreenAction(e, 1.0));
@@ -557,10 +696,8 @@ public class MainController implements Initializable {
 
         showReflectionBottomButton.setSelected(true);
 
-
         showReflectionButton.selectedProperty().bindBidirectional(showReflectionBottomButton.selectedProperty());
         showReflection(null);
-
 
         stopCurrentSearchButton.setOnAction(e -> {
             if (searchingTask.getFuture() != null) {
@@ -572,7 +709,6 @@ public class MainController implements Initializable {
                 }
             }
         });
-
 
         lockMediaViewBottomToggle.selectedProperty().bindBidirectional(lockMediaViewMediaControlsToggle.selectedProperty());
         currentTimeLabel.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(0.15));
@@ -780,7 +916,7 @@ public class MainController implements Initializable {
         if (fileInfo != null) {
             fileNamDetailLabelContent.setText(fileInfo.getFileName());
 
-            sizeDetailLabelContent.setText(CommonUtilities.turnBytesIntoHumanReadable(fileInfo.length()));
+            sizeDetailLabelContent.setText(PortableFileUtilities.turnBytesIntoHumanReadable(fileInfo.length()));
 
             pathLabelContent.setText(fileInfo.getAbsolutePath());
 
@@ -973,6 +1109,7 @@ public class MainController implements Initializable {
     public void removePaneSingular(String pane) {
         ObservableList<Node> items = mainSplitPane.getItems();
 
+
         if (items.size() == 1) {
             CommonUtilities.showErrorAlert("Cannot Remove Last Pane");
         } else if (items.size() >= 2) {
@@ -1000,7 +1137,10 @@ public class MainController implements Initializable {
             items.remove(fileBrowserTreeTable);
         } else if (pane.equals("terminal")) {
             items.remove(terminalTabPane);
-        } else {
+        } else if (pane.equals("webView")) {
+            items.remove(webViewVBox);
+        }else
+         {
             items.remove(rightPaneScrollPane);
         }
     }
@@ -1057,7 +1197,7 @@ public class MainController implements Initializable {
             }
         }
 
-        double[] sps = {0, 0, 0,0};
+        double[] sps = {0, 0, 0, 0,0};
 
         for (int i = 0; i < mainSplitPane.getDividers().size(); i++) {
 
@@ -1325,6 +1465,8 @@ public class MainController implements Initializable {
 
     }
 
+    boolean halfToggle = true;
+
     public void fitScreenAction(ActionEvent actionEvent, Double size) {
 
         if (size == 0.25) {
@@ -1342,7 +1484,38 @@ public class MainController implements Initializable {
 
             mainSplitPane.getScene().getWindow().setX(points.get(counter % 4).getX());
             mainSplitPane.getScene().getWindow().setY(points.get(counter % 4).getY());
+
+            if (counter == 8){
+                counter = 0;
+            }
+
             counter++;
+        } else if (size == 0.5){
+
+            Rectangle2D rect = Screen.getPrimary().getBounds();
+
+            Double oldX = mainSplitPane.getScene().getWindow().getX();
+            Double oldY = mainSplitPane.getScene().getWindow().getY();
+
+            Double height = mainSplitPane.getScene().getWindow().getHeight();
+            Double width = mainSplitPane.getScene().getWindow().getWidth();
+
+            oldScreenSize = new Rectangle2D(oldX, oldY, width, height);
+            mainSplitPane.getScene().getWindow().setHeight(rect.getHeight());
+            mainSplitPane.getScene().getWindow().setWidth(rect.getWidth() / 2);
+
+            if (halfToggle){
+                mainSplitPane.getScene().getWindow().setX(rect.getMinX());
+                mainSplitPane.getScene().getWindow().setY(rect.getMinY());
+
+
+
+            } else {
+                mainSplitPane.getScene().getWindow().setX(rect.getMaxX()/2);
+                mainSplitPane.getScene().getWindow().setY(rect.getMinY());
+            }
+            halfToggle = !halfToggle;
+
         } else if (size == 1.0) {
 
             if (fitScreenToggleButton.isSelected()) {
@@ -1370,6 +1543,15 @@ public class MainController implements Initializable {
                     mainSplitPane.getScene().getWindow().setY(oldScreenSize.getMinY());
                 }
             }
+        }
+    }
+
+    public void changeOrientation(ActionEvent actionEvent) {
+
+        if (mainSplitPane.getOrientation() == Orientation.HORIZONTAL){
+            mainSplitPane.setOrientation(Orientation.VERTICAL);
+        } else {
+            mainSplitPane.setOrientation(Orientation.HORIZONTAL);
         }
     }
 }
