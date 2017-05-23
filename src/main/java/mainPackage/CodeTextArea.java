@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import org.fxmisc.richtext.demo.JavaKeywordsAsync;
+//import org.fxmisc.richtext.demo.JavaKeywordsAsync;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import windows.CustomTextArea;
@@ -101,7 +101,7 @@ public class CodeTextArea {
                     codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
                 });
 
-        mainController.mainSplitPane.getScene().getStylesheets().add(JavaKeywordsAsync.class.getResource("java-keywords.css").toExternalForm());
+        //mainController.mainSplitPane.getScene().getStylesheets().add(JavaKeywordsAsync.class.getResource("java-keywords.css").toExternalForm());
 
 
         setText(sampleCode);

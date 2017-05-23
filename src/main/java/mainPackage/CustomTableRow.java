@@ -35,6 +35,8 @@ public class CustomTableRow extends TableRow<FileInfo> {
     }
     private Tooltip tooltip = new Tooltip();
 
+    ContextMenu cm;
+
 
     public CustomTableRow(TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
         CommonUtilities.formatTooltip(tooltip);
@@ -44,9 +46,14 @@ public class CustomTableRow extends TableRow<FileInfo> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 FileInfo fileInfo = (FileInfo)this.getItem();
 
+                if (cm != null) {
+                    cm.hide();
+                }
 
-                ContextMenu cm = Utilities.createContextMenu(fileInfo, mainController.mainTableView, mainController.files, mainController, "tableView");
-                cm.show(this, e.getScreenX(), e.getScreenY());
+                cm = Utilities.createContextMenu(fileInfo, mainController.mainTableView, mainController.files, mainController, "tableView");
+                    cm.show(this, e.getScreenX(), e.getScreenY());
+
+
             }
         });
     }

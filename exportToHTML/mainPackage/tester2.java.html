@@ -1,0 +1,247 @@
+<html>
+<head>
+<title>tester2.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: #606366; font-weight: normal; font-style: normal; }
+.s0 { color: rgb(91,161,204); }
+.s1 { color: rgb(169,183,198); }
+.s2 { color: rgb(204,120,50); }
+.s3 { color: rgb(104,151,187); }
+.s4 { color: rgb(106,135,89); }
+.s5 { color: rgb(128,128,128); }
+</style>
+</head>
+<BODY BGCOLOR="#2b2b2b">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+tester2.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">package </span><span class="s1">mainPackage</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">impl.org.controlsfx.autocompletion.SuggestionProvider</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">impl.org.controlsfx.skin.AutoCompletePopup</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.application.Application</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.event.EventType</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.Node</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.Scene</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.control.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.image.ImageView</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.input.KeyCode</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.input.MouseButton</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.layout.VBox</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.stage.Stage</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.util.Callback</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.util.StringConverter</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">org.controlsfx.control.textfield.AutoCompletionBinding</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">org.controlsfx.control.textfield.TextFields</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">java.io.File</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.io.IOException</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.nio.file.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.nio.file.attribute.BasicFileAttributes</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.util.ArrayList</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.util.Arrays</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.util.Collection</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.util.HashSet</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.util.prefs.BackingStoreException</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.util.prefs.Preferences</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s0">public class </span><span class="s1">tester2 </span><span class="s0">extends </span><span class="s1">Application { 
+ 
+ 
+ 
+ 
+ 
+    </span><span class="s0">int </span><span class="s1">counter = </span><span class="s3">0</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">private class </span><span class="s1">TreeCellFilePath </span><span class="s0">extends </span><span class="s1">TreeCell&lt;FilePathTreeItem&gt; { 
+        </span><span class="s0">public </span><span class="s1">TreeCellFilePath() { 
+ 
+            </span><span class="s0">this</span><span class="s1">.setOnMouseClicked(e -&gt; { 
+                </span><span class="s0">if </span><span class="s1">(e.getButton() == MouseButton.SECONDARY) { 
+ 
+ 
+ 
+                    System.err.println(</span><span class="s4">&quot;___________Class: &quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">1</span><span class="s1">].getClassName() + </span><span class="s4">&quot;____Line:&quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">1</span><span class="s1">].getLineNumber() + 
+                            </span><span class="s4">&quot;___ right clicked&quot; </span><span class="s1">+ </span><span class="s0">this</span><span class="s1">.getItem().getPathString())</span><span class="s2">;</span><span class="s1"> 
+                } 
+            })</span><span class="s2">;</span><span class="s1"> 
+        } 
+ 
+        @Override 
+        </span><span class="s0">protected void </span><span class="s1">updateItem(FilePathTreeItem item</span><span class="s2">, </span><span class="s0">boolean </span><span class="s1">empty) { 
+            </span><span class="s0">super</span><span class="s1">.updateItem(item</span><span class="s2">, </span><span class="s1">empty)</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">if </span><span class="s1">(empty) { 
+                setText(</span><span class="s0">null</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                setGraphic(</span><span class="s0">null</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            } </span><span class="s0">else </span><span class="s1">{ 
+                setText(item.getPathString())</span><span class="s2">;</span><span class="s1"> 
+                setGraphic(</span><span class="s0">new </span><span class="s1">ImageView(FilePathTreeItem.dlImage))</span><span class="s2">;</span><span class="s1"> 
+            } 
+        } 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">start(Stage primaryStage) </span><span class="s0">throws </span><span class="s1">Exception { 
+ 
+        TreeView tableView = </span><span class="s0">new </span><span class="s1">TreeView&lt;&gt;()</span><span class="s2">;</span><span class="s1"> 
+ 
+        TreeItem&lt;FilePathTreeItem&gt; root = </span><span class="s0">new </span><span class="s1">TreeItem&lt;&gt;(</span><span class="s0">new </span><span class="s1">FilePathTreeItem(Paths.get(</span><span class="s4">&quot;/Users/jacobmenke/Desktop&quot;</span><span class="s1">)</span><span class="s2">, </span><span class="s0">null</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+ 
+        tableView.setRoot(root)</span><span class="s2">;</span><span class="s1"> 
+ 
+        TreeItem&lt;FilePathTreeItem&gt; newTreeItem = </span><span class="s0">new </span><span class="s1">TreeItem&lt;&gt;(</span><span class="s0">new </span><span class="s1">FilePathTreeItem(Paths.get(</span><span class="s4">&quot;/etc/passwd&quot;</span><span class="s1">)</span><span class="s2">, </span><span class="s0">null</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+ 
+        root.getChildren().add(newTreeItem)</span><span class="s2">;</span><span class="s1"> 
+ 
+        TextField directoryToSearchTextField = </span><span class="s0">new </span><span class="s1">TextField()</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+        ArrayList&lt;String&gt; autoCompleteDirectoriesArrayList = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+        </span><span class="s0">class </span><span class="s1">TextFieldBinding </span><span class="s0">extends </span><span class="s1">AutoCompletionBinding&lt;String&gt; { 
+ 
+            </span><span class="s0">private final </span><span class="s1">AutoCompletePopup&lt;String&gt; autoCompletionPopup</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+            </span><span class="s0">protected </span><span class="s1">TextFieldBinding(Node completionTarget</span><span class="s2">, </span><span class="s1">Callback&lt;ISuggestionRequest</span><span class="s2">, </span><span class="s1">Collection&lt;String&gt;&gt; suggestionProvider</span><span class="s2">, </span><span class="s1">StringConverter&lt;String&gt; converter) { 
+                </span><span class="s0">super</span><span class="s1">(completionTarget</span><span class="s2">, </span><span class="s1">suggestionProvider</span><span class="s2">, </span><span class="s1">converter)</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+                autoCompletionPopup = </span><span class="s0">new </span><span class="s1">AutoCompletePopup&lt;&gt;()</span><span class="s2">;</span><span class="s1"> 
+                autoCompletionPopup.setConverter(converter)</span><span class="s2">;</span><span class="s1"> 
+                autoCompletionPopup.show(directoryToSearchTextField)</span><span class="s2">;</span><span class="s1"> 
+                autoCompletionPopup.setOnSuggestion(sce-&gt;{ 
+                   </span><span class="s0">try</span><span class="s1">{ 
+                       sce.getSuggestion()</span><span class="s2">;</span><span class="s1"> 
+                       </span><span class="s0">this</span><span class="s1">.fireAutoCompletion(sce.getSuggestion())</span><span class="s2">;</span><span class="s1"> 
+                       </span><span class="s0">this</span><span class="s1">.showPopup()</span><span class="s2">;</span><span class="s1"> 
+                   } </span><span class="s0">finally</span><span class="s1">{ 
+ 
+                   } 
+                })</span><span class="s2">;</span><span class="s1"> 
+ 
+            } 
+ 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">dispose() { 
+ 
+            } 
+ 
+            @Override 
+            </span><span class="s0">protected void </span><span class="s1">completeUserInput(String s) { 
+ 
+            } 
+        } 
+ 
+        directoryToSearchTextField.setOnKeyReleased(e -&gt; { 
+ 
+ 
+            </span><span class="s0">if </span><span class="s1">(e.getCode() == KeyCode.SLASH) { 
+ 
+                File possiblePath = </span><span class="s0">new </span><span class="s1">File(directoryToSearchTextField.getText())</span><span class="s2">;</span><span class="s1"> 
+ 
+                </span><span class="s0">if </span><span class="s1">(possiblePath.exists()) { 
+ 
+                    </span><span class="s0">try </span><span class="s1">{ 
+                        Files.walkFileTree(Paths.get(possiblePath.getAbsolutePath())</span><span class="s2">, </span><span class="s0">new </span><span class="s1">HashSet&lt;FileVisitOption&gt;()</span><span class="s2">, </span><span class="s3">1</span><span class="s2">, </span><span class="s0">new </span><span class="s1">FileVisitor&lt;Path&gt;() { 
+                            @Override 
+                            </span><span class="s0">public </span><span class="s1">FileVisitResult preVisitDirectory(Path dir</span><span class="s2">, </span><span class="s1">BasicFileAttributes attrs) </span><span class="s0">throws </span><span class="s1">IOException { 
+                                </span><span class="s0">return </span><span class="s1">FileVisitResult.CONTINUE</span><span class="s2">;</span><span class="s1"> 
+                            } 
+ 
+                            @Override 
+                            </span><span class="s0">public </span><span class="s1">FileVisitResult visitFile(Path file</span><span class="s2">, </span><span class="s1">BasicFileAttributes attrs) </span><span class="s0">throws </span><span class="s1">IOException { 
+                                </span><span class="s0">if </span><span class="s1">(file.toFile().isDirectory()) { 
+                                   autoCompleteDirectoriesArrayList.add(file.toFile().getAbsolutePath())</span><span class="s2">;</span><span class="s1"> 
+                                } 
+                                </span><span class="s0">return </span><span class="s1">FileVisitResult.CONTINUE</span><span class="s2">;</span><span class="s1"> 
+                            } 
+ 
+                            @Override 
+                            </span><span class="s0">public </span><span class="s1">FileVisitResult visitFileFailed(Path file</span><span class="s2">, </span><span class="s1">IOException exc) </span><span class="s0">throws </span><span class="s1">IOException { 
+                                </span><span class="s0">return </span><span class="s1">FileVisitResult.SKIP_SUBTREE</span><span class="s2">;</span><span class="s1"> 
+                            } 
+ 
+                            @Override 
+                            </span><span class="s0">public </span><span class="s1">FileVisitResult postVisitDirectory(Path dir</span><span class="s2">, </span><span class="s1">IOException exc) </span><span class="s0">throws </span><span class="s1">IOException { 
+                                </span><span class="s0">return </span><span class="s1">FileVisitResult.CONTINUE</span><span class="s2">;</span><span class="s1"> 
+                            } 
+                        })</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s5">//                        System.err.println(&quot;___________&quot; + Thread.currentThread().getStackTrace()[1].getClassName()+ &quot;____Line:&quot; + Thread.currentThread().getStackTrace()[1].getLineNumber() +</span><span class="s1"> 
+</span><span class="s5">//                        &quot;___ showing Popup&quot; + autoCompleteDirectoriesArrayList);</span><span class="s1"> 
+</span><span class="s5">//                        TextFieldBinding textFieldBinding = new TextFieldBinding(directoryToSearchTextField, SuggestionProvider.create(autoCompleteDirectoriesArrayList));</span><span class="s1"> 
+</span><span class="s5">//                        textFieldBinding.setHideOnEscape(true);</span><span class="s1"> 
+</span><span class="s5">//                        textFieldBinding.setMinWidth(400);</span><span class="s1"> 
+ 
+</span><span class="s5">//                        textFieldBinding.showPopup();</span><span class="s1"> 
+</span><span class="s5">//</span><span class="s1"> 
+ 
+                    } </span><span class="s0">catch </span><span class="s1">(Exception ex) { 
+ 
+                    } 
+                } 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        Button b = </span><span class="s0">new </span><span class="s1">Button(</span><span class="s4">&quot;add&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+        b.setOnAction(e-&gt;{ 
+            autoCompleteDirectoriesArrayList.add(</span><span class="s4">&quot;dogs &quot; </span><span class="s1">+ Math.random()+</span><span class="s4">&quot;&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        Scene scene = </span><span class="s0">new </span><span class="s1">Scene(</span><span class="s0">new </span><span class="s1">VBox(tableView</span><span class="s2">, </span><span class="s1">directoryToSearchTextField</span><span class="s2">, </span><span class="s1">b))</span><span class="s2">;</span><span class="s1"> 
+ 
+        AutoCompletePopup&lt;String&gt; autoCompletePopup = </span><span class="s0">new </span><span class="s1">AutoCompletePopup&lt;&gt;()</span><span class="s2">;</span><span class="s1"> 
+        autoCompletePopup.setOnSuggestion(sce-&gt;{ 
+</span><span class="s5">//            sce.</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        primaryStage.setScene(scene)</span><span class="s2">;</span><span class="s1"> 
+ 
+        autoCompletePopup.show(directoryToSearchTextField)</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+        primaryStage.show()</span><span class="s2">;</span><span class="s1"> 
+ 
+    } 
+ 
+ 
+    </span><span class="s0">void </span><span class="s1">calling(){ 
+ 
+        System.err.println(</span><span class="s4">&quot;__________Class:&quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">1</span><span class="s1">].getClassName()+ </span><span class="s4">&quot;____Line:&quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">1</span><span class="s1">].getLineNumber() + 
+        </span><span class="s4">&quot;______Called by: &quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">2</span><span class="s1">].getMethodName() + </span><span class="s4">&quot;_____ dogs&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">for </span><span class="s1">(StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) { 
+            System.out.println(stackTraceElement)</span><span class="s2">;</span><span class="s1"> 
+        } 
+ 
+    } 
+    </span><span class="s0">public static void </span><span class="s1">main(String[] args) { 
+ 
+        </span><span class="s0">try </span><span class="s1">{ 
+            Preferences.userRoot().exportNode(System.out)</span><span class="s2">;</span><span class="s1"> 
+            Preferences.userRoot().clear()</span><span class="s2">;</span><span class="s1"> 
+ 
+        } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+            e.printStackTrace()</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">catch </span><span class="s1">(BackingStoreException e) { 
+            e.printStackTrace()</span><span class="s2">;</span><span class="s1"> 
+        } 
+ 
+        System.err.println(</span><span class="s4">&quot;__________Class:&quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">1</span><span class="s1">].getClassName()+ </span><span class="s4">&quot;____Line:&quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">1</span><span class="s1">].getLineNumber() + 
+        </span><span class="s4">&quot;______Called by: &quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">2</span><span class="s1">].getMethodName() + </span><span class="s4">&quot;_____&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+        </span><span class="s0">new </span><span class="s1">tester2().calling()</span><span class="s2">;</span><span class="s1"> 
+    } 
+}</span></pre>
+</body>
+</html>

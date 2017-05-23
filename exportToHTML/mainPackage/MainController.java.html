@@ -1,0 +1,1588 @@
+<html>
+<head>
+<title>MainController.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: #606366; font-weight: normal; font-style: normal; }
+.s0 { color: rgb(91,161,204); }
+.s1 { color: rgb(169,183,198); }
+.s2 { color: rgb(204,120,50); }
+.s3 { color: rgb(104,151,187); }
+.s4 { color: rgb(106,135,89); }
+.s5 { color: rgb(128,128,128); }
+</style>
+</head>
+<BODY BGCOLOR="#2b2b2b">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+MainController.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">package </span><span class="s1">mainPackage</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">com.terminalfx.TerminalBuilder</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">com.terminalfx.TerminalTab</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">com.terminalfx.config.TerminalConfig</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.animation.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.application.Platform</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.beans.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.beans.binding.Bindings</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.beans.property.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.beans.value.ChangeListener</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.beans.value.ObservableValue</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.collections.FXCollections</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.collections.ObservableList</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.concurrent.Task</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.event.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.event.ActionEvent</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.fxml.Initializable</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.geometry.Orientation</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.geometry.Point2D</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.geometry.Point3D</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.geometry.Rectangle2D</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.Cursor</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.control.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.control.Button</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.control.Label</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.control.MenuBar</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.control.MenuItem</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.control.ScrollPane</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.control.TextArea</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.control.TextField</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.effect.Reflection</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.image.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.image.Image</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.input.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.input.KeyEvent</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.input.MouseEvent</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.layout.FlowPane</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.layout.HBox</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.layout.StackPane</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.layout.VBox</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.media.Media</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.media.MediaPlayer</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.media.MediaView</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.paint.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.paint.Color</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.shape.Cylinder</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.shape.DrawMode</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.text.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.scene.web.WebView</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.stage.*</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">java.awt.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.awt.event.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.io.File</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.io.IOException</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">com.sun.management.OperatingSystemMXBean</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">java.lang.management.ManagementFactory</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.net.URL</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.nio.file.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.nio.file.attribute.BasicFileAttributes</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.security.Key</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.util.*</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">java.util.prefs.Preferences</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">javafx.scene.text.Font</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.util.Callback</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.util.Duration</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">javafx.util.StringConverter</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">org.controlsfx.control.textfield.AutoCompletionBinding</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">org.controlsfx.control.textfield.TextFields</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">windows.CustomTextArea</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s0">import static </span><span class="s1">javafx.scene.input.KeyCode.*</span><span class="s2">;</span><span class="s1"> 
+ 
+</span><span class="s0">public class </span><span class="s1">MainController </span><span class="s0">implements </span><span class="s1">Initializable { 
+    </span><span class="s0">public </span><span class="s1">TableView&lt;FileInfo&gt; mainTableView</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">TextField mainTextField</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">TextField directoryToSearchTextField</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">SplitPane mainSplitPane</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label sizeLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label lastModifiedLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label pathLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">TextField destinationCopyAllTextField</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label fileNamDetailLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton caseInsensitiveMatchingCheckbox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">TreeView fileBrowserTreeTable</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton automaticSearchCheckBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton showHiddenFilesCheckBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton selectInTreeViewCheckBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton hideDirectoriesCheckBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton pathMatchingCheckbox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ImageView rightPaneImageView</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">VBox rightSidePaneVBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ScrollPane rightPaneScrollPane</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label fileNamDetailLabelContent</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label sizeDetailLabelContent</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label pathLabelContent</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label lastModifiedLabelContent</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">TextFlow textFlowRightPane</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label textLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">CodeTextArea textContent</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">MediaView rightPaneMediaView</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">MenuBar menuBar</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ProgressIndicator thinkingIndicator</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label activityIndicatorLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Button stopCurrentSearchButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Button searchButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ProgressBar progressIndicator</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Slider playPositionSlider</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton autoplayCheckbox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">FlowPane mediaPlayerControls</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Button play2XSlowerButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Button play2XFasterButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label mediaPlayerRateLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">StackPane mediaStackPane</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Slider volumeSlider</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Button playMediaButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label currentTimeLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label totalTimeLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton loopButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">HBox sliderHbox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Button fullScreenMediaButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">HBox topHBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">HBox bottomHBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">static </span><span class="s1">MediaPlayer mediaPlayer</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">VBox rightSidePaneTextVBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">HBox topSecondHBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton lockMediaViewMediaControlsToggle</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label numberResultsLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label loadingFileLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label volumeAndCurrentTimeSwipeLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton autoPlayMediaControl</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label fileNameLabelMediaControls</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Button normalScreenMediaButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton removeSliderMediaControl</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">HBox filterHBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">MenuButton menuButtonAdd</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Cylinder sphere</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">PointLight pointLight</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">VBox imagesVBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton showPlayingIconCheckbox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton showPlayingIconTreeCheckbox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton showLineNumbersCheckbox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">HBox showPlayinIconTreeHBox</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton showReflectionBottomButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton showReflectionButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton lockMediaViewBottomToggle</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton fitScreenToggleButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">ToggleButton fitScreenToggleMediaButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">TabPane terminalTabPane</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Label systemStatsLabel</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">TextField webViewTextField</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Button webViewBackButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Button webViewForwardButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">WebView splitPaneWebView</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Button restorePanesButton</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">TextFlow textFlowFinalFinalRightPane</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">VBox webViewVBox</span><span class="s2">;</span><span class="s1"> 
+    ObservableList&lt;FileInfo&gt; files = FXCollections.observableArrayList()</span><span class="s2">;</span><span class="s1"> 
+    TreeItem root</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">boolean </span><span class="s1">out = </span><span class="s0">false</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">boolean </span><span class="s1">hidden = </span><span class="s0">false</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public static </span><span class="s1">CustomTask&lt;String&gt; searchingTask</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public static </span><span class="s1">CustomTask&lt;String&gt; loadingTask</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">static </span><span class="s1">CustomTask&lt;String&gt; rasterizingTask</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">DoubleProperty mediaPlayerRateProperty = </span><span class="s0">new </span><span class="s1">SimpleDoubleProperty(</span><span class="s3">1</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">DoubleProperty mediaPlayerVolumeProperty = </span><span class="s0">new </span><span class="s1">SimpleDoubleProperty(</span><span class="s3">1</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+    Double[] dividerPositions = {</span><span class="s3">0d</span><span class="s2">, </span><span class="s3">0d</span><span class="s1">}</span><span class="s2">;</span><span class="s1"> 
+    FilePathTreeItem currentlySelectedFilePathTreeItem = </span><span class="s0">null</span><span class="s2">;</span><span class="s1"> 
+    Timeline timeline</span><span class="s2">;</span><span class="s1"> 
+    Timer disappearTimer</span><span class="s2">;</span><span class="s1"> 
+    ArrayList&lt;String&gt; filesForAutoplay = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s2">;</span><span class="s1"> 
+    ObservableList&lt;Node&gt; splitPaneChildren = FXCollections.observableArrayList()</span><span class="s2">;</span><span class="s1"> 
+    AutoCompletionBinding&lt;String&gt; binding</span><span class="s2">;</span><span class="s1"> 
+ 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">initialize(URL location</span><span class="s2">, </span><span class="s1">ResourceBundle resources) { 
+ 
+        addWebViewPane()</span><span class="s2">;</span><span class="s1"> 
+ 
+        addTerminalPane()</span><span class="s2">;</span><span class="s1"> 
+ 
+        mediaPlayer = </span><span class="s0">new </span><span class="s1">MediaPlayer(</span><span class="s0">new </span><span class="s1">Media(getClass().getResource(</span><span class="s4">&quot;/ClosedHH.wav&quot;</span><span class="s1">).toExternalForm()))</span><span class="s2">;</span><span class="s1"> 
+ 
+        Double scalingFactor = </span><span class="s3">7d</span><span class="s2">;</span><span class="s1"> 
+ 
+        sphere = </span><span class="s0">new </span><span class="s1">Cylinder(</span><span class="s3">2 </span><span class="s1">* scalingFactor</span><span class="s2">, </span><span class="s3">2 </span><span class="s1">* scalingFactor)</span><span class="s2">;</span><span class="s1"> 
+        PhongMaterial material = </span><span class="s0">new </span><span class="s1">PhongMaterial(Color.BLACK)</span><span class="s2">;</span><span class="s1"> 
+        material.setSpecularColor(Color.LIGHTBLUE)</span><span class="s2">;</span><span class="s1"> 
+        material.setSpecularPower(</span><span class="s3">10.0d</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        sphere.setMaterial(material)</span><span class="s2">;</span><span class="s1"> 
+ 
+        pointLight = </span><span class="s0">new </span><span class="s1">PointLight(Color.WHITE)</span><span class="s2">;</span><span class="s1"> 
+        sphere.setMaterial(material)</span><span class="s2">;</span><span class="s1"> 
+ 
+        DoubleProperty translateY = </span><span class="s0">new </span><span class="s1">SimpleDoubleProperty()</span><span class="s2">;</span><span class="s1"> 
+ 
+        timeline = </span><span class="s0">new </span><span class="s1">Timeline(</span><span class="s0">new </span><span class="s1">KeyFrame(javafx.util.Duration.seconds(</span><span class="s3">0</span><span class="s1">)</span><span class="s2">, </span><span class="s0">new </span><span class="s1">KeyValue(translateY</span><span class="s2">, </span><span class="s3">3000</span><span class="s1">))</span><span class="s2">,</span><span class="s1"> 
+                </span><span class="s0">new </span><span class="s1">KeyFrame(javafx.util.Duration.seconds(</span><span class="s3">10</span><span class="s1">)</span><span class="s2">, </span><span class="s0">new </span><span class="s1">KeyValue(translateY</span><span class="s2">, </span><span class="s3">0</span><span class="s1">)))</span><span class="s2">;</span><span class="s1"> 
+ 
+        sphere.setDrawMode(DrawMode.LINE)</span><span class="s2">;</span><span class="s1"> 
+ 
+        sphere.setRotationAxis(</span><span class="s0">new </span><span class="s1">Point3D(</span><span class="s3">3</span><span class="s2">, </span><span class="s3">1</span><span class="s2">, </span><span class="s3">1</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+        sphere.rotateProperty().bind(translateY)</span><span class="s2">;</span><span class="s1"> 
+        sphere.setTranslateZ(</span><span class="s3">90</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        timeline.setAutoReverse(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        timeline.setCycleCount(Animation.INDEFINITE)</span><span class="s2">;</span><span class="s1"> 
+ 
+        Group group = </span><span class="s0">new </span><span class="s1">Group(sphere</span><span class="s2">, </span><span class="s1">pointLight)</span><span class="s2">;</span><span class="s1"> 
+ 
+        group.prefWidth(</span><span class="s3">100</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        group.setStyle(</span><span class="s4">&quot;-fx-background-color: red&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        topHBox.getChildren().add(group)</span><span class="s2">;</span><span class="s1"> 
+ 
+        menuBar.setUseSystemMenuBar(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        mainTableView.getColumns().clear()</span><span class="s2">;</span><span class="s1"> 
+ 
+        rightPaneMediaView.setMediaPlayer(mediaPlayer)</span><span class="s2">;</span><span class="s1"> 
+ 
+        TreeViewInitialization.initTreeView(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        mainSplitPane.setDividerPositions(</span><span class="s3">0.2</span><span class="s2">, </span><span class="s3">0.9</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        mainTableView.setEditable(</span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        mainTableView.setItems(files)</span><span class="s2">;</span><span class="s1"> 
+ 
+        TableViewUtilities.initTableViewColumns(mainTableView</span><span class="s2">, </span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        mainTableView.addEventFilter(MouseEvent.MOUSE_PRESSED</span><span class="s2">, </span><span class="s1">e -&gt; { 
+            </span><span class="s0">if </span><span class="s1">(e.isSecondaryButtonDown()) { 
+                e.consume()</span><span class="s2">;</span><span class="s1"> 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        fileBrowserTreeTable.addEventFilter(MouseEvent.MOUSE_PRESSED</span><span class="s2">, </span><span class="s1">e -&gt; { 
+            </span><span class="s0">if </span><span class="s1">(e.isSecondaryButtonDown()) { 
+                e.consume()</span><span class="s2">;</span><span class="s1"> 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        mainTableView.setOnMouseClicked(e -&gt; { 
+            Utilities.fromAutoPlay = </span><span class="s0">false</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">if </span><span class="s1">(e.getButton() == MouseButton.PRIMARY) { 
+ 
+                Object item = mainTableView.getSelectionModel().getSelectedItem()</span><span class="s2">;</span><span class="s1"> 
+ 
+                </span><span class="s0">if </span><span class="s1">(item != </span><span class="s0">null</span><span class="s1">) { 
+                    </span><span class="s0">if </span><span class="s1">(lockMediaViewMediaControlsToggle.isSelected()) { 
+                        startPlayingMedia(item</span><span class="s2">, </span><span class="s0">false</span><span class="s2">, </span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                    } </span><span class="s0">else </span><span class="s1">{ 
+                        startPlayingMedia(item</span><span class="s2">, </span><span class="s0">true</span><span class="s2">, </span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                    } 
+                } 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        fileBrowserTreeTable.setOnMouseClicked(e -&gt; { 
+            </span><span class="s0">if </span><span class="s1">(e.getButton() == MouseButton.PRIMARY) { 
+                Object item = fileBrowserTreeTable.getSelectionModel().getSelectedItem()</span><span class="s2">;</span><span class="s1"> 
+ 
+                </span><span class="s0">if </span><span class="s1">(!lockMediaViewMediaControlsToggle.isSelected()) { 
+ 
+                    startPlayingMediaFromTree(item)</span><span class="s2">;</span><span class="s1"> 
+                } 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        rightPaneScrollPane.setOnMouseClicked(e -&gt; { 
+            </span><span class="s0">if </span><span class="s1">(e.getButton() == MouseButton.SECONDARY) { 
+ 
+                ObservableList&lt;FileInfo&gt; list = mainTableView.getItems()</span><span class="s2">;</span><span class="s1"> 
+ 
+                ContextMenu cm = Utilities.createContextMenu(</span><span class="s0">new </span><span class="s1">FileInfo(pathLabelContent.getText())</span><span class="s2">, </span><span class="s1">mainTableView</span><span class="s2">, </span><span class="s1">list</span><span class="s2">, </span><span class="s0">this</span><span class="s2">, </span><span class="s4">&quot;stackPane&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                cm.show(mediaStackPane.getScene().getWindow()</span><span class="s2">, </span><span class="s1">e.getSceneX()</span><span class="s2">, </span><span class="s1">e.getSceneY())</span><span class="s2">;</span><span class="s1"> 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        splitPaneChildren.addAll(mainSplitPane.getItems())</span><span class="s2">;</span><span class="s1"> 
+ 
+        restorePanesButton.setOnAction(e -&gt; { 
+            restorePanesToOld(</span><span class="s0">null</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        DraggingInit.initDraggingBindings(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        initCheckBoxes()</span><span class="s2">;</span><span class="s1"> 
+ 
+        initTasks()</span><span class="s2">;</span><span class="s1"> 
+ 
+        initToolTips()</span><span class="s2">;</span><span class="s1"> 
+ 
+        initUsageMonitoring()</span><span class="s2">;</span><span class="s1"> 
+ 
+        initFileSystemChangesMonitoring()</span><span class="s2">;</span><span class="s1"> 
+ 
+        initAutoComplete()</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    ContextMenu contextMenu</span><span class="s2">;</span><span class="s1"> 
+ 
+    </span><span class="s0">public void </span><span class="s1">addWebViewPane() { 
+        splitPaneWebView.prefHeightProperty().bind(mainSplitPane.heightProperty())</span><span class="s2">;</span><span class="s1"> 
+ 
+        splitPaneWebView.setContextMenuEnabled(</span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        splitPaneWebView.setOnMouseClicked(event -&gt; { 
+            </span><span class="s0">if </span><span class="s1">(event.getButton() == MouseButton.SECONDARY){ 
+ 
+ 
+                MenuItem reload = </span><span class="s0">new </span><span class="s1">MenuItem(</span><span class="s4">&quot;Reload page&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+                MenuItem closePaneWeb = </span><span class="s0">new </span><span class="s1">MenuItem(</span><span class="s4">&quot;Close this pane.&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+                reload.setOnAction(e-&gt;{ 
+                    splitPaneWebView.getEngine().reload()</span><span class="s2">;</span><span class="s1"> 
+                })</span><span class="s2">;</span><span class="s1"> 
+ 
+                closePaneWeb.setOnAction(e-&gt;{ 
+                    removePaneSingular(</span><span class="s4">&quot;webView&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+                })</span><span class="s2">;</span><span class="s1"> 
+ 
+                </span><span class="s0">if </span><span class="s1">(contextMenu != </span><span class="s0">null</span><span class="s1">){ 
+                    contextMenu.hide()</span><span class="s2">;</span><span class="s1"> 
+                } 
+ 
+                 contextMenu = </span><span class="s0">new </span><span class="s1">ContextMenu()</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+                contextMenu.getItems().addAll(reload</span><span class="s2">, </span><span class="s1">closePaneWeb)</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+                contextMenu.show(splitPaneWebView</span><span class="s2">, </span><span class="s1">event.getScreenX()</span><span class="s2">, </span><span class="s1">event.getScreenY())</span><span class="s2">;</span><span class="s1"> 
+ 
+            } </span><span class="s0">else </span><span class="s1">{ 
+ 
+                contextMenu.hide()</span><span class="s2">;</span><span class="s1"> 
+ 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        webViewBackButton.setOnAction(e -&gt; { 
+            splitPaneWebView.getEngine().getHistory().go(-</span><span class="s3">1</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        webViewForwardButton.setOnAction(e -&gt; { 
+            splitPaneWebView.getEngine().getHistory().go(</span><span class="s3">1</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        webViewTextField.setText(</span><span class="s4">&quot;http://www.youtube.com&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        webViewTextField.setOnAction(e -&gt; { 
+            splitPaneWebView.getEngine().load(webViewTextField.getText())</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">initAutoComplete() { 
+        ArrayList&lt;String&gt; autoCompleteDirectoriesArrayList = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s2">;</span><span class="s1"> 
+ 
+        EventHandler&lt;KeyEvent&gt; autoCompleteHandler = </span><span class="s0">new </span><span class="s1">EventHandler&lt;KeyEvent&gt;() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">handle(KeyEvent e) { 
+ 
+                </span><span class="s0">switch </span><span class="s1">(e.getCode()) { 
+                    </span><span class="s0">case </span><span class="s1">SLASH: 
+                    </span><span class="s0">case </span><span class="s1">BACK_SLASH: 
+                    </span><span class="s0">case </span><span class="s1">BACK_SPACE: 
+                    </span><span class="s0">case </span><span class="s1">DOWN: 
+                    </span><span class="s0">case </span><span class="s1">UP: 
+                    </span><span class="s0">case </span><span class="s1">LEFT: 
+                    </span><span class="s0">case </span><span class="s1">RIGHT: 
+                        </span><span class="s0">break</span><span class="s2">;</span><span class="s1"> 
+ 
+                    </span><span class="s0">default</span><span class="s1">: 
+                        TextField tf = (TextField) e.getSource()</span><span class="s2">;</span><span class="s1"> 
+ 
+                        File possiblePath = </span><span class="s0">new </span><span class="s1">File(tf.getText())</span><span class="s2">;</span><span class="s1"> 
+ 
+                        </span><span class="s0">if </span><span class="s1">(possiblePath.exists()) { 
+                            autoCompleteDirectoriesArrayList.clear()</span><span class="s2">;</span><span class="s1"> 
+ 
+                            </span><span class="s0">try </span><span class="s1">{ 
+                                Files.walkFileTree(Paths.get(possiblePath.getAbsolutePath())</span><span class="s2">, </span><span class="s0">new </span><span class="s1">HashSet&lt;FileVisitOption&gt;()</span><span class="s2">, </span><span class="s3">1</span><span class="s2">, </span><span class="s0">new </span><span class="s1">FileVisitor&lt;Path&gt;() { 
+                                    @Override 
+                                    </span><span class="s0">public </span><span class="s1">FileVisitResult preVisitDirectory(Path dir</span><span class="s2">, </span><span class="s1">BasicFileAttributes attrs) </span><span class="s0">throws </span><span class="s1">IOException { 
+                                        </span><span class="s0">return </span><span class="s1">FileVisitResult.CONTINUE</span><span class="s2">;</span><span class="s1"> 
+                                    } 
+ 
+                                    @Override 
+                                    </span><span class="s0">public </span><span class="s1">FileVisitResult visitFile(Path file</span><span class="s2">, </span><span class="s1">BasicFileAttributes attrs) </span><span class="s0">throws </span><span class="s1">IOException { 
+                                        </span><span class="s0">if </span><span class="s1">(file.toFile().isDirectory()) { 
+                                            autoCompleteDirectoriesArrayList.add(file.toFile().getAbsolutePath())</span><span class="s2">;</span><span class="s1"> 
+                                        } 
+                                        </span><span class="s0">return </span><span class="s1">FileVisitResult.CONTINUE</span><span class="s2">;</span><span class="s1"> 
+                                    } 
+ 
+                                    @Override 
+                                    </span><span class="s0">public </span><span class="s1">FileVisitResult visitFileFailed(Path file</span><span class="s2">, </span><span class="s1">IOException exc) </span><span class="s0">throws </span><span class="s1">IOException { 
+                                        </span><span class="s0">return </span><span class="s1">FileVisitResult.SKIP_SUBTREE</span><span class="s2">;</span><span class="s1"> 
+                                    } 
+ 
+                                    @Override 
+                                    </span><span class="s0">public </span><span class="s1">FileVisitResult postVisitDirectory(Path dir</span><span class="s2">, </span><span class="s1">IOException exc) </span><span class="s0">throws </span><span class="s1">IOException { 
+                                        </span><span class="s0">return </span><span class="s1">FileVisitResult.CONTINUE</span><span class="s2">;</span><span class="s1"> 
+                                    } 
+                                })</span><span class="s2">;</span><span class="s1"> 
+ 
+                                </span><span class="s0">if </span><span class="s1">(binding != </span><span class="s0">null</span><span class="s1">) { 
+                                    binding.dispose()</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s5">//                                    try {</span><span class="s1"> 
+</span><span class="s5">//                                        new Robot().keyPress(java.awt.event.KeyEvent.VK_ESCAPE);</span><span class="s1"> 
+</span><span class="s5">//                                    } catch (AWTException e1) {</span><span class="s1"> 
+</span><span class="s5">//                                        e1.printStackTrace();</span><span class="s1"> 
+</span><span class="s5">//                                    }</span><span class="s1"> 
+                                } 
+ 
+ 
+                                System.err.println(</span><span class="s4">&quot;___________&quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">1</span><span class="s1">].getClassName() + </span><span class="s4">&quot;____Line:&quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">1</span><span class="s1">].getLineNumber() + 
+                                        </span><span class="s4">&quot;___ &quot; </span><span class="s1">+ binding)</span><span class="s2">;</span><span class="s1"> 
+ 
+                                binding = TextFields.bindAutoCompletion(directoryToSearchTextField</span><span class="s2">, </span><span class="s1">autoCompleteDirectoriesArrayList)</span><span class="s2">;</span><span class="s1"> 
+                                binding.setMinWidth(</span><span class="s3">500</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                                binding.setHideOnEscape(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                                binding.setDelay(</span><span class="s3">0</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+                                binding.setOnAutoCompleted(ex -&gt; { 
+                                    binding.dispose()</span><span class="s2">;</span><span class="s1"> 
+                                })</span><span class="s2">;</span><span class="s1"> 
+                            } </span><span class="s0">catch </span><span class="s1">(IOException e1) { 
+                                e1.printStackTrace()</span><span class="s2">;</span><span class="s1"> 
+                            } 
+ 
+                            </span><span class="s0">break</span><span class="s2">;</span><span class="s1"> 
+                        } 
+                } 
+            } 
+        }</span><span class="s2">;</span><span class="s1"> 
+ 
+        directoryToSearchTextField.setOnKeyReleased(autoCompleteHandler)</span><span class="s2">;</span><span class="s1"> 
+ 
+        destinationCopyAllTextField.setOnKeyReleased(autoCompleteHandler)</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">initFileSystemChangesMonitoring() { 
+ 
+        </span><span class="s0">try </span><span class="s1">{ 
+            WatchService watchService = FileSystems.getDefault().newWatchService()</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">new </span><span class="s1">Thread(() -&gt; { 
+ 
+                </span><span class="s0">try </span><span class="s1">{ 
+ 
+                    </span><span class="s5">//todo register tree table and</span><span class="s1"> 
+                    Paths.get(directoryToSearchTextField.getText()).register(watchService</span><span class="s2">, </span><span class="s1">StandardWatchEventKinds.ENTRY_CREATE</span><span class="s2">, </span><span class="s1">StandardWatchEventKinds.ENTRY_DELETE</span><span class="s2">,</span><span class="s1"> 
+                            StandardWatchEventKinds.ENTRY_MODIFY)</span><span class="s2">;</span><span class="s1"> 
+ 
+                    WatchKey watchKey = watchService.take()</span><span class="s2">;</span><span class="s1"> 
+ 
+                    </span><span class="s0">do </span><span class="s1">{ 
+                        watchKey.pollEvents().forEach(e -&gt; { 
+ 
+</span><span class="s5">//                            if (e.context().toString().charAt(0) != '.'){</span><span class="s1"> 
+</span><span class="s5">//</span><span class="s1"> 
+</span><span class="s5">//                                    runInBackgroundThreadSecondary(()-&gt;{</span><span class="s1"> 
+</span><span class="s5">//                                        RegexUtilities.searchAndRefresh(this);</span><span class="s1"> 
+</span><span class="s5">//                                    });</span><span class="s1"> 
+</span><span class="s5">//                            }</span><span class="s1"> 
+ 
+                            System.err.println(</span><span class="s4">&quot;___________&quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">1</span><span class="s1">].getClassName() + </span><span class="s4">&quot;____Line:&quot; </span><span class="s1">+ Thread.currentThread().getStackTrace()[</span><span class="s3">1</span><span class="s1">].getLineNumber() + 
+                                    </span><span class="s4">&quot;___ &quot; </span><span class="s1">+ e.context())</span><span class="s2">;</span><span class="s1"> 
+                        })</span><span class="s2">;</span><span class="s1"> 
+                    } </span><span class="s0">while </span><span class="s1">(watchKey.reset())</span><span class="s2">;</span><span class="s1"> 
+                } </span><span class="s0">catch </span><span class="s1">(Exception e) { 
+                    e.printStackTrace()</span><span class="s2">;</span><span class="s1"> 
+                } 
+            }).start()</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">catch </span><span class="s1">(Exception e) { 
+            e.printStackTrace()</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">initUsageMonitoring() { 
+ 
+        OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory 
+                .getOperatingSystemMXBean()</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">new </span><span class="s1">Thread(() -&gt; { 
+            </span><span class="s0">while </span><span class="s1">(</span><span class="s0">true</span><span class="s1">) { 
+                </span><span class="s0">try </span><span class="s1">{ 
+                    Thread.sleep(</span><span class="s3">1000</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                    Platform.runLater(() -&gt; { 
+ 
+                        Long memUsed = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()</span><span class="s2">;</span><span class="s1"> 
+                        systemStatsLabel.setText(String.format(</span><span class="s4">&quot;CPU %.2f%% MEM %s&quot;</span><span class="s2">, </span><span class="s1">operatingSystemMXBean.getProcessCpuLoad() * </span><span class="s3">100</span><span class="s2">, </span><span class="s1">CommonUtilities.turnBytesIntoHumanReadable(memUsed)))</span><span class="s2">;</span><span class="s1"> 
+                    })</span><span class="s2">;</span><span class="s1"> 
+                } </span><span class="s0">catch </span><span class="s1">(InterruptedException e) { 
+                    e.printStackTrace()</span><span class="s2">;</span><span class="s1"> 
+                } 
+            } 
+        }).start()</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">addTerminalPane() { 
+        TerminalConfig darkConfig = </span><span class="s0">new </span><span class="s1">TerminalConfig()</span><span class="s2">;</span><span class="s1"> 
+ 
+        darkConfig.setBackgroundColor(Color.rgb(</span><span class="s3">16</span><span class="s2">, </span><span class="s3">16</span><span class="s2">, </span><span class="s3">16</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+        darkConfig.setForegroundColor(Color.rgb(</span><span class="s3">240</span><span class="s2">, </span><span class="s3">240</span><span class="s2">, </span><span class="s3">240</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+        darkConfig.setCursorColor(Color.rgb(</span><span class="s3">255</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0.5</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+ 
+        TerminalBuilder terminalBuilder1 = </span><span class="s0">new </span><span class="s1">TerminalBuilder(darkConfig)</span><span class="s2">;</span><span class="s1"> 
+        TerminalTab terminalTab = terminalBuilder1.newTerminal()</span><span class="s2">;</span><span class="s1"> 
+ 
+        terminalTabPane = </span><span class="s0">new </span><span class="s1">TabPane()</span><span class="s2">;</span><span class="s1"> 
+        terminalTabPane.getTabs().addAll(terminalTab)</span><span class="s2">;</span><span class="s1"> 
+ 
+        ContextMenu cm = </span><span class="s0">new </span><span class="s1">ContextMenu()</span><span class="s2">;</span><span class="s1"> 
+        MenuItem maximizeThisPane = </span><span class="s0">new </span><span class="s1">MenuItem(</span><span class="s4">&quot;Maximize This Pane&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        MenuItem hideThisPane = </span><span class="s0">new </span><span class="s1">MenuItem(</span><span class="s4">&quot;Hide This Pane&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        MenuItem restorePanes = </span><span class="s0">new </span><span class="s1">MenuItem(</span><span class="s4">&quot;Restore Panes&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        terminalTab.getContextMenu().getItems().addAll(maximizeThisPane</span><span class="s2">, </span><span class="s1">hideThisPane</span><span class="s2">, </span><span class="s1">restorePanes)</span><span class="s2">;</span><span class="s1"> 
+ 
+        maximizeThisPane.setOnAction(e -&gt; { 
+            removePanes(terminalTabPane)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        hideThisPane.setOnAction(e -&gt; { 
+            removePaneSingular(</span><span class="s4">&quot;terminal&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        restorePanes.setOnAction(e -&gt; { 
+            restorePanesToOriginal(</span><span class="s4">&quot;terminal&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+        mainSplitPane.getItems().add(terminalTabPane)</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">initTreeViewKeyBindings() { 
+        fileBrowserTreeTable.setOnKeyReleased(e -&gt; { 
+            </span><span class="s0">if </span><span class="s1">(e.getCode() == DOWN || e.getCode() == UP) { 
+                Object item = fileBrowserTreeTable.getSelectionModel().getSelectedItem()</span><span class="s2">;</span><span class="s1"> 
+ 
+                </span><span class="s0">if </span><span class="s1">(!lockMediaViewMediaControlsToggle.isSelected()) { 
+ 
+                    startPlayingMediaFromTree(item)</span><span class="s2">;</span><span class="s1"> 
+                } 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">initMainTableViewKeyBindings() { 
+        mainTableView.setOnKeyReleased(e -&gt; { 
+            Utilities.fromAutoPlay = </span><span class="s0">false</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">if </span><span class="s1">(e.getCode() == DOWN || e.getCode() == UP) { 
+ 
+                Object item = mainTableView.getSelectionModel().getSelectedItem()</span><span class="s2">;</span><span class="s1"> 
+ 
+                </span><span class="s0">if </span><span class="s1">(lockMediaViewMediaControlsToggle.isSelected()) { 
+                    startPlayingMedia(item</span><span class="s2">, </span><span class="s0">false</span><span class="s2">, </span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                } </span><span class="s0">else </span><span class="s1">{ 
+                    startPlayingMedia(item</span><span class="s2">, </span><span class="s0">true</span><span class="s2">, </span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                } 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">initToolTips() { 
+ 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">startPlayingMediaFromTree(Object item) { 
+ 
+        FilePathTreeItem filePathTreeItem = (FilePathTreeItem) item</span><span class="s2">;</span><span class="s1"> 
+ 
+        currentlySelectedFilePathTreeItem = filePathTreeItem</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">if </span><span class="s1">(filePathTreeItem.getPathString() != </span><span class="s0">null</span><span class="s1">) { 
+            FileInfo file = </span><span class="s0">new </span><span class="s1">FileInfo(filePathTreeItem.getPathString())</span><span class="s2">;</span><span class="s1"> 
+ 
+            updateRightSidePane(file)</span><span class="s2">;</span><span class="s1"> 
+ 
+            runInBackgroundThreadSecondary(() -&gt; { 
+                Utilities.updateThumbnailRightSidePane(MainController.</span><span class="s0">this</span><span class="s2">, </span><span class="s1">filePathTreeItem)</span><span class="s2">;</span><span class="s1"> 
+            })</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">if </span><span class="s1">(showPlayingIconTreeCheckbox.isSelected()) { 
+ 
+                FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">Paths.get(filePathTreeItem.getPathString())</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            } 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">startPlayingMedia(Object item</span><span class="s2">, </span><span class="s0">boolean </span><span class="s1">playInRightPane</span><span class="s2">, </span><span class="s0">boolean </span><span class="s1">fromContext) { 
+ 
+        FileInfo fileInfo = (FileInfo) item</span><span class="s2">;</span><span class="s1"> 
+ 
+        FilePathTreeItem filePathTreeItem = </span><span class="s0">new </span><span class="s1">FilePathTreeItem(Paths.get(fileInfo.getAbsolutePath())</span><span class="s2">, </span><span class="s1">MainController.</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        currentlySelectedFilePathTreeItem = filePathTreeItem</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">if </span><span class="s1">(selectInTreeViewCheckBox.isSelected()) { 
+ 
+            </span><span class="s0">if </span><span class="s1">(!fromContext) { 
+ 
+                </span><span class="s0">if </span><span class="s1">(!Utilities.fromAutoPlay) { 
+                    runInBackgroundThreadSecondary(() -&gt; { 
+                        FilePathTreeItem.selectTreeItemRecursively(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">Paths.get(fileInfo.getAbsolutePath())</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                    })</span><span class="s2">;</span><span class="s1"> 
+                } 
+            } 
+        } 
+ 
+        </span><span class="s0">if </span><span class="s1">(playInRightPane) { 
+ 
+            </span><span class="s0">if </span><span class="s1">(showPlayingIconTreeCheckbox.isSelected()) { 
+                runInBackgroundThreadSecondary(() -&gt; { 
+ 
+                    FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">Paths.get(fileInfo.getAbsolutePath())</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                })</span><span class="s2">;</span><span class="s1"> 
+            } 
+            updateRightSidePane(fileInfo)</span><span class="s2">;</span><span class="s1"> 
+ 
+            runInBackgroundThreadSecondary(() -&gt; { 
+                Utilities.updateThumbnailRightSidePane(MainController.</span><span class="s0">this</span><span class="s2">, </span><span class="s1">filePathTreeItem)</span><span class="s2">;</span><span class="s1"> 
+            })</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">initTasks() { 
+        loadingTask = </span><span class="s0">new </span><span class="s1">CustomTask&lt;&gt;(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        searchingTask = </span><span class="s0">new </span><span class="s1">CustomTask&lt;&gt;(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">searchForFile(ActionEvent actionEvent) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(</span><span class="s0">new </span><span class="s1">File(directoryToSearchTextField.getText()).exists()) { 
+            RegexUtilities.searchAndRefresh(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            CommonUtilities.showErrorAlert(</span><span class="s4">&quot;Directory </span><span class="s2">\&quot;</span><span class="s4">&quot; </span><span class="s1">+ directoryToSearchTextField.getText() + </span><span class="s4">&quot;</span><span class="s2">\&quot;</span><span class="s4"> does not exist.&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">checkToShowHiddenFiles(Path file) { 
+        hidden = </span><span class="s0">false</span><span class="s2">;</span><span class="s1"> 
+ 
+        file.iterator().forEachRemaining(path -&gt; { 
+            </span><span class="s0">if </span><span class="s1">(path.toFile().getAbsoluteFile().isHidden()) { 
+                hidden = </span><span class="s0">true</span><span class="s2">;</span><span class="s1"> 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">if </span><span class="s1">(hidden) { 
+            </span><span class="s0">if </span><span class="s1">(showHiddenFilesCheckBox.isSelected()) { 
+                checktoShowDirectories(file)</span><span class="s2">;</span><span class="s1"> 
+            } 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            checktoShowDirectories(file)</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">checktoShowDirectories(Path file) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(hideDirectoriesCheckBox.isSelected()) { 
+            </span><span class="s0">if </span><span class="s1">(!file.toFile().isDirectory()) { 
+                files.add(</span><span class="s0">new </span><span class="s1">FileInfo(file.toString()))</span><span class="s2">;</span><span class="s1"> 
+            } 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            files.add(</span><span class="s0">new </span><span class="s1">FileInfo(file.toString()))</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">initBindings() { 
+ 
+        textContent = </span><span class="s0">new </span><span class="s1">CodeTextArea(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        mainSplitPane.getItems().add(textContent.getCodeArea())</span><span class="s2">;</span><span class="s1"> 
+ 
+        fitScreenToggleButton.setOnAction(e -&gt; fitScreenAction(e</span><span class="s2">, </span><span class="s3">1.0</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+        fitScreenToggleMediaButton.setOnAction(e -&gt; fitScreenAction(e</span><span class="s2">, </span><span class="s3">1.0</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+ 
+        RegexUtilities.searchAndRefresh(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        rightPaneMediaView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty())</span><span class="s2">;</span><span class="s1"> 
+        rightPaneImageView.fitWidthProperty().bind(rightPaneScrollPane.widthProperty())</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s5">//        thinkingIndicator.progressProperty().bind(searchingTask.progressProperty());</span><span class="s1"> 
+        stopCurrentSearchButton.visibleProperty().bind(sphere.visibleProperty())</span><span class="s2">;</span><span class="s1"> 
+        stopCurrentSearchButton.managedProperty().bind(sphere.managedProperty())</span><span class="s2">;</span><span class="s1"> 
+ 
+        activityIndicatorLabel.textProperty().bind(searchingTask.messageProperty())</span><span class="s2">;</span><span class="s1"> 
+        loadingFileLabel.textProperty().bind(loadingTask.messageProperty())</span><span class="s2">;</span><span class="s1"> 
+ 
+        fullScreenMediaButton.disableProperty().bind(Utilities.maximized)</span><span class="s2">;</span><span class="s1"> 
+        normalScreenMediaButton.disableProperty().bind(Utilities.maximized.not())</span><span class="s2">;</span><span class="s1"> 
+        fitScreenToggleMediaButton.selectedProperty().bindBidirectional(fitScreenToggleButton.selectedProperty())</span><span class="s2">;</span><span class="s1"> 
+ 
+        showReflectionBottomButton.setSelected(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        showReflectionButton.selectedProperty().bindBidirectional(showReflectionBottomButton.selectedProperty())</span><span class="s2">;</span><span class="s1"> 
+        showReflection(</span><span class="s0">null</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        stopCurrentSearchButton.setOnAction(e -&gt; { 
+            </span><span class="s0">if </span><span class="s1">(searchingTask.getFuture() != </span><span class="s0">null</span><span class="s1">) { 
+                searchingTask.getFuture().cancel(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            } 
+            </span><span class="s0">if </span><span class="s1">(loadingTask.getFuture() != </span><span class="s0">null</span><span class="s1">) { 
+                </span><span class="s0">if </span><span class="s1">(stopCurrentSearchButton.getText().equals(</span><span class="s4">&quot;Stop Load&quot;</span><span class="s1">)) { 
+                    loadingTask.getFuture().cancel(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                } 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        lockMediaViewBottomToggle.selectedProperty().bindBidirectional(lockMediaViewMediaControlsToggle.selectedProperty())</span><span class="s2">;</span><span class="s1"> 
+        currentTimeLabel.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(</span><span class="s3">0.15</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+ 
+        ObjectProperty&lt;Font&gt; fontObjectProperty = </span><span class="s0">new </span><span class="s1">SimpleObjectProperty&lt;Font&gt;(Font.font(</span><span class="s4">&quot;Helvetica&quot;</span><span class="s2">, </span><span class="s1">FontWeight.BOLD</span><span class="s2">, </span><span class="s3">10</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+ 
+        currentTimeLabel.fontProperty().bind(fontObjectProperty)</span><span class="s2">;</span><span class="s1"> 
+        totalTimeLabel.fontProperty().bind(fontObjectProperty)</span><span class="s2">;</span><span class="s1"> 
+ 
+        volumeAndCurrentTimeSwipeLabel.fontProperty().bind(fontObjectProperty)</span><span class="s2">;</span><span class="s1"> 
+        volumeAndCurrentTimeSwipeLabel.effectProperty().bind(Bindings.when(showReflectionBottomButton.selectedProperty()).then(</span><span class="s0">new </span><span class="s1">Reflection()).otherwise((Reflection) </span><span class="s0">null</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+ 
+        rightPaneScrollPane.widthProperty().addListener(</span><span class="s0">new </span><span class="s1">ChangeListener&lt;Number&gt;() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">changed(ObservableValue&lt;? </span><span class="s0">extends </span><span class="s1">Number&gt; observable</span><span class="s2">, </span><span class="s1">Number oldValue</span><span class="s2">, </span><span class="s1">Number newValue) { 
+                Double scalingFactor = </span><span class="s3">0.03</span><span class="s2">;</span><span class="s1"> 
+                Integer startingValue = </span><span class="s3">5</span><span class="s2">;</span><span class="s1"> 
+ 
+                fontObjectProperty.set(Font.font(</span><span class="s4">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">FontWeight.BOLD</span><span class="s2">, </span><span class="s1">newValue.doubleValue() * scalingFactor + startingValue))</span><span class="s2">;</span><span class="s1"> 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        totalTimeLabel.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(</span><span class="s3">0.15</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+        playPositionSlider.prefWidthProperty().bind(rightPaneScrollPane.widthProperty().multiply(</span><span class="s3">0.7</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+ 
+        volumeSlider.valueProperty().set(</span><span class="s3">1</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">initMediaPlayerBindings(String sender) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(sender.equals(</span><span class="s4">&quot;video&quot;</span><span class="s1">) || sender.equals(</span><span class="s4">&quot;music&quot;</span><span class="s1">)) { 
+ 
+            volumeAndCurrentTimeSwipeLabel.setVisible(</span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+            mediaStackPane.setOnScroll(e -&gt; { 
+ 
+                FilePathTreeItem filePathTreeItem = </span><span class="s0">new </span><span class="s1">FilePathTreeItem(Paths.get(pathLabelContent.getText())</span><span class="s2">, </span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                </span><span class="s0">if </span><span class="s1">(filePathTreeItem.getType().equals(</span><span class="s4">&quot;video&quot;</span><span class="s1">) || filePathTreeItem.getType().equals(</span><span class="s4">&quot;music&quot;</span><span class="s1">)) { 
+                    </span><span class="s0">if </span><span class="s1">(Math.abs(e.getDeltaY()) &gt; </span><span class="s3">4</span><span class="s1">) { 
+                        Utilities.swipeRight = </span><span class="s0">false</span><span class="s2">;</span><span class="s1"> 
+ 
+                        </span><span class="s0">double </span><span class="s1">changeY = e.getDeltaY() * -</span><span class="s3">1</span><span class="s2">;</span><span class="s1"> 
+                        </span><span class="s0">double </span><span class="s1">scalingFactor = </span><span class="s3">0.005</span><span class="s2">;</span><span class="s1"> 
+ 
+                        </span><span class="s0">double </span><span class="s1">changeTo = changeY * scalingFactor + volumeSlider.getValue()</span><span class="s2">;</span><span class="s1"> 
+ 
+                        </span><span class="s0">if </span><span class="s1">(changeTo &lt; </span><span class="s3">1 </span><span class="s1">|| changeTo &gt; </span><span class="s3">0</span><span class="s1">) { 
+ 
+                            </span><span class="s0">if </span><span class="s1">(volumeSlider.valueProperty() != </span><span class="s0">null</span><span class="s1">) { 
+                                volumeSlider.valueProperty().set(changeTo)</span><span class="s2">;</span><span class="s1"> 
+                            } 
+ 
+                            volumeSlider.setValueChanging(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                            volumeSlider.setValueChanging(</span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                        } 
+                    } 
+ 
+                    </span><span class="s0">if </span><span class="s1">(mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(</span><span class="s3">0</span><span class="s1">)) &amp;&amp; mediaPlayer.getCurrentTime().lessThan(mediaPlayer.getTotalDuration().subtract(Duration.seconds(</span><span class="s3">2</span><span class="s1">)))) { 
+                        </span><span class="s0">if </span><span class="s1">(Math.abs(e.getDeltaX()) &gt; </span><span class="s3">4</span><span class="s1">) { 
+                            Utilities.swipeRight = </span><span class="s0">true</span><span class="s2">;</span><span class="s1"> 
+                            </span><span class="s0">double </span><span class="s1">changeX = e.getDeltaX()</span><span class="s2">;</span><span class="s1"> 
+                            </span><span class="s0">double </span><span class="s1">scalingFactorX = </span><span class="s3">0.001</span><span class="s2">;</span><span class="s1"> 
+                            </span><span class="s0">double </span><span class="s1">changeToX = changeX * scalingFactorX</span><span class="s2">;</span><span class="s1"> 
+ 
+                            </span><span class="s0">if </span><span class="s1">(changeToX &lt; </span><span class="s3">1 </span><span class="s1">|| changeToX &gt; </span><span class="s3">0</span><span class="s1">) { 
+                                volumeAndCurrentTimeSwipeLabel.setVisible(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                                Duration newDuration = Duration.millis(changeToX * mediaPlayer.getTotalDuration().toMillis()).add(mediaPlayer.getCurrentTime())</span><span class="s2">;</span><span class="s1"> 
+                                </span><span class="s0">if </span><span class="s1">(newDuration.toMillis() &lt; </span><span class="s3">0</span><span class="s1">) newDuration = Duration.ZERO</span><span class="s2">;</span><span class="s1"> 
+                                </span><span class="s0">if </span><span class="s1">(newDuration.greaterThan(mediaPlayer.getTotalDuration())) { 
+                                    newDuration = mediaPlayer.getTotalDuration()</span><span class="s2">;</span><span class="s1"> 
+                                    mediaPlayer.pause()</span><span class="s2">;</span><span class="s1"> 
+                                } 
+ 
+                                mediaPlayer.seek(newDuration)</span><span class="s2">;</span><span class="s1"> 
+                            } 
+                            hideNodeAfterDelay(volumeAndCurrentTimeSwipeLabel)</span><span class="s2">;</span><span class="s1"> 
+                        } 
+                    } 
+ 
+                    e.consume()</span><span class="s2">;</span><span class="s1"> 
+                } 
+            })</span><span class="s2">;</span><span class="s1"> 
+ 
+            volumeSlider.valueChangingProperty().addListener(</span><span class="s0">new </span><span class="s1">ChangeListener&lt;Boolean&gt;() { 
+                @Override 
+                </span><span class="s0">public void </span><span class="s1">changed(ObservableValue&lt;? </span><span class="s0">extends </span><span class="s1">Boolean&gt; observable</span><span class="s2">, </span><span class="s1">Boolean oldValue</span><span class="s2">, </span><span class="s1">Boolean newValue) { 
+                    volumeAndCurrentTimeSwipeLabel.setVisible(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                    </span><span class="s0">if </span><span class="s1">(oldValue &amp;&amp; !newValue) { 
+                        hideNodeAfterDelay(volumeAndCurrentTimeSwipeLabel)</span><span class="s2">;</span><span class="s1"> 
+                    } 
+                } 
+            })</span><span class="s2">;</span><span class="s1"> 
+ 
+            mediaPlayerVolumeProperty.bind(volumeSlider.valueProperty())</span><span class="s2">;</span><span class="s1"> 
+ 
+            mediaPlayerVolumeProperty.addListener(</span><span class="s0">new </span><span class="s1">InvalidationListener() { 
+                @Override 
+                </span><span class="s0">public void </span><span class="s1">invalidated(javafx.beans.Observable observable) { 
+                    Utilities.swipeRight = </span><span class="s0">false</span><span class="s2">;</span><span class="s1"> 
+ 
+                    volumeAndCurrentTimeSwipeLabel.setText(String.format(</span><span class="s4">&quot;Volume: %.1f%%&quot;</span><span class="s2">, </span><span class="s1">((DoubleProperty) observable).doubleValue() * </span><span class="s3">100</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+                } 
+            })</span><span class="s2">;</span><span class="s1"> 
+ 
+            mediaPlayer.rateProperty().bind(mediaPlayerRateProperty)</span><span class="s2">;</span><span class="s1"> 
+ 
+            mediaPlayer.volumeProperty().bind(mediaPlayerVolumeProperty)</span><span class="s2">;</span><span class="s1"> 
+ 
+            playMediaButton.graphicProperty().bind(Bindings.when(mediaPlayer.statusProperty().isEqualTo(MediaPlayer.Status.PLAYING)) 
+                    .then(</span><span class="s0">new </span><span class="s1">ImageView(</span><span class="s0">new </span><span class="s1">Image(getClass().getResourceAsStream(</span><span class="s4">&quot;/png/pause.png&quot;</span><span class="s1">)))).otherwise(</span><span class="s0">new </span><span class="s1">ImageView(</span><span class="s0">new </span><span class="s1">Image(getClass().getResourceAsStream(</span><span class="s4">&quot;/png/play.png&quot;</span><span class="s1">)))))</span><span class="s2">;</span><span class="s1"> 
+            play2XFasterButton.setOnAction(e -&gt; { 
+                </span><span class="s0">if </span><span class="s1">(mediaPlayerRateProperty.get() &lt; </span><span class="s3">8</span><span class="s1">) { 
+                    mediaPlayerRateProperty.set(mediaPlayerRateProperty.get() + </span><span class="s3">0.25</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                    mediaPlayerRateLabel.setText(Bindings.format(</span><span class="s4">&quot;%3.2fx&quot;</span><span class="s2">, </span><span class="s1">mediaPlayerRateProperty.get()).getValue())</span><span class="s2">;</span><span class="s1"> 
+                } 
+            })</span><span class="s2">;</span><span class="s1"> 
+ 
+            play2XSlowerButton.setOnAction(e -&gt; { 
+                </span><span class="s0">if </span><span class="s1">(mediaPlayerRateProperty.get() &gt; </span><span class="s3">0</span><span class="s1">) { 
+                    mediaPlayerRateProperty.set(mediaPlayerRateProperty.get() - </span><span class="s3">0.25</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                    mediaPlayerRateLabel.setText(Bindings.format(</span><span class="s4">&quot;%3.2fx&quot;</span><span class="s2">, </span><span class="s1">mediaPlayerRateProperty.get()).getValue())</span><span class="s2">;</span><span class="s1"> 
+                } 
+            })</span><span class="s2">;</span><span class="s1"> 
+ 
+            mediaStackPane.setOnMouseEntered(e -&gt; { 
+                FilePathTreeItem filePathTreeItem = </span><span class="s0">new </span><span class="s1">FilePathTreeItem(Paths.get(pathLabelContent.getText())</span><span class="s2">, </span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                </span><span class="s0">if </span><span class="s1">(filePathTreeItem.getType().equals(</span><span class="s4">&quot;video&quot;</span><span class="s1">) || filePathTreeItem.getType().equals(</span><span class="s4">&quot;music&quot;</span><span class="s1">)) { 
+                    mediaPlayerControls.setVisible(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                    disappearTimer = </span><span class="s0">new </span><span class="s1">Timer()</span><span class="s2">;</span><span class="s1"> 
+                    disappearTimer.schedule(</span><span class="s0">new </span><span class="s1">TimerTask() { 
+                        @Override 
+                        </span><span class="s0">public void </span><span class="s1">run() { 
+                            Platform.runLater(() -&gt; { 
+                                Utilities.removeFromView(mediaPlayerControls)</span><span class="s2">;</span><span class="s1"> 
+                            })</span><span class="s2">;</span><span class="s1"> 
+                        } 
+                    }</span><span class="s2">, </span><span class="s3">3 </span><span class="s1">* </span><span class="s3">1000</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                } 
+            })</span><span class="s2">;</span><span class="s1"> 
+ 
+            mediaStackPane.setOnMouseMoved(e -&gt; { 
+ 
+                FilePathTreeItem filePathTreeItem = </span><span class="s0">new </span><span class="s1">FilePathTreeItem(Paths.get(pathLabelContent.getText())</span><span class="s2">, </span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                </span><span class="s0">if </span><span class="s1">(filePathTreeItem.getType().equals(</span><span class="s4">&quot;video&quot;</span><span class="s1">) || filePathTreeItem.getType().equals(</span><span class="s4">&quot;music&quot;</span><span class="s1">)) { 
+ 
+                    </span><span class="s0">if </span><span class="s1">(!mediaPlayerControls.isVisible()) { 
+                        Utilities.addToView(mediaPlayerControls)</span><span class="s2">;</span><span class="s1"> 
+                    } </span><span class="s0">else </span><span class="s1">{ 
+                        </span><span class="s0">if </span><span class="s1">(disappearTimer != </span><span class="s0">null</span><span class="s1">) { 
+                            disappearTimer.cancel()</span><span class="s2">;</span><span class="s1"> 
+                            disappearTimer.purge()</span><span class="s2">;</span><span class="s1"> 
+                            disappearTimer = </span><span class="s0">new </span><span class="s1">Timer()</span><span class="s2">;</span><span class="s1"> 
+                            disappearTimer.schedule(</span><span class="s0">new </span><span class="s1">TimerTask() { 
+                                @Override 
+                                </span><span class="s0">public void </span><span class="s1">run() { 
+                                    Platform.runLater(() -&gt; { 
+                                        Utilities.removeFromView(mediaPlayerControls)</span><span class="s2">;</span><span class="s1"> 
+                                    })</span><span class="s2">;</span><span class="s1"> 
+                                } 
+                            }</span><span class="s2">, </span><span class="s3">3000</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                        } 
+                    } 
+                } 
+            })</span><span class="s2">;</span><span class="s1"> 
+ 
+            mediaStackPane.setOnMouseExited(e -&gt; { 
+                FilePathTreeItem filePathTreeItem = </span><span class="s0">new </span><span class="s1">FilePathTreeItem(Paths.get(pathLabelContent.getText())</span><span class="s2">, </span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                </span><span class="s0">if </span><span class="s1">(filePathTreeItem.getType().equals(</span><span class="s4">&quot;video&quot;</span><span class="s1">) || filePathTreeItem.getType().equals(</span><span class="s4">&quot;music&quot;</span><span class="s1">)) { 
+                    Utilities.removeFromView(mediaPlayerControls)</span><span class="s2">;</span><span class="s1"> 
+                } 
+                </span><span class="s0">if </span><span class="s1">(disappearTimer != </span><span class="s0">null</span><span class="s1">) { 
+                    disappearTimer.cancel()</span><span class="s2">;</span><span class="s1"> 
+                    disappearTimer.purge()</span><span class="s2">;</span><span class="s1"> 
+                } 
+            })</span><span class="s2">;</span><span class="s1"> 
+ 
+            playMediaButton.setOnAction(ez -&gt; { 
+                </span><span class="s0">if </span><span class="s1">(mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) { 
+                    mediaPlayer.pause()</span><span class="s2">;</span><span class="s1"> 
+                } </span><span class="s0">else </span><span class="s1">{ 
+ 
+                    mediaPlayer.play()</span><span class="s2">;</span><span class="s1"> 
+                } 
+            })</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">hideNodeAfterDelay(Node node) { 
+        Thread t = </span><span class="s0">new </span><span class="s1">Thread(() -&gt; { 
+            </span><span class="s0">try </span><span class="s1">{ 
+                Thread.sleep(</span><span class="s3">3000</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+                Platform.runLater(() -&gt; node.setVisible(</span><span class="s0">false</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+            } </span><span class="s0">catch </span><span class="s1">(InterruptedException e1) { 
+                e1.printStackTrace()</span><span class="s2">;</span><span class="s1"> 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        t.start()</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">updateRightSidePane(FileInfo newValue) { 
+ 
+        FileInfo fileInfo = newValue</span><span class="s2">;</span><span class="s1"> 
+        </span><span class="s0">if </span><span class="s1">(fileInfo != </span><span class="s0">null</span><span class="s1">) { 
+            fileNamDetailLabelContent.setText(fileInfo.getFileName())</span><span class="s2">;</span><span class="s1"> 
+ 
+            sizeDetailLabelContent.setText(CommonUtilities.turnBytesIntoHumanReadable(fileInfo.length()))</span><span class="s2">;</span><span class="s1"> 
+ 
+            pathLabelContent.setText(fileInfo.getAbsolutePath())</span><span class="s2">;</span><span class="s1"> 
+ 
+            lastModifiedLabelContent.setText(Utilities.formatDate(fileInfo.lastModified()))</span><span class="s2">;</span><span class="s1"> 
+        } 
+ 
+        </span><span class="s0">if </span><span class="s1">(showPlayingIconCheckbox.isSelected()) { 
+            mainTableView.refresh()</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">initCheckBoxes() { 
+ 
+        automaticSearchCheckBox.setOnAction(e -&gt; { 
+            RegexUtilities.searchAndRefresh(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        showHiddenFilesCheckBox.setOnAction(e -&gt; { 
+            RegexUtilities.searchAndRefresh(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        hideDirectoriesCheckBox.setOnAction(e -&gt; { 
+            RegexUtilities.searchAndRefresh(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        pathMatchingCheckbox.setOnAction(e -&gt; { 
+            RegexUtilities.searchAndRefresh(</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">refreshTreeViewFromBottom() { 
+ 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">chooseDir(ActionEvent actionEvent) { 
+        DirectoryChooser dc = </span><span class="s0">new </span><span class="s1">DirectoryChooser()</span><span class="s2">;</span><span class="s1"> 
+        File newDirToSearch = dc.showDialog(mainTableView.getScene().getWindow())</span><span class="s2">;</span><span class="s1"> 
+        directoryToSearchTextField.setText(newDirToSearch.getAbsolutePath())</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">refreshTreeView(ActionEvent actionEvent) { 
+        FilePathTreeItem filePathTreeItem = (FilePathTreeItem) fileBrowserTreeTable.getSelectionModel().getSelectedItem()</span><span class="s2">;</span><span class="s1"> 
+        </span><span class="s0">try </span><span class="s1">{ 
+            filePathTreeItem.populateSourceAndImmediateChildren(filePathTreeItem)</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">catch </span><span class="s1">(Exception e) { 
+            e.printStackTrace()</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">collapseNodesRecursive(TreeItem treeItem) { 
+        treeItem.setExpanded(</span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        treeItem.getChildren().forEach(node -&gt; { 
+            collapseNodesRecursive((TreeItem) node)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">collapseAllTreeNodes(ActionEvent actionEvent) { 
+        runInBackgroundThreadSecondary(() -&gt; { 
+            fileBrowserTreeTable.getRoot().setExpanded(</span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            </span><span class="s0">if </span><span class="s1">(!fileBrowserTreeTable.getRoot().getChildren().isEmpty()) { 
+                fileBrowserTreeTable.getRoot().getChildren().forEach(node -&gt; { 
+                    collapseNodesRecursive((TreeItem) node)</span><span class="s2">;</span><span class="s1"> 
+                })</span><span class="s2">;</span><span class="s1"> 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">findDirectoryInTree(ActionEvent actionEvent) { 
+ 
+        runInBackgroundThreadSecondary(() -&gt; { 
+            </span><span class="s0">if </span><span class="s1">(!directoryToSearchTextField.getText().equals(</span><span class="s4">&quot;&quot;</span><span class="s1">)) { 
+                FileInfo fileInfo = </span><span class="s0">new </span><span class="s1">FileInfo(directoryToSearchTextField.getText())</span><span class="s2">;</span><span class="s1"> 
+ 
+                </span><span class="s0">if </span><span class="s1">(fileInfo.exists()) { 
+                    FilePathTreeItem filePathTreeItem = </span><span class="s0">new </span><span class="s1">FilePathTreeItem(Paths.get(fileInfo.getAbsolutePath())</span><span class="s2">, </span><span class="s1">MainController.</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+                    FilePathTreeItem.selectTreeItemRecursively(MainController.</span><span class="s0">this</span><span class="s2">, </span><span class="s1">Paths.get(fileInfo.getAbsolutePath())</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                } </span><span class="s0">else </span><span class="s1">{ 
+                    String error = </span><span class="s4">&quot;Not A Valid File or Folder.&quot;</span><span class="s2">;</span><span class="s1"> 
+                    CommonUtilities.showErrorAlert(error)</span><span class="s2">;</span><span class="s1"> 
+                } 
+            } 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">runInBackgroundThread(Runnable r) { 
+        Utilities.addToView(sphere)</span><span class="s2">;</span><span class="s1"> 
+        timeline.play()</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s5">//        Utilities.addToView(thinkingIndicator);</span><span class="s1"> 
+        System.out.println(</span><span class="s4">&quot;visible&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        stopCurrentSearchButton.setText(</span><span class="s4">&quot;Stop Search&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        searchingTask = </span><span class="s0">new </span><span class="s1">CustomTask&lt;&gt;(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">r</span><span class="s2">, </span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        activityIndicatorLabel.textProperty().bind(searchingTask.messageProperty())</span><span class="s2">;</span><span class="s1"> 
+ 
+        searchButton.disableProperty().bind(searchingTask.runningProperty())</span><span class="s2">;</span><span class="s1"> 
+ 
+        searchingTask.setRunnable(r)</span><span class="s2">;</span><span class="s1"> 
+ 
+        Thread thread = </span><span class="s0">new </span><span class="s1">Thread(searchingTask)</span><span class="s2">;</span><span class="s1"> 
+ 
+        thread.start()</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">runInBackgroundThreadSecondary(Runnable r) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(searchingTask.getState() != Task.State.RUNNING) { 
+            Utilities.addToView(sphere)</span><span class="s2">;</span><span class="s1"> 
+            timeline.play()</span><span class="s2">;</span><span class="s1"> 
+            </span><span class="s5">// System.out.println(&quot;started secondary&quot;);</span><span class="s1"> 
+            stopCurrentSearchButton.setText(</span><span class="s4">&quot;Stop Load&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            loadingTask = </span><span class="s0">new </span><span class="s1">CustomTask&lt;String&gt;(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">r</span><span class="s2">, </span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            loadingTask = </span><span class="s0">new </span><span class="s1">CustomTask&lt;String&gt;(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">r</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        } 
+ 
+        loadingFileLabel.textProperty().bind(MainController.loadingTask.messageProperty())</span><span class="s2">;</span><span class="s1"> 
+ 
+        Thread thread = </span><span class="s0">new </span><span class="s1">Thread(loadingTask)</span><span class="s2">;</span><span class="s1"> 
+ 
+        thread.start()</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">goToHomeDirectory(ActionEvent actionEvent) { 
+ 
+        String home = System.getProperty(</span><span class="s4">&quot;user.home&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        runInBackgroundThreadSecondary(() -&gt; { 
+            FilePathTreeItem.selectTreeItemRecursively(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">Paths.get(home)</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">copyAllButtonAction(ActionEvent actionEvent) { 
+ 
+        Utilities.copyFilesFromTableViewToDirectory(mainTableView</span><span class="s2">, </span><span class="s1">destinationCopyAllTextField.getText())</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">openFromRightSidePane(ActionEvent actionEvent) { 
+        </span><span class="s0">try </span><span class="s1">{ 
+            Desktop.getDesktop().open(</span><span class="s0">new </span><span class="s1">File(pathLabelContent.getText()))</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+            CommonUtilities.showErrorAlert(</span><span class="s4">&quot;Could not open file.&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">copyPath(ActionEvent actionEvent) { 
+        CommonUtilities.copyToClipboard(pathLabelContent.getText())</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">openEnclosing(ActionEvent actionEvent) { 
+ 
+        CommonUtilities.openEnclosingDirectory(</span><span class="s0">new </span><span class="s1">FileInfo(pathLabelContent.getText()))</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">moveToTrash(ActionEvent actionEvent) { 
+        CommonUtilities.moveToTrash(</span><span class="s0">new </span><span class="s1">FileInfo(pathLabelContent.getText())</span><span class="s2">, </span><span class="s1">mainTableView</span><span class="s2">, </span><span class="s1">files</span><span class="s2">, </span><span class="s1">MainController.</span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">goToDesktopDirectory(ActionEvent actionEvent) { 
+        String home = System.getProperty(</span><span class="s4">&quot;user.home&quot;</span><span class="s1">) + File.separator + </span><span class="s4">&quot;Desktop&quot;</span><span class="s2">;</span><span class="s1"> 
+ 
+        runInBackgroundThreadSecondary(() -&gt; { 
+            FilePathTreeItem.selectTreeItemRecursively(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">Paths.get(home)</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">openDestinationFolder(ActionEvent actionEvent) { 
+        File newFile = </span><span class="s0">new </span><span class="s1">File(destinationCopyAllTextField.getText())</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">if </span><span class="s1">(newFile.exists()) { 
+            </span><span class="s0">try </span><span class="s1">{ 
+                Desktop.getDesktop().open(newFile)</span><span class="s2">;</span><span class="s1"> 
+            } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+                e.printStackTrace()</span><span class="s2">;</span><span class="s1"> 
+            } 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            CommonUtilities.showErrorAlert(</span><span class="s4">&quot;Destination directory does not exist.&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">maximizeVideo(ActionEvent actionEvent) { 
+ 
+        removePanes(rightPaneScrollPane)</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">returnToOldDividers(ActionEvent actionEvent) { 
+        restorePanesToOriginal(</span><span class="s4">&quot;mediaContextMenu&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">removePaneSingular(String pane) { 
+        ObservableList&lt;Node&gt; items = mainSplitPane.getItems()</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+        </span><span class="s0">if </span><span class="s1">(items.size() == </span><span class="s3">1</span><span class="s1">) { 
+            CommonUtilities.showErrorAlert(</span><span class="s4">&quot;Cannot Remove Last Pane&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else if </span><span class="s1">(items.size() &gt;= </span><span class="s3">2</span><span class="s1">) { 
+            checkForSender(pane</span><span class="s2">, </span><span class="s1">items)</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">if </span><span class="s1">(items.size() == </span><span class="s3">1</span><span class="s1">) { 
+ 
+                </span><span class="s0">if </span><span class="s1">(items.get(</span><span class="s3">0</span><span class="s1">) == rightPaneScrollPane) { 
+                    </span><span class="s5">//removing all but media view right pane</span><span class="s1"> 
+                    Utilities.removeFromView(rightSidePaneTextVBox)</span><span class="s2">;</span><span class="s1"> 
+                    Utilities.removeFromView(topHBox)</span><span class="s2">;</span><span class="s1"> 
+                    Utilities.removeFromView(bottomHBox)</span><span class="s2">;</span><span class="s1"> 
+                    Utilities.removeFromView(topSecondHBox)</span><span class="s2">;</span><span class="s1"> 
+                    Utilities.maximized.set(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                } 
+            } 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">checkForSender(String pane</span><span class="s2">, </span><span class="s1">ObservableList&lt;Node&gt; items) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(pane.equals(</span><span class="s4">&quot;tableView&quot;</span><span class="s1">)) { 
+            items.remove(mainTableView)</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else if </span><span class="s1">(pane.equals(</span><span class="s4">&quot;treeView&quot;</span><span class="s1">)) { 
+            items.remove(fileBrowserTreeTable)</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else if </span><span class="s1">(pane.equals(</span><span class="s4">&quot;terminal&quot;</span><span class="s1">)) { 
+            items.remove(terminalTabPane)</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else if </span><span class="s1">(pane.equals(</span><span class="s4">&quot;webView&quot;</span><span class="s1">)) { 
+            items.remove(webViewVBox)</span><span class="s2">;</span><span class="s1"> 
+        }</span><span class="s0">else</span><span class="s1"> 
+         { 
+            items.remove(rightPaneScrollPane)</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">removePanes(Node node) { 
+ 
+        splitPaneChildren.clear()</span><span class="s2">;</span><span class="s1"> 
+        splitPaneChildren.addAll(mainSplitPane.getItems())</span><span class="s2">;</span><span class="s1"> 
+ 
+        ObservableList&lt;Node&gt; items = mainSplitPane.getItems()</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">if </span><span class="s1">(items.size() == </span><span class="s3">1</span><span class="s1">) { 
+            CommonUtilities.showErrorAlert(</span><span class="s4">&quot;Already Maximized.&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else </span><span class="s1">{ 
+ 
+            </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i &lt; mainSplitPane.getDividers().size()</span><span class="s2">; </span><span class="s1">i++) { 
+                Preferences.userRoot().putDouble(</span><span class="s4">&quot;dividerPos&quot; </span><span class="s1">+ i</span><span class="s2">, </span><span class="s1">mainSplitPane.getDividerPositions()[i])</span><span class="s2">;</span><span class="s1"> 
+            } 
+ 
+            items.clear()</span><span class="s2">;</span><span class="s1"> 
+            items.add(node)</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">if </span><span class="s1">(node == rightPaneScrollPane) { 
+                FileInfo fileInfo = </span><span class="s0">new </span><span class="s1">FileInfo(pathLabelContent.getText())</span><span class="s2">;</span><span class="s1"> 
+                String type = FileTypeUtilities.getFileType(fileInfo.getAbsolutePath())</span><span class="s2">;</span><span class="s1"> 
+                Utilities.removeFromView(topHBox)</span><span class="s2">;</span><span class="s1"> 
+                Utilities.removeFromView(bottomHBox)</span><span class="s2">;</span><span class="s1"> 
+                Utilities.removeFromView(topSecondHBox)</span><span class="s2">;</span><span class="s1"> 
+ 
+                </span><span class="s0">if </span><span class="s1">(type.equals(</span><span class="s4">&quot;video&quot;</span><span class="s1">) || type.equals(</span><span class="s4">&quot;music&quot;</span><span class="s1">) || type.equals(</span><span class="s4">&quot;image&quot;</span><span class="s1">) || type.equals(</span><span class="s4">&quot;pdf&quot;</span><span class="s1">)) { 
+ 
+                    Utilities.addToView(fileNameLabelMediaControls)</span><span class="s2">;</span><span class="s1"> 
+                    Utilities.removeFromView(rightSidePaneTextVBox)</span><span class="s2">;</span><span class="s1"> 
+                } 
+            } 
+ 
+            Utilities.maximized.set(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">restorePanesToOld(String mediaContextMenu) { 
+        mainSplitPane.getItems().clear()</span><span class="s2">;</span><span class="s1"> 
+        mainSplitPane.getItems().addAll(splitPaneChildren)</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">if </span><span class="s1">(!topHBox.isVisible()) { 
+ 
+            Utilities.addToView(topHBox)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.addToView(bottomHBox)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.addToView(topSecondHBox)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.removeFromView(fileNameLabelMediaControls)</span><span class="s2">;</span><span class="s1"> 
+            </span><span class="s5">//case of music or video</span><span class="s1"> 
+            </span><span class="s0">if </span><span class="s1">(!rightSidePaneTextVBox.isVisible()) { 
+                Utilities.addToView(rightSidePaneTextVBox)</span><span class="s2">;</span><span class="s1"> 
+            } 
+        } 
+ 
+        </span><span class="s0">double</span><span class="s1">[] sps = {</span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">,</span><span class="s3">0</span><span class="s1">}</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i &lt; mainSplitPane.getDividers().size()</span><span class="s2">; </span><span class="s1">i++) { 
+ 
+            Double sp = Preferences.userRoot().getDouble(</span><span class="s4">&quot;dividerPos&quot; </span><span class="s1">+ i</span><span class="s2">, </span><span class="s1">mainSplitPane.getDividerPositions()[i])</span><span class="s2">;</span><span class="s1"> 
+            sps[i] = sp</span><span class="s2">;</span><span class="s1"> 
+        } 
+ 
+        mainSplitPane.setDividerPositions(sps)</span><span class="s2">;</span><span class="s1"> 
+ 
+        Utilities.maximized.set(</span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">restorePanesToOriginal(String mediaControl) { 
+ 
+        ObservableList&lt;Node&gt; items = mainSplitPane.getItems()</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">if </span><span class="s1">(!topHBox.isVisible()) { 
+ 
+            Utilities.addToView(topHBox)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.addToView(bottomHBox)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.addToView(topSecondHBox)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.removeFromView(fileNameLabelMediaControls)</span><span class="s2">;</span><span class="s1"> 
+            </span><span class="s5">//case of music or video</span><span class="s1"> 
+            </span><span class="s0">if </span><span class="s1">(!rightSidePaneTextVBox.isVisible()) { 
+                Utilities.addToView(rightSidePaneTextVBox)</span><span class="s2">;</span><span class="s1"> 
+            } 
+        } 
+ 
+        mainSplitPane.getItems().clear()</span><span class="s2">;</span><span class="s1"> 
+ 
+        items.addAll(Arrays.asList(fileBrowserTreeTable</span><span class="s2">, </span><span class="s1">mainTableView</span><span class="s2">, </span><span class="s1">rightPaneScrollPane</span><span class="s2">, </span><span class="s1">terminalTabPane))</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">double</span><span class="s1">[] sps = {</span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s1">}</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i &lt; mainSplitPane.getDividers().size()</span><span class="s2">; </span><span class="s1">i++) { 
+ 
+            Double sp = Preferences.userRoot().getDouble(</span><span class="s4">&quot;dividerPos&quot; </span><span class="s1">+ i</span><span class="s2">, </span><span class="s1">mainSplitPane.getDividerPositions()[i])</span><span class="s2">;</span><span class="s1"> 
+            sps[i] = sp</span><span class="s2">;</span><span class="s1"> 
+        } 
+ 
+        mainSplitPane.setDividerPositions(sps)</span><span class="s2">;</span><span class="s1"> 
+ 
+        Utilities.maximized.set(</span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">goToDownloadsDirectory(ActionEvent actionEvent) { 
+        String home = System.getProperty(</span><span class="s4">&quot;user.home&quot;</span><span class="s1">) + File.separator + </span><span class="s4">&quot;Downloads&quot;</span><span class="s2">;</span><span class="s1"> 
+ 
+        runInBackgroundThreadSecondary(() -&gt; { 
+            FilePathTreeItem.selectTreeItemRecursively(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">Paths.get(home)</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">rewindToStart(MouseEvent actionEvent) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(MainController.mediaPlayer != </span><span class="s0">null</span><span class="s1">) { 
+            </span><span class="s0">if </span><span class="s1">(actionEvent.getEventType() == MouseEvent.MOUSE_CLICKED) { 
+                </span><span class="s0">if </span><span class="s1">(actionEvent.getButton() == MouseButton.PRIMARY) { 
+                    </span><span class="s0">if </span><span class="s1">(actionEvent.getClickCount() == </span><span class="s3">1</span><span class="s1">) { 
+ 
+                        mediaPlayer.stop()</span><span class="s2">;</span><span class="s1"> 
+                        mediaPlayer.seek(Duration.ZERO)</span><span class="s2">;</span><span class="s1"> 
+                        mediaPlayer.pause()</span><span class="s2">;</span><span class="s1"> 
+                        mediaPlayer.play()</span><span class="s2">;</span><span class="s1"> 
+                    } </span><span class="s0">else </span><span class="s1">{ 
+                        Utilities.endOfMediaAction(</span><span class="s0">this</span><span class="s2">, </span><span class="s0">false</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                    } 
+                } 
+            } 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">removeSliderHBox(ActionEvent actionEvent) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(removeSliderMediaControl.isSelected()) { 
+            Utilities.removeFromView(sliderHbox)</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            Utilities.addToView(sliderHbox)</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">addFilter(ActionEvent actionEvent) { 
+ 
+        MenuItem menuItem = (MenuItem) actionEvent.getSource()</span><span class="s2">;</span><span class="s1"> 
+        Label label = </span><span class="s0">new </span><span class="s1">Label()</span><span class="s2">;</span><span class="s1"> 
+ 
+        </span><span class="s0">switch </span><span class="s1">(menuItem.getText()) { 
+            </span><span class="s0">case </span><span class="s4">&quot;+ Or&quot;</span><span class="s1">: 
+                label.setText(</span><span class="s4">&quot;OR&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                </span><span class="s0">break</span><span class="s2">;</span><span class="s1"> 
+            </span><span class="s0">case </span><span class="s4">&quot;+ And&quot;</span><span class="s1">: 
+                label.setText(</span><span class="s4">&quot;AND&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                </span><span class="s0">break</span><span class="s2">;</span><span class="s1"> 
+            </span><span class="s0">default</span><span class="s1">: 
+                </span><span class="s0">break</span><span class="s2">;</span><span class="s1"> 
+        } 
+ 
+        TextField textField = </span><span class="s0">new </span><span class="s1">TextField()</span><span class="s2">;</span><span class="s1"> 
+        textField.setPrefWidth(</span><span class="s3">40</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+        HBox hBox = </span><span class="s0">new </span><span class="s1">HBox()</span><span class="s2">;</span><span class="s1"> 
+        hBox.getChildren().addAll(label</span><span class="s2">, </span><span class="s1">textField)</span><span class="s2">;</span><span class="s1"> 
+        filterHBox.getChildren().add(hBox)</span><span class="s2">;</span><span class="s1"> 
+ 
+        label.setOnDragDetected(event -&gt; { 
+ 
+            Dragboard db = label.startDragAndDrop(TransferMode.ANY)</span><span class="s2">;</span><span class="s1"> 
+            mainTableView.getScene().setCursor(Cursor.CLOSED_HAND)</span><span class="s2">;</span><span class="s1"> 
+            ClipboardContent clipboardContent = </span><span class="s0">new </span><span class="s1">ClipboardContent()</span><span class="s2">;</span><span class="s1"> 
+ 
+            clipboardContent.putString(filterHBox.getChildren().indexOf(hBox) + </span><span class="s4">&quot;&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            db.setContent(clipboardContent)</span><span class="s2">;</span><span class="s1"> 
+ 
+            event.consume()</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        fileBrowserTreeTable.setOnDragOver(e -&gt; 
+ 
+        { 
+            </span><span class="s0">if </span><span class="s1">(e.getGestureSource() != mainTableView &amp;&amp; e.getDragboard().hasString()) { 
+                e.acceptTransferModes(TransferMode.ANY)</span><span class="s2">;</span><span class="s1"> 
+ 
+                mainTableView.getScene().setCursor(Cursor.DISAPPEAR)</span><span class="s2">;</span><span class="s1"> 
+            } 
+ 
+            e.consume()</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        fileBrowserTreeTable.setOnDragEntered(e -&gt; { 
+            </span><span class="s0">if </span><span class="s1">(e.getSource() != mainTableView) { 
+                mainTableView.getScene().setCursor(Cursor.DISAPPEAR)</span><span class="s2">;</span><span class="s1"> 
+            } 
+            e.consume()</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        fileBrowserTreeTable.setOnDragExited(e -&gt; { 
+ 
+            mainTableView.getScene().setCursor(Cursor.CLOSED_HAND)</span><span class="s2">;</span><span class="s1"> 
+ 
+            e.consume()</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        fileBrowserTreeTable.setOnDragDropped(e -&gt; 
+ 
+        { 
+ 
+            Dragboard db = e.getDragboard()</span><span class="s2">;</span><span class="s1"> 
+            </span><span class="s0">if </span><span class="s1">(db.hasString()) { 
+ 
+                </span><span class="s0">int </span><span class="s1">integer = Integer.parseInt(db.getString())</span><span class="s2">;</span><span class="s1"> 
+                filterHBox.getChildren().remove(integer)</span><span class="s2">;</span><span class="s1"> 
+            } 
+ 
+            e.setDropCompleted(</span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            mainTableView.getScene().setCursor(Cursor.DEFAULT)</span><span class="s2">;</span><span class="s1"> 
+ 
+            e.consume()</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+ 
+        label.setOnDragDone(e -&gt; { 
+            System.out.println(</span><span class="s4">&quot;done with drag and drop&quot;</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            e.consume()</span><span class="s2">;</span><span class="s1"> 
+        })</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">removeFilter(ActionEvent actionEvent) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(filterHBox.getChildren().size() &gt; </span><span class="s3">1</span><span class="s1">) { 
+            filterHBox.getChildren().remove(filterHBox.getChildren().size() - </span><span class="s3">1</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">storeFileList(ActionEvent actionEvent) { 
+        </span><span class="s0">if </span><span class="s1">(autoplayCheckbox.isSelected()) { 
+            mainTableView.refresh()</span><span class="s2">;</span><span class="s1"> 
+            filesForAutoplay.clear()</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s3">0</span><span class="s2">; </span><span class="s1">i &lt; mainTableView.getItems().size()</span><span class="s2">; </span><span class="s1">i++) { 
+ 
+                FileInfo file = (FileInfo) mainTableView.getItems().get(i)</span><span class="s2">;</span><span class="s1"> 
+                filesForAutoplay.add(file.getAbsolutePath())</span><span class="s2">;</span><span class="s1"> 
+            } 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">showPlayingIcon(ActionEvent actionEvent) { 
+        mainTableView.refresh()</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">showLineNumbers(ActionEvent actionEvent) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(pathLabelContent != </span><span class="s0">null</span><span class="s1">) { 
+ 
+            FilePathTreeItem filePathTreeItem = </span><span class="s0">new </span><span class="s1">FilePathTreeItem(Paths.get(pathLabelContent.getText())</span><span class="s2">, </span><span class="s0">this</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">if </span><span class="s1">(filePathTreeItem.isTextual()) { 
+                Utilities.updateThumbnailRightSidePane(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">filePathTreeItem)</span><span class="s2">;</span><span class="s1"> 
+            } 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">showReflection(ActionEvent actionEvent) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(showReflectionBottomButton.isSelected()) { 
+            Utilities.initEffects(</span><span class="s0">this</span><span class="s1">.rightPaneMediaView)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.initEffects(</span><span class="s0">this</span><span class="s1">.rightPaneImageView)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.initEffects(</span><span class="s0">this</span><span class="s1">.playPositionSlider)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.initEffects(</span><span class="s0">this</span><span class="s1">.mediaPlayerControls)</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s5">//            Utilities.initEffects(this.volumeAndCurrentTimeSwipeLabel);</span><span class="s1"> 
+        } </span><span class="s0">else </span><span class="s1">{ 
+ 
+            Utilities.removeEffects(</span><span class="s0">this</span><span class="s1">.rightPaneMediaView)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.removeEffects(</span><span class="s0">this</span><span class="s1">.rightPaneImageView)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.removeEffects(</span><span class="s0">this</span><span class="s1">.playPositionSlider)</span><span class="s2">;</span><span class="s1"> 
+            Utilities.removeEffects(</span><span class="s0">this</span><span class="s1">.mediaPlayerControls)</span><span class="s2">;</span><span class="s1"> 
+</span><span class="s5">//            Utilities.removeEffects(this.volumeAndCurrentTimeSwipeLabel);</span><span class="s1"> 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">playNext(ActionEvent actionEvent) { 
+        </span><span class="s0">if </span><span class="s1">(MainController.mediaPlayer != </span><span class="s0">null</span><span class="s1">) { 
+            mediaPlayer.stop()</span><span class="s2">;</span><span class="s1"> 
+            mediaPlayer.play()</span><span class="s2">;</span><span class="s1"> 
+            </span><span class="s0">if </span><span class="s1">(autoplayCheckbox.isSelected()) { 
+                Utilities.endOfMediaAction(</span><span class="s0">this</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            } </span><span class="s0">else </span><span class="s1">{ 
+                Utilities.endOfMediaAction(</span><span class="s0">this</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            } 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">showPlayingIconTree(ActionEvent actionEvent) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(showPlayingIconTreeCheckbox.isSelected()) { 
+            fileBrowserTreeTable.refresh()</span><span class="s2">;</span><span class="s1"> 
+ 
+            FileInfo fileInfo = </span><span class="s0">new </span><span class="s1">FileInfo(pathLabelContent.getText())</span><span class="s2">;</span><span class="s1"> 
+            runInBackgroundThreadSecondary(() -&gt; { 
+ 
+                FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">Paths.get(fileInfo.getAbsolutePath())</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            })</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else </span><span class="s1">{ 
+ 
+            FileInfo fileInfo = </span><span class="s0">new </span><span class="s1">FileInfo(pathLabelContent.getText())</span><span class="s2">;</span><span class="s1"> 
+            runInBackgroundThreadSecondary(() -&gt; { 
+ 
+                FilePathTreeItem.selectTreeItemRecursivelyAndChangeGraphic(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">Paths.get(fileInfo.getAbsolutePath())</span><span class="s2">, </span><span class="s0">true</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            })</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+ 
+    Rectangle2D oldScreenSize</span><span class="s2">;</span><span class="s1"> 
+    ArrayList&lt;Point2D&gt; points = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s2">;</span><span class="s1"> 
+    Integer counter = </span><span class="s3">0</span><span class="s2">;</span><span class="s1"> 
+ 
+    { 
+        Rectangle2D rect = Screen.getPrimary().getBounds()</span><span class="s2">;</span><span class="s1"> 
+        points.add(</span><span class="s0">new </span><span class="s1">Point2D(rect.getMinX()</span><span class="s2">, </span><span class="s1">rect.getMinY()))</span><span class="s2">;</span><span class="s1"> 
+        points.add(</span><span class="s0">new </span><span class="s1">Point2D(rect.getMinX()</span><span class="s2">, </span><span class="s1">rect.getMaxY() / </span><span class="s3">2</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+        points.add(</span><span class="s0">new </span><span class="s1">Point2D(rect.getMaxX() / </span><span class="s3">2</span><span class="s2">, </span><span class="s1">rect.getMaxY() / </span><span class="s3">2</span><span class="s1">))</span><span class="s2">;</span><span class="s1"> 
+        points.add(</span><span class="s0">new </span><span class="s1">Point2D(rect.getMaxX() / </span><span class="s3">2</span><span class="s2">, </span><span class="s1">rect.getMinY()))</span><span class="s2">;</span><span class="s1"> 
+    } 
+ 
+    { 
+ 
+    } 
+ 
+    </span><span class="s0">boolean </span><span class="s1">halfToggle = </span><span class="s0">true</span><span class="s2">;</span><span class="s1"> 
+ 
+    </span><span class="s0">public void </span><span class="s1">fitScreenAction(ActionEvent actionEvent</span><span class="s2">, </span><span class="s1">Double size) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(size == </span><span class="s3">0.25</span><span class="s1">) { 
+ 
+            Rectangle2D rect = Screen.getPrimary().getBounds()</span><span class="s2">;</span><span class="s1"> 
+ 
+            Double oldX = mainSplitPane.getScene().getWindow().getX()</span><span class="s2">;</span><span class="s1"> 
+            Double oldY = mainSplitPane.getScene().getWindow().getY()</span><span class="s2">;</span><span class="s1"> 
+ 
+            Double height = mainSplitPane.getScene().getWindow().getHeight()</span><span class="s2">;</span><span class="s1"> 
+            Double width = mainSplitPane.getScene().getWindow().getWidth()</span><span class="s2">;</span><span class="s1"> 
+            oldScreenSize = </span><span class="s0">new </span><span class="s1">Rectangle2D(oldX</span><span class="s2">, </span><span class="s1">oldY</span><span class="s2">, </span><span class="s1">width</span><span class="s2">, </span><span class="s1">height)</span><span class="s2">;</span><span class="s1"> 
+            mainSplitPane.getScene().getWindow().setHeight(rect.getHeight() / </span><span class="s3">2</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+            mainSplitPane.getScene().getWindow().setWidth(rect.getWidth() / </span><span class="s3">2</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+            mainSplitPane.getScene().getWindow().setX(points.get(counter % </span><span class="s3">4</span><span class="s1">).getX())</span><span class="s2">;</span><span class="s1"> 
+            mainSplitPane.getScene().getWindow().setY(points.get(counter % </span><span class="s3">4</span><span class="s1">).getY())</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">if </span><span class="s1">(counter == </span><span class="s3">8</span><span class="s1">){ 
+                counter = </span><span class="s3">0</span><span class="s2">;</span><span class="s1"> 
+            } 
+ 
+            counter++</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else if </span><span class="s1">(size == </span><span class="s3">0.5</span><span class="s1">){ 
+ 
+            Rectangle2D rect = Screen.getPrimary().getBounds()</span><span class="s2">;</span><span class="s1"> 
+ 
+            Double oldX = mainSplitPane.getScene().getWindow().getX()</span><span class="s2">;</span><span class="s1"> 
+            Double oldY = mainSplitPane.getScene().getWindow().getY()</span><span class="s2">;</span><span class="s1"> 
+ 
+            Double height = mainSplitPane.getScene().getWindow().getHeight()</span><span class="s2">;</span><span class="s1"> 
+            Double width = mainSplitPane.getScene().getWindow().getWidth()</span><span class="s2">;</span><span class="s1"> 
+ 
+            oldScreenSize = </span><span class="s0">new </span><span class="s1">Rectangle2D(oldX</span><span class="s2">, </span><span class="s1">oldY</span><span class="s2">, </span><span class="s1">width</span><span class="s2">, </span><span class="s1">height)</span><span class="s2">;</span><span class="s1"> 
+            mainSplitPane.getScene().getWindow().setHeight(rect.getHeight())</span><span class="s2">;</span><span class="s1"> 
+            mainSplitPane.getScene().getWindow().setWidth(rect.getWidth() / </span><span class="s3">2</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+ 
+            </span><span class="s0">if </span><span class="s1">(halfToggle){ 
+                mainSplitPane.getScene().getWindow().setX(rect.getMinX())</span><span class="s2">;</span><span class="s1"> 
+                mainSplitPane.getScene().getWindow().setY(rect.getMinY())</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+            } </span><span class="s0">else </span><span class="s1">{ 
+                mainSplitPane.getScene().getWindow().setX(rect.getMaxX()/</span><span class="s3">2</span><span class="s1">)</span><span class="s2">;</span><span class="s1"> 
+                mainSplitPane.getScene().getWindow().setY(rect.getMinY())</span><span class="s2">;</span><span class="s1"> 
+            } 
+            halfToggle = !halfToggle</span><span class="s2">;</span><span class="s1"> 
+ 
+ 
+ 
+        } </span><span class="s0">else if </span><span class="s1">(size == </span><span class="s3">1.0</span><span class="s1">) { 
+ 
+            </span><span class="s0">if </span><span class="s1">(fitScreenToggleButton.isSelected()) { 
+                Rectangle2D rect = Screen.getPrimary().getBounds()</span><span class="s2">;</span><span class="s1"> 
+ 
+                Double oldX = mainSplitPane.getScene().getWindow().getX()</span><span class="s2">;</span><span class="s1"> 
+                Double oldY = mainSplitPane.getScene().getWindow().getY()</span><span class="s2">;</span><span class="s1"> 
+ 
+                Double height = mainSplitPane.getScene().getWindow().getHeight()</span><span class="s2">;</span><span class="s1"> 
+                Double width = mainSplitPane.getScene().getWindow().getWidth()</span><span class="s2">;</span><span class="s1"> 
+ 
+                oldScreenSize = </span><span class="s0">new </span><span class="s1">Rectangle2D(oldX</span><span class="s2">, </span><span class="s1">oldY</span><span class="s2">, </span><span class="s1">width</span><span class="s2">, </span><span class="s1">height)</span><span class="s2">;</span><span class="s1"> 
+ 
+                mainSplitPane.getScene().getWindow().setHeight(rect.getHeight())</span><span class="s2">;</span><span class="s1"> 
+                mainSplitPane.getScene().getWindow().setWidth(rect.getWidth())</span><span class="s2">;</span><span class="s1"> 
+ 
+                mainSplitPane.getScene().getWindow().setX(rect.getMinX())</span><span class="s2">;</span><span class="s1"> 
+                mainSplitPane.getScene().getWindow().setY(rect.getMinY())</span><span class="s2">;</span><span class="s1"> 
+            } </span><span class="s0">else </span><span class="s1">{ 
+ 
+                </span><span class="s0">if </span><span class="s1">(oldScreenSize != </span><span class="s0">null</span><span class="s1">) { 
+                    mainSplitPane.getScene().getWindow().setHeight(oldScreenSize.getHeight())</span><span class="s2">;</span><span class="s1"> 
+                    mainSplitPane.getScene().getWindow().setWidth(oldScreenSize.getWidth())</span><span class="s2">;</span><span class="s1"> 
+                    mainSplitPane.getScene().getWindow().setX(oldScreenSize.getMinX())</span><span class="s2">;</span><span class="s1"> 
+                    mainSplitPane.getScene().getWindow().setY(oldScreenSize.getMinY())</span><span class="s2">;</span><span class="s1"> 
+                } 
+            } 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">changeOrientation(ActionEvent actionEvent) { 
+ 
+        </span><span class="s0">if </span><span class="s1">(mainSplitPane.getOrientation() == Orientation.HORIZONTAL){ 
+            mainSplitPane.setOrientation(Orientation.VERTICAL)</span><span class="s2">;</span><span class="s1"> 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            mainSplitPane.setOrientation(Orientation.HORIZONTAL)</span><span class="s2">;</span><span class="s1"> 
+        } 
+    } 
+} 
+</span></pre>
+</body>
+</html>

@@ -93,7 +93,7 @@ public class TableViewUtilities {
                     @Override
                     protected void updateItem(Long item, boolean empty) {
                         if (item != null) {
-                            setText(CommonUtilities.turnBytesIntoHumanReadable(item));
+                            setText(PortableFileUtilities.turnBytesIntoHumanReadable(item));
                         }
                     }
                 };

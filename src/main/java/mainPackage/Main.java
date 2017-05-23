@@ -100,15 +100,18 @@ public class Main extends Application {
 
         mainVBox.setStyle("-fx-background-color: transparent");
 
-        String color = CommonUtilities.toWebColor(Color.valueOf(Preferences.userRoot().get("backgroundColorPicker", null)));
-
         String style = "-fx-border-color: transparent;";
 
-        if (color != null) {
-            style += "-fx-base: " + color;
-        }
-
-        bottomVbox.setStyle(style+";-fx-background-color: "+color+";");
+//        String color = Preferences.userRoot().get("backgroundColorPicker", null);
+//
+//        if (color != null) {
+//            String realColor = CommonUtilities.toWebColor(Color.valueOf(color));
+//            style += "-fx-base: " + color;
+//        }
+//
+//
+//
+//        bottomVbox.setStyle(style+";-fx-background-color: "+color+";");
 
 
         Reflection reflection = new Reflection();
@@ -178,7 +181,9 @@ public class Main extends Application {
     @Override
     public void start(Stage initStage) throws Exception {
 
-        showSplash(initStage, () -> showMainStage());
+//        showSplash(initStage, () -> showMainStage());
+
+        showMainStage();
     }
 
     FXMLLoader loader;
@@ -255,7 +260,7 @@ public class Main extends Application {
 
         Settings.initMenuBar(mainController, mainScene, primaryStage);
 
-        double[] sps = {0, 0, 0,0};
+        double[] sps = {0, 0, 0,0,0};
 
         for (int i = 0; i < mainController.mainSplitPane.getDividers().size(); i++) {
 
@@ -382,6 +387,11 @@ public class Main extends Application {
 
                     if (e.getCode() == KeyCode.B) {
                         MainController.mediaPlayer.seek(MainController.mediaPlayer.getCurrentTime().subtract(Duration.seconds(15)));
+                        e.consume();
+                    }
+
+                    if (e.getCode() == KeyCode.H){
+                        mainController.fitScreenAction(null, 0.50);
                         e.consume();
                     }
                 }

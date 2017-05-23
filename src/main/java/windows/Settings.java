@@ -270,7 +270,7 @@ public class Settings {
 
         newStage.setScene(newScene);
 
-        loadPreferences(newScene, backgroundColorPicker, treeColorPicker, textColorPicker, tableColorPicker, rightScrollPaneBackroundColorPicker, textSizeTextField, fontFamilyListView, mainController.directoryToSearchTextField, mainController.mainTextField);
+        //loadPreferences(newScene, backgroundColorPicker, treeColorPicker, textColorPicker, tableColorPicker, rightScrollPaneBackroundColorPicker, textSizeTextField, fontFamilyListView, mainController.directoryToSearchTextField, mainController.mainTextField);
 
         changeStyles(textSizeTextField, bp, backgroundColorPicker, fontFamilyListView, textColorPicker, tableEH, scrollPaneEH, treeColorEH);
 
@@ -308,7 +308,7 @@ public class Settings {
     }
 
     public static void savePrefs(MainController mainController, TextField textSizeTextField, ListView<String> fontFamilyListView, ColorPicker backgroundColorPicker, ColorPicker textColorPicker, ColorPicker treeColorPicker, ColorPicker tableColorPicker, ColorPicker rightScrollPaneBackroundColorPicker, Scene newScene) {
-        savePreferences(newScene, backgroundColorPicker, treeColorPicker, textColorPicker, tableColorPicker, rightScrollPaneBackroundColorPicker, textSizeTextField, fontFamilyListView, mainController.directoryToSearchTextField, mainController.mainTextField);
+//        savePreferences(newScene, backgroundColorPicker, treeColorPicker, textColorPicker, tableColorPicker, rightScrollPaneBackroundColorPicker, textSizeTextField, fontFamilyListView, mainController.directoryToSearchTextField, mainController.mainTextField);
     }
 
     private static void savePreferences(Scene newScene, Node... nodes) {
@@ -344,6 +344,14 @@ public class Settings {
             String id = node.getId();
 
             String prop = Preferences.userRoot().get(node.getId(), null);
+            System.err.println("__________Class:" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+            "______Called by: " + Thread.currentThread().getStackTrace()[2].getMethodName() + "_____ prop" + prop);
+
+            System.err.println("__________Class:" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+            "______Called by: " + Thread.currentThread().getStackTrace()[2].getMethodName() + "_____ " + node.getId());
+
+            System.err.println("__________Class:" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+            "______Called by: " + Thread.currentThread().getStackTrace()[2].getMethodName() + "_____ " + Preferences.userRoot());
 
             if (prop != null) {
                 if (node instanceof ColorPicker) {

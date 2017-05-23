@@ -7,9 +7,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -122,33 +120,6 @@ public class CommonUtilities {
         return null;
     }
 
-    public static String turnBytesIntoHumanReadable(long length) {
-        Integer power = 0;
-
-        String suffix = "B";
-
-        if (length < 1024) {
-
-        } else if (length < Math.pow(1024, 2)) {
-            power = 1;
-            suffix = "KiB";
-        } else if (length < Math.pow(1024, 3)) {
-            power = 2;
-            suffix = "MiB";
-        } else if (length < Math.pow(1024, 4)) {
-            power = 3;
-            suffix = "GiB";
-        } else if (length < Math.pow(1024, 5)) {
-            power = 4;
-            suffix = "TiB";
-        }
-
-        Double factor = Math.pow(1024, power);
-
-        return String.format("%.2f %s", length / factor, suffix);
-    }
-
-
     public static String formatDuration(Duration duration) {
         double millis = duration.toMillis();
         int seconds = (int) (millis / 1000) % 60;
@@ -247,14 +218,6 @@ public class CommonUtilities {
         return sb.toString();
     }
 
-    public static String quote(String s) {
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("\"").append(s).append("\"");
-        return sb.toString();
-    }
-
     public static void copyItem(FileInfo fileInfo, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
         TextInputDialog textInputDialog = new TextInputDialog(fileInfo.getAbsolutePath());
 
@@ -265,7 +228,7 @@ public class CommonUtilities {
 
         textInputDialog.getDialogPane().setStyle(Utilities.mainStyleProp.get());
 
-        textInputDialog.headerTextProperty().bind(Bindings.concat("Copy ", quote(fileInfo.getAbsolutePath()), " to \"", textInputDialog.getEditor().textProperty(), "\""));
+        textInputDialog.headerTextProperty().bind(Bindings.concat("Copy ", PortableFileUtilities.quote(fileInfo.getAbsolutePath()), " to \"", textInputDialog.getEditor().textProperty(), "\""));
 
         Optional<String> result = textInputDialog.showAndWait();
         textInputDialog.getDialogPane().setStyle(Utilities.mainStyleProp.getValue());

@@ -11,14 +11,17 @@ import static mainPackage.CustomTableRow.changeToolTipTime;
  * Created by jacobmenke on 4/15/17.
  */
 public class CustomTreeCell extends TreeCell<FilePathTreeItem> {
+    ContextMenu cm;
     public CustomTreeCell(TreeView fileBrowserTreeTable, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
 
         this.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
 
                 FilePathTreeItem filePathTreeItem = (FilePathTreeItem) this.getTreeItem();
-
-                ContextMenu cm = Utilities.createContextMenu(new FileInfo(filePathTreeItem.getPathString()), mainTableView, files, mainController, "treeView");
+                if (cm != null) {
+                    cm.hide();
+                }
+                cm = Utilities.createContextMenu(new FileInfo(filePathTreeItem.getPathString()), mainTableView, files, mainController, "treeView");
 
                 cm.show(this, e.getScreenX(), e.getScreenY());
             }
