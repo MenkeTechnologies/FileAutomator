@@ -2,7 +2,7 @@
   <artifact type="jar" name="untitled1:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/untitled1_jar</output-path>
     <root id="archive" name="untitled1.jar">
-      <element id="module-output" name="untitled1" />
+      <element id="module-output" name="FileAutomator" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.10/commons-codec-1.10.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/stax/stax-api/1.0.1/stax-api-1.0.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-io/commons-io/2.5/commons-io-2.5.jar" path-in-jar="/" />

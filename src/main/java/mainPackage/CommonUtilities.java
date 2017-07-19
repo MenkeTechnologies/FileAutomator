@@ -42,7 +42,6 @@ public class CommonUtilities {
     public static StringProperty terminalBackgroundColor = new SimpleStringProperty();
 
     public static String toWebColor(Color value) {
-
         return  value.toString().replace("0x", "#").substring(0, 7);
     }
 
@@ -53,7 +52,6 @@ public class CommonUtilities {
     public static String createLineNumberingFromString(String s, MainController mainController) {
 
         Scanner scanner = new Scanner(s);
-
         StringBuilder sb = new StringBuilder();
         int counter = 0;
 
