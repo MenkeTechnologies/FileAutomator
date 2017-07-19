@@ -344,14 +344,6 @@ public class Settings {
             String id = node.getId();
 
             String prop = Preferences.userRoot().get(node.getId(), null);
-            System.err.println("__________Class:" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-            "______Called by: " + Thread.currentThread().getStackTrace()[2].getMethodName() + "_____ prop" + prop);
-
-            System.err.println("__________Class:" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-            "______Called by: " + Thread.currentThread().getStackTrace()[2].getMethodName() + "_____ " + node.getId());
-
-            System.err.println("__________Class:" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-            "______Called by: " + Thread.currentThread().getStackTrace()[2].getMethodName() + "_____ " + Preferences.userRoot());
 
             if (prop != null) {
                 if (node instanceof ColorPicker) {
