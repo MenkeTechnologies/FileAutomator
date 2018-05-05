@@ -3,7 +3,10 @@ package mainPackage;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created by jacobmenke on 4/17/17.
@@ -19,7 +22,18 @@ public class CustomTask<T> extends Task<String> {
         this.mainController = mainController;
         this.r = r;
         searchingTaskRunning = b;
+    }
 
+    public CustomTask(MainController mainController) {
+        this.mainController = mainController;
+    }
+
+    public CustomTask() {
+    }
+
+    public CustomTask(MainController mainController, Runnable r) {
+        this.mainController = mainController;
+        this.r = r;
     }
 
     public Future getFuture() {
@@ -30,12 +44,12 @@ public class CustomTask<T> extends Task<String> {
         return r;
     }
 
-    public ExecutorService getExecutorService() {
-        return executorService;
-    }
-
     public void setRunnable(Runnable r) {
         this.r = r;
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 
     @Override
@@ -61,7 +75,6 @@ public class CustomTask<T> extends Task<String> {
     @Override
     protected String call() throws Exception {
 
-
         executorService = Executors.newSingleThreadExecutor();
         future = executorService.submit(r);
         //System.out.println("called and submitting to executor");
@@ -71,21 +84,18 @@ public class CustomTask<T> extends Task<String> {
             future.get();
             //System.out.println("future done");
 
-
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } finally {
-           if (!searchingTaskRunning){
-               Platform.runLater(() -> {
-             //      Utilities.removeFromView(mainController.thinkingIndicator);
-                   Utilities.removeFromView(mainController.sphere);
-                   mainController.timeline.stop();
-               });
-           }
-
+            if (!searchingTaskRunning) {
+                Platform.runLater(() -> {
+                    //      Utilities.removeFromView(mainController.thinkingIndicator);
+                    Utilities.removeFromView(mainController.sphere);
+                    mainController.timeline.stop();
+                });
+            }
         }
 
         executorService.shutdownNow();
@@ -94,17 +104,4 @@ public class CustomTask<T> extends Task<String> {
 
         return "Completed";
     }
-
-    public CustomTask(MainController mainController) {
-        this.mainController = mainController;
-    }
-
-    public CustomTask() {
-    }
-
-    public CustomTask(MainController mainController, Runnable r) {
-        this.mainController = mainController;
-        this.r = r;
-    }
-
 }

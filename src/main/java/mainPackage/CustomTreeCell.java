@@ -12,6 +12,8 @@ import static mainPackage.CustomTableRow.changeToolTipTime;
  */
 public class CustomTreeCell extends TreeCell<FilePathTreeItem> {
     ContextMenu cm;
+    private Tooltip tooltip = new Tooltip();
+
     public CustomTreeCell(TreeView fileBrowserTreeTable, TableView mainTableView, ObservableList<FileInfo> files, MainController mainController) {
 
         this.setOnMouseClicked(e -> {
@@ -27,8 +29,6 @@ public class CustomTreeCell extends TreeCell<FilePathTreeItem> {
             }
         });
     }
-
-    private Tooltip tooltip = new Tooltip();
 
     @Override
     protected void updateItem(FilePathTreeItem item, boolean empty) {
@@ -59,7 +59,6 @@ public class CustomTreeCell extends TreeCell<FilePathTreeItem> {
             } else {
                 if (item.specialDirs.containsKey(item.getPathString())) {
                     tooltip.setGraphic(new ImageView(item.specialDirs.get(item.getPathString())));
-
                 } else {
                     tooltip.setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
                 }

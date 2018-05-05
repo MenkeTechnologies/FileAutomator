@@ -5,7 +5,7 @@ package mainPackage;
  */
 public class FileTypeUtilities {
     public static boolean determineIfTextual(String type) {
-        switch (type){
+        switch (type) {
             case "pdf":
             case "java":
             case "py":
@@ -33,9 +33,7 @@ public class FileTypeUtilities {
                 return true;
             default:
                 return false;
-
         }
-
     }
 
     static public String getFileType(String pathName) {

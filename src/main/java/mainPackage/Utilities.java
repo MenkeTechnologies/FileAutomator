@@ -10,28 +10,14 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
 import windows.ServiceWindow;
@@ -46,8 +32,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.prefs.Preferences;
 
 import static mainPackage.CommonUtilities.toWebColor;
 
@@ -55,15 +39,15 @@ import static mainPackage.CommonUtilities.toWebColor;
  * Created by jacobmenke on 4/13/17.
  */
 public class Utilities {
+    public static BooleanProperty maximized = new SimpleBooleanProperty(false);
+    public static StringProperty mainStyleProp = new SimpleStringProperty("");
     static boolean toggle = false;
     static boolean stopSlider = false;
     static boolean swipeRight = false;
     static ArrayList<ImageView> imageViews;
-    public static BooleanProperty maximized = new SimpleBooleanProperty(false);
     static String textContent = null;
     static Image image = null;
     static boolean fromAutoPlay = false;
-    public  static StringProperty mainStyleProp = new SimpleStringProperty("");
 
     public static String getStringBuilderStyle(ColorPicker backgroundColorPicker, ListView<String> listView, TextField textField, ColorPicker textColorPicker) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -413,7 +397,17 @@ public class Utilities {
         mainController.playPositionSlider.setManaged(true);
         mainController.playPositionSlider.setVisible(true);
 
-        mp.currentTimeProperty().addListener(new InvalidationListener() {
+        mp.currentTimeProperty().addListener(new         class SliderListener implements InvalidationListener {
+            @Override
+            public void invalidated(Observable observable) {
+
+                Platform.runLater(() -> {
+                    updatePositonSlider(mainController);
+                });
+            }
+        });
+
+InvalidationListener() {
             @Override
             public void invalidated(javafx.beans.Observable observable) {
                 mainController.currentTimeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()));
@@ -425,16 +419,6 @@ public class Utilities {
                         mainController.volumeAndCurrentTimeSwipeLabel.setText(CommonUtilities.formatDuration(mp.getCurrentTime()));
                     }
                 }
-            }
-        });
-
-        class SliderListener implements InvalidationListener {
-            @Override
-            public void invalidated(Observable observable) {
-
-                Platform.runLater(() -> {
-                    updatePositonSlider(mainController);
-                });
             }
         }
 

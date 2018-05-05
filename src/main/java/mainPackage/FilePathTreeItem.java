@@ -1,14 +1,12 @@
 package mainPackage;
 
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -53,13 +49,14 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> implements Comm
     public static Image computerImage = new Image(MainController.class.getResourceAsStream("/png/computer.png"));
     public static FilePathTreeItem oldFilePathTreeItem = null;
     public static Node oldPathGraphic = null;
-    private String fullPath;
-    boolean isDirectory = false;
-    private String type;
+    static public HashMap<String, Image> specialDirs = new HashMap<>();
     static String home = System.getProperty("user.home");
     static String downloads = System.getProperty("user.home") + File.separator + "Downloads";
     static String desktop = System.getProperty("user.home") + File.separator + "Desktop";
-    static public HashMap<String, Image> specialDirs = new HashMap<>();
+    boolean isDirectory = false;
+    MainController mainController;
+    private String fullPath;
+    private String type;
     private boolean isTextual;
     private boolean isHost;
     private String fileName;
@@ -69,41 +66,6 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> implements Comm
         FilePathTreeItem.specialDirs.put(FilePathTreeItem.home, FilePathTreeItem.homeImage);
         FilePathTreeItem.specialDirs.put(FilePathTreeItem.downloads, FilePathTreeItem.dlImage);
         FilePathTreeItem.specialDirs.put(FilePathTreeItem.desktop, FilePathTreeItem.desktopImage);
-    }
-
-    @Override
-    public String toString() {
-        return fullPath;
-    }
-
-    public boolean isTextual() {
-        return isTextual;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public Path getPath() {
-        return Paths.get(getPathString());
-    }
-
-    MainController mainController;
-
-    public String getPathString() {
-        return fullPath;
-    }
-
-    public void setFullPath(String fullPath) {
-        this.fullPath = fullPath;
-    }
-
-    public boolean isDirectory() {
-        return isDirectory;
-    }
-
-    public void setDirectory(boolean directory) {
-        isDirectory = directory;
     }
 
     public FilePathTreeItem(String fullPath, boolean isHost) {
@@ -122,14 +84,6 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> implements Comm
                 e.printStackTrace();
             }
         }
-    }
-
-    public boolean isHost() {
-        return isHost;
-    }
-
-    public String getFileName() {
-        return fileName;
     }
 
     public FilePathTreeItem(Path file, MainController mainController) {
@@ -215,7 +169,47 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> implements Comm
                 }
             }
         });
+    }
 
+    @Override
+    public String toString() {
+        return fullPath;
+    }
+
+    public boolean isTextual() {
+        return isTextual;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Path getPath() {
+        return Paths.get(getPathString());
+    }
+
+    public String getPathString() {
+        return fullPath;
+    }
+
+    public void setFullPath(String fullPath) {
+        this.fullPath = fullPath;
+    }
+
+    public boolean isDirectory() {
+        return isDirectory;
+    }
+
+    public void setDirectory(boolean directory) {
+        isDirectory = directory;
+    }
+
+    public boolean isHost() {
+        return isHost;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     public void populateSourceAndImmediateChildren(FilePathTreeItem source) {
@@ -315,7 +309,6 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> implements Comm
 
         for (TreeItem<FilePathTreeItem> child : getChildren()) {
 
-
             String treePathName = child.getValue().getFileName().replace("/", "");
 
             if (treePathName.equals(nextPath.toString())) {
@@ -329,14 +322,11 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> implements Comm
                     filePathTreeItem1.populateSourceAndImmediateChildrenSameThreadCheckingForExpanded(filePathTreeItem1);
                 }
 
-
-
                 if (pathIterator.hasNext()) {
 
                     filePathTreeItem1.recurseAndSelectTreeItems(pathIterator, checkForExpanded, mainController, select);
                     break;
                 } else {
-
 
                     if (select) {
 
@@ -369,14 +359,12 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> implements Comm
         }
     }
 
-
     static void selectTreeItemRecursively(MainController mainController, Path path, boolean checkForExpanded) {
         Platform.runLater(() -> {
             mainController.fileBrowserTreeTable.getRoot().setExpanded(true);
 
             mainController.root = (TreeItem) mainController.fileBrowserTreeTable.getRoot().getChildren().get(0);
             mainController.root.setExpanded(true);
-
 
             FilePathTreeItem filePathTreeItem = (FilePathTreeItem) mainController.root;
 

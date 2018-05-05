@@ -32,41 +32,38 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by jacobmenke on 4/15/17.
  */
 public class CommonUtilities {
-
     public static Integer index = 0;
-
     public static AtomicLong TOTAL_FILE_COUNTER = new AtomicLong(0);
     public static AtomicLong MATCHING_FILE_COUNTER = new AtomicLong(0);
     public static StringProperty treeViewColorProperty = new SimpleStringProperty();
-    public  static StringProperty tableViewColorProperty = new SimpleStringProperty();
+    public static StringProperty tableViewColorProperty = new SimpleStringProperty();
     public static StringProperty terminalBackgroundColor = new SimpleStringProperty();
 
     public static String toWebColor(Color value) {
-        return  value.toString().replace("0x", "#").substring(0, 7);
+        return value.toString().replace("0x", "#").substring(0, 7);
     }
 
     public static void formatTooltip(Tooltip tooltip) {
         tooltip.setWrapText(true);
-        tooltip.setMaxSize(1000,1000);
+        tooltip.setMaxSize(1000, 1000);
     }
+
     public static String createLineNumberingFromString(String s, MainController mainController) {
 
         Scanner scanner = new Scanner(s);
         StringBuilder sb = new StringBuilder();
         int counter = 0;
 
-        while (scanner.hasNextLine()){
-            if (mainController.showLineNumbersCheckbox.isSelected()){
+        while (scanner.hasNextLine()) {
+            if (mainController.showLineNumbersCheckbox.isSelected()) {
                 counter++;
                 sb.append(counter).append("\t").append(scanner.nextLine()).append("\n");
             } else {
                 sb.append(scanner.nextLine()).append("\n");
             }
-
         }
 
         return sb.toString();
-
     }
 
     public static ArrayList<Image> createImageFromPDF(String pathString) {
@@ -87,10 +84,9 @@ public class CommonUtilities {
 
             for (int i = 0; i < document.getNumberOfPages(); i++) {
 
-
                 String addition = "-" + (i + 1) + ".png";
                 if (!new File(fileName + addition).exists()) {
-                    MainController.loadingTask.updateMessage("Rastering " + pathString + " page "+ (i+1) + " of " + document.getNumberOfPages() + ".");
+                    MainController.loadingTask.updateMessage("Rastering " + pathString + " page " + (i + 1) + " of " + document.getNumberOfPages() + ".");
 
                     BufferedImage bim = pdfRenderer.renderImageWithDPI(i, dpi, ImageType.RGB);
 
@@ -100,9 +96,9 @@ public class CommonUtilities {
 
                     images.add(image);
                 } else {
-                    MainController.loadingTask.updateMessage("Loading " + sourceFile.getName() + " page "+ (i+1) + " of " + document.getNumberOfPages() + ".");
+                    MainController.loadingTask.updateMessage("Loading " + sourceFile.getName() + " page " + (i + 1) + " of " + document.getNumberOfPages() + ".");
 
-                    Image image = new Image("file:" + fileName+addition);
+                    Image image = new Image("file:" + fileName + addition);
 
                     images.add(image);
                 }
@@ -284,7 +280,6 @@ public class CommonUtilities {
         TextInputDialog dialog = new TextInputDialog(fileInfo.getFileName());
         dialog.setHeaderText("Rename " + "\"" + fileInfo.getFileName() + "\"");
         dialog.getDialogPane().setStyle(Utilities.mainStyleProp.getValue());
-
 
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {

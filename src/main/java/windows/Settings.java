@@ -116,7 +116,6 @@ public class Settings {
                 Paint fill = rightScrollPaneBackroundColorPicker.getValue();
                 String webColor = fill.toString().replace("0x", "#").substring(0, 7);
                 mainController.rightPaneScrollPane.setStyle("-fx-background-color: " + webColor);
-
             }
         };
 

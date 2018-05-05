@@ -53,7 +53,6 @@ public class CSSVBox extends VBox {
                 String path = saveCssFileTextField.getText() + File.separator + nameSaveCssFileTextField.getText();
                 if (!saveCssFileTextField.getText().equals("") && !nameSaveCssFileTextField.getText().equals("")) {
 
-
                     if (!nameSaveCssFileTextField.getText().endsWith(".css")) {
                         path += ".css";
                     }
@@ -66,7 +65,6 @@ public class CSSVBox extends VBox {
                     }
                 } else {
                     CommonUtilities.showErrorAlert("Name and Directory text fields cannot be blank.");
-
                 }
             });
 

@@ -1,6 +1,5 @@
 package mainPackage.StylesheetUtilities;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import javafx.scene.Scene;
 import mainPackage.MainController;
 
@@ -19,9 +18,8 @@ import java.util.List;
  * Created by jacobmenke on 5/1/17.
  */
 public class Modify {
-
-   public static String tempCssFile = System.getProperty("user.home") + File.separator + "modify.css";
-   public static ArrayList<Scene> scenes = new ArrayList<>();
+    public static String tempCssFile = System.getProperty("user.home") + File.separator + "modify.css";
+    public static ArrayList<Scene> scenes = new ArrayList<>();
 
     public static void modifyStylesheet(MainController mainController, String element, String prop, boolean append, String value) {
 
@@ -79,7 +77,6 @@ public class Modify {
             e1.printStackTrace();
         }
 
-
         try (PrintWriter pw = new PrintWriter(new FileOutputStream(tempCssFile))) {
 
             for (int i = 0; i < lines.size(); i++) {
@@ -87,15 +84,12 @@ public class Modify {
             }
 
             addStyleSheets(Modify.scenes, tempCssFile);
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     public static void addStyleSheets(ArrayList<Scene> scenes, String tempCssFile) {
-
 
         for (Scene scene : scenes) {
             if (scene != null) {
@@ -109,12 +103,9 @@ public class Modify {
                     e.printStackTrace();
                 }
             } else {
-                System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-                "___ " + scene +" was null.");
+                System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+                        "___ " + scene + " was null.");
             }
-
         }
-
-
     }
 }

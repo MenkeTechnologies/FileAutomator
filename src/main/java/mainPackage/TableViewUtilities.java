@@ -29,7 +29,6 @@ public class TableViewUtilities {
 
                             FileInfo fileAtRow = (FileInfo) this.getTableRow().getItem();
 
-
                             FileInfo playingFile = null;
                             if (mainController.pathLabelContent != null && mainController.pathLabelContent.getText() != "") {
                                 playingFile = new FileInfo(mainController.pathLabelContent.getText());
@@ -54,9 +53,8 @@ public class TableViewUtilities {
                         if (fileAtRow.isDirectory()) {
                             if (FilePathTreeItem.specialDirs.containsKey(fileAtRow.getAbsolutePath())) {
                                 setGraphic(new ImageView(FilePathTreeItem.specialDirs.get(fileAtRow.getAbsolutePath())));
-                            } else{
+                            } else {
                                 setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
-
                             }
                         } else {
 
@@ -72,7 +70,6 @@ public class TableViewUtilities {
                 return tableCell;
             }
         });
-
 
         filesColumn.setCellValueFactory(new PropertyValueFactory<FileInfo, String>("fileName"));
 
@@ -111,14 +108,13 @@ public class TableViewUtilities {
         TableColumn<FileInfo, String> fileTypeColumn = new TableColumn<>("File Type");
         fileTypeColumn.setCellValueFactory(new PropertyValueFactory<>("fileType"));
 
-
         TableColumn<FileInfo, Boolean> hiddenColumn = new TableColumn<>("Hidden");
         hiddenColumn.setCellValueFactory(new PropertyValueFactory<FileInfo, Boolean>("hiddenProperty"));
 
         TableColumn<FileInfo, String> dateTimeTableColumn = new TableColumn<>("Last Modified");
         dateTimeTableColumn.setCellValueFactory(new PropertyValueFactory<FileInfo, String>("lastModified"));
 
-        mainTableView.getColumns().addAll(filesColumn, pathColumn, fileSizeColumn, dateTimeTableColumn, fileTypeColumn,hiddenColumn, directoryColumn);
+        mainTableView.getColumns().addAll(filesColumn, pathColumn, fileSizeColumn, dateTimeTableColumn, fileTypeColumn, hiddenColumn, directoryColumn);
 
         mainController.mainTableView.setRowFactory(new Callback<TableView<FileInfo>, TableRow<FileInfo>>() {
             @Override
@@ -126,6 +122,5 @@ public class TableViewUtilities {
                 return new CustomTableRow(mainController.mainTableView, mainController.files, mainController);
             }
         });
-
     }
 }
