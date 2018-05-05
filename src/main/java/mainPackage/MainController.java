@@ -1,40 +1,47 @@
 package mainPackage;
 
+import com.sun.management.OperatingSystemMXBean;
 import com.terminalfx.TerminalBuilder;
 import com.terminalfx.TerminalTab;
 import com.terminalfx.config.TerminalConfig;
-import javafx.animation.*;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.*;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.*;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.*;
 import javafx.scene.Cursor;
-import javafx.scene.control.*;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.PointLight;
 import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.Reflection;
-import javafx.scene.image.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -42,20 +49,23 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.DrawMode;
-import javafx.scene.text.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextFlow;
 import javafx.scene.web.WebView;
-import javafx.stage.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Screen;
+import javafx.util.Duration;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-
-import com.sun.management.OperatingSystemMXBean;
-
 import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.nio.file.*;
@@ -63,14 +73,14 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.prefs.Preferences;
 
-import javafx.scene.text.Font;
-import javafx.util.Duration;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
-
-import static javafx.scene.input.KeyCode.*;
+import static javafx.scene.input.KeyCode.DOWN;
+import static javafx.scene.input.KeyCode.UP;
 
 public class MainController implements Initializable {
+    public static CustomTask<String> searchingTask;
+    public static CustomTask<String> loadingTask;
+    static MediaPlayer mediaPlayer;
+    static CustomTask<String> rasterizingTask;
     public TableView<FileInfo> mainTableView;
     public TextField mainTextField;
     public TextField directoryToSearchTextField;
@@ -120,7 +130,6 @@ public class MainController implements Initializable {
     public Button fullScreenMediaButton;
     public HBox topHBox;
     public HBox bottomHBox;
-    static MediaPlayer mediaPlayer;
     public VBox rightSidePaneTextVBox;
     public HBox topSecondHBox;
     public ToggleButton lockMediaViewMediaControlsToggle;
@@ -154,15 +163,12 @@ public class MainController implements Initializable {
     public Button restorePanesButton;
     public TextFlow textFlowFinalFinalRightPane;
     public VBox webViewVBox;
+    public DoubleProperty mediaPlayerRateProperty = new SimpleDoubleProperty(1);
+    public DoubleProperty mediaPlayerVolumeProperty = new SimpleDoubleProperty(1);
     ObservableList<FileInfo> files = FXCollections.observableArrayList();
     TreeItem root;
     boolean out = false;
     boolean hidden = false;
-    public static CustomTask<String> searchingTask;
-    public static CustomTask<String> loadingTask;
-    static CustomTask<String> rasterizingTask;
-    public DoubleProperty mediaPlayerRateProperty = new SimpleDoubleProperty(1);
-    public DoubleProperty mediaPlayerVolumeProperty = new SimpleDoubleProperty(1);
     Double[] dividerPositions = {0d, 0d};
     FilePathTreeItem currentlySelectedFilePathTreeItem = null;
     Timeline timeline;
@@ -170,6 +176,23 @@ public class MainController implements Initializable {
     ArrayList<String> filesForAutoplay = new ArrayList<>();
     ObservableList<Node> splitPaneChildren = FXCollections.observableArrayList();
     AutoCompletionBinding<String> binding;
+    ContextMenu contextMenu;
+    Rectangle2D oldScreenSize;
+    ArrayList<Point2D> points = new ArrayList<>();
+    Integer counter = 0;
+    boolean halfToggle = true;
+
+    {
+        Rectangle2D rect = Screen.getPrimary().getBounds();
+        points.add(new Point2D(rect.getMinX(), rect.getMinY()));
+        points.add(new Point2D(rect.getMinX(), rect.getMaxY() / 2));
+        points.add(new Point2D(rect.getMaxX() / 2, rect.getMaxY() / 2));
+        points.add(new Point2D(rect.getMaxX() / 2, rect.getMinY()));
+    }
+
+    {
+
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -299,46 +322,38 @@ public class MainController implements Initializable {
         initAutoComplete();
     }
 
-    ContextMenu contextMenu;
-
     public void addWebViewPane() {
         splitPaneWebView.prefHeightProperty().bind(mainSplitPane.heightProperty());
 
         splitPaneWebView.setContextMenuEnabled(false);
 
         splitPaneWebView.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.SECONDARY){
-
+            if (event.getButton() == MouseButton.SECONDARY) {
 
                 MenuItem reload = new MenuItem("Reload page");
 
                 MenuItem closePaneWeb = new MenuItem("Close this pane.");
 
-                reload.setOnAction(e->{
+                reload.setOnAction(e -> {
                     splitPaneWebView.getEngine().reload();
                 });
 
-                closePaneWeb.setOnAction(e->{
+                closePaneWeb.setOnAction(e -> {
                     removePaneSingular("webView");
-
                 });
 
-                if (contextMenu != null){
+                if (contextMenu != null) {
                     contextMenu.hide();
                 }
 
-                 contextMenu = new ContextMenu();
-
+                contextMenu = new ContextMenu();
 
                 contextMenu.getItems().addAll(reload, closePaneWeb);
 
-
                 contextMenu.show(splitPaneWebView, event.getScreenX(), event.getScreenY());
-
             } else {
 
                 contextMenu.hide();
-
             }
         });
 
@@ -415,7 +430,6 @@ public class MainController implements Initializable {
 //                                        e1.printStackTrace();
 //                                    }
                                 }
-
 
                                 System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
                                         "___ " + binding);
@@ -1109,7 +1123,6 @@ public class MainController implements Initializable {
     public void removePaneSingular(String pane) {
         ObservableList<Node> items = mainSplitPane.getItems();
 
-
         if (items.size() == 1) {
             CommonUtilities.showErrorAlert("Cannot Remove Last Pane");
         } else if (items.size() >= 2) {
@@ -1139,8 +1152,7 @@ public class MainController implements Initializable {
             items.remove(terminalTabPane);
         } else if (pane.equals("webView")) {
             items.remove(webViewVBox);
-        }else
-         {
+        } else {
             items.remove(rightPaneScrollPane);
         }
     }
@@ -1197,7 +1209,7 @@ public class MainController implements Initializable {
             }
         }
 
-        double[] sps = {0, 0, 0, 0,0};
+        double[] sps = {0, 0, 0, 0, 0};
 
         for (int i = 0; i < mainSplitPane.getDividers().size(); i++) {
 
@@ -1449,24 +1461,6 @@ public class MainController implements Initializable {
         }
     }
 
-    Rectangle2D oldScreenSize;
-    ArrayList<Point2D> points = new ArrayList<>();
-    Integer counter = 0;
-
-    {
-        Rectangle2D rect = Screen.getPrimary().getBounds();
-        points.add(new Point2D(rect.getMinX(), rect.getMinY()));
-        points.add(new Point2D(rect.getMinX(), rect.getMaxY() / 2));
-        points.add(new Point2D(rect.getMaxX() / 2, rect.getMaxY() / 2));
-        points.add(new Point2D(rect.getMaxX() / 2, rect.getMinY()));
-    }
-
-    {
-
-    }
-
-    boolean halfToggle = true;
-
     public void fitScreenAction(ActionEvent actionEvent, Double size) {
 
         if (size == 0.25) {
@@ -1485,12 +1479,12 @@ public class MainController implements Initializable {
             mainSplitPane.getScene().getWindow().setX(points.get(counter % 4).getX());
             mainSplitPane.getScene().getWindow().setY(points.get(counter % 4).getY());
 
-            if (counter == 8){
+            if (counter == 8) {
                 counter = 0;
             }
 
             counter++;
-        } else if (size == 0.5){
+        } else if (size == 0.5) {
 
             Rectangle2D rect = Screen.getPrimary().getBounds();
 
@@ -1504,18 +1498,14 @@ public class MainController implements Initializable {
             mainSplitPane.getScene().getWindow().setHeight(rect.getHeight());
             mainSplitPane.getScene().getWindow().setWidth(rect.getWidth() / 2);
 
-            if (halfToggle){
+            if (halfToggle) {
                 mainSplitPane.getScene().getWindow().setX(rect.getMinX());
                 mainSplitPane.getScene().getWindow().setY(rect.getMinY());
-
-
-
             } else {
-                mainSplitPane.getScene().getWindow().setX(rect.getMaxX()/2);
+                mainSplitPane.getScene().getWindow().setX(rect.getMaxX() / 2);
                 mainSplitPane.getScene().getWindow().setY(rect.getMinY());
             }
             halfToggle = !halfToggle;
-
         } else if (size == 1.0) {
 
             if (fitScreenToggleButton.isSelected()) {
@@ -1548,7 +1538,7 @@ public class MainController implements Initializable {
 
     public void changeOrientation(ActionEvent actionEvent) {
 
-        if (mainSplitPane.getOrientation() == Orientation.HORIZONTAL){
+        if (mainSplitPane.getOrientation() == Orientation.HORIZONTAL) {
             mainSplitPane.setOrientation(Orientation.VERTICAL);
         } else {
             mainSplitPane.setOrientation(Orientation.HORIZONTAL);

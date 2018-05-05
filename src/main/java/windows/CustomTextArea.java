@@ -9,22 +9,12 @@ import mainPackage.MainController;
 
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * Created by jacobmenke on 5/2/17.
  */
 public class CustomTextArea extends TextArea {
     MainController mainController;
-
-    public MainController getMainController() {
-        return mainController;
-    }
-
-    public void setMainController(MainController mainController) {
-        this.mainController = mainController;
-    }
 
     public CustomTextArea() {
 
@@ -53,5 +43,13 @@ public class CustomTextArea extends TextArea {
                 CommonUtilities.showErrorAlert("Could not save " + path);
             }
         });
+    }
+
+    public MainController getMainController() {
+        return mainController;
+    }
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
     }
 }

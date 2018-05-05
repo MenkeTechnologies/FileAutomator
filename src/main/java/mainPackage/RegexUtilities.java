@@ -1,25 +1,28 @@
 package mainPackage;
 
 import javafx.application.Platform;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-
-import javafx.scene.control.*;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
 
 /**
  * Created by jacobmenke on 4/16/17.
  */
 public class RegexUtilities {
+    static class CustomFileVisitor extends SimpleFileVisitor<Path> {
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+            return FileVisitResult.SKIP_SUBTREE;
+        }
+    }
+
     public static void searchAndRefresh(MainController mainController) {
         mainController.mainTableView.getItems().clear();
         mainController.mainTableView.refresh();
@@ -35,14 +38,13 @@ public class RegexUtilities {
             ArrayList<String> andTerms = new ArrayList<>();
 
             mainController.filterHBox.getChildren().forEach(child -> {
-                if (child instanceof TextField){
+                if (child instanceof TextField) {
 
-                    TextField tf = (TextField)child;
+                    TextField tf = (TextField) child;
                     orTerms.add(tf.getText());
-
-                } else if (child instanceof HBox){
-                    Label label = (Label)((HBox) child).getChildren().get(0);
-                    TextField tf = (TextField)((HBox)child).getChildren().get(1);
+                } else if (child instanceof HBox) {
+                    Label label = (Label) ((HBox) child).getChildren().get(0);
+                    TextField tf = (TextField) ((HBox) child).getChildren().get(1);
 
                     if (!tf.getText().equals("")) {
                         if (label.getText().equals("OR")) {
@@ -52,9 +54,7 @@ public class RegexUtilities {
                         }
                     }
                 }
-
             });
-
 
             findFilesWithRegex(mainController, directory, andTerms, orTerms);
 
@@ -66,17 +66,6 @@ public class RegexUtilities {
         });
     }
 
-   static class CustomFileVisitor extends SimpleFileVisitor<Path>{
-
-        @Override
-        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-            return FileVisitResult.SKIP_SUBTREE;
-        }
-
-
-
-    }
-
     public static void findFilesWithRegex(MainController mainController, String directory, ArrayList<String> andTerms, ArrayList<String> orTerms) {
 
         try {
@@ -84,14 +73,12 @@ public class RegexUtilities {
             CommonUtilities.TOTAL_FILE_COUNTER.set(0);
             CommonUtilities.MATCHING_FILE_COUNTER.set(0);
 
-
             Files.walkFileTree(Paths.get(directory), new SimpleFileVisitor<Path>() {
-
                 @Override
                 public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
 
-                    System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-                    "___ Permissions error at" + file);
+                    System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+                            "___ Permissions error at" + file);
                     return FileVisitResult.SKIP_SUBTREE;
                 }
 
@@ -165,23 +152,15 @@ public class RegexUtilities {
                     return FileVisitResult.CONTINUE;
                 }
             });
+        } catch (IOException fse) {
+            System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+                    "___ Swallowing IOException....");
+        } catch (RuntimeException e) {
 
+            e.printStackTrace();
 
-            } catch (IOException fse) {
-                System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-                        "___ Swallowing IOException....");
-            } catch (RuntimeException e){
-
-                e.printStackTrace();
-
-                System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-                        "___ Exiting Loop.");
-
-            }
-
-
-
-
-
+            System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+                    "___ Exiting Loop.");
+        }
     }
 }

@@ -1,23 +1,30 @@
 package mainPackage;
 
-import java.util.concurrent.*;
-
 import javafx.application.Application;
-
-import static javafx.application.Application.launch;
-
 import javafx.application.Platform;
-import javafx.beans.property.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.concurrent.Task;
-import javafx.event.*;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.*;
-import javafx.scene.control.*;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import javafx.stage.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 public class PromptingTask extends Application {
     private static final String[] SAMPLE_TEXT =
@@ -43,7 +50,7 @@ public class PromptingTask extends Application {
         layout.getChildren().addAll(status, progress, textContainer);
         layout.setStyle("-fx-background-color: cornsilk; -fx-padding: 10;");
 
-        ImageView imageView  =new ImageView(new Image(getClass().getResourceAsStream("../png/back.png")));
+        ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("../png/back.png")));
 
         layout.getChildren().add(imageView);
 

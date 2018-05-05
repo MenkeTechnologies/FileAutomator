@@ -1,20 +1,17 @@
 package mainPackage;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -32,40 +29,32 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import mainPackage.StylesheetUtilities.Modify;
-import org.controlsfx.control.BreadCrumbBar;
-import org.controlsfx.control.HiddenSidesPane;
-import org.controlsfx.control.NotificationPane;
-import org.controlsfx.control.PropertySheet;
 import windows.Settings;
 import windows.Splash;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.prefs.Preferences;
 
 public class Main extends Application {
-    public static final Image SPLASH_IMAGE =new Image(MainController.class.getResourceAsStream("/splash.jpg"));
-    private VBox mainVBox;
-    private ProgressBar loadProgress;
-    private Label progressText;
-    private Stage primaryStage;
+    public static final Image SPLASH_IMAGE = new Image(MainController.class.getResourceAsStream("/splash.jpg"));
     private static final int SPLASH_WIDTH = 1000;
     private static final int SPLASH_HEIGHT = 480;
     Scene mainScene;
     int MaxSize = 100;
+    FXMLLoader loader;
+    Parent root = null;
+    MainController mainController;
+    private VBox mainVBox;
+    private ProgressBar loadProgress;
+    private Label progressText;
+    private Stage primaryStage;
 
     @Override
     public void init() throws Exception {
 
         File newFile = new File(System.getProperty("user.home") + File.separator + "modify.css");
-        if (!newFile.exists()){
+        if (!newFile.exists()) {
             newFile.createNewFile();
         }
 
@@ -77,13 +66,12 @@ public class Main extends Application {
         loadProgress.setPrefWidth(SPLASH_WIDTH);
         progressText = new Label("Loading ...");
 
-
         StackPane stackpane = new StackPane();
         stackpane.setPrefWidth(mainVBox.getWidth());
         splash.fitWidthProperty().bind(stackpane.widthProperty());
 
         Text label = new Text("File Automator");
-        label.setFont(Font.font("MARSNEVENEKSK",170));
+        label.setFont(Font.font("MARSNEVENEKSK", 170));
 
         label.setFill(Color.WHITE);
 
@@ -113,7 +101,6 @@ public class Main extends Application {
 //
 //        bottomVbox.setStyle(style+";-fx-background-color: "+color+";");
 
-
         Reflection reflection = new Reflection();
 
         loadProgress.setEffect(new Reflection());
@@ -122,7 +109,7 @@ public class Main extends Application {
     }
 
     private void showSplash(final Stage initStage, Splash.InitCompletionHandler initCompletionHandler) {
-        Scene splashScene = new Scene(mainVBox, SPLASH_WIDTH,SPLASH_HEIGHT,Color.TRANSPARENT);
+        Scene splashScene = new Scene(mainVBox, SPLASH_WIDTH, SPLASH_HEIGHT, Color.TRANSPARENT);
         final Rectangle2D bounds = Screen.getPrimary().getBounds();
         initStage.toFront();
 
@@ -151,7 +138,6 @@ public class Main extends Application {
         initStage.setAlwaysOnTop(true);
         initStage.show();
 
-
         loadingTask.stateProperty().addListener((observableValue, oldState, newState) -> {
 
             if (newState == Worker.State.SUCCEEDED) {
@@ -174,10 +160,6 @@ public class Main extends Application {
         new Thread(loadingTask).start();
     }
 
-    public interface InitCompletionHandler {
-        void complete();
-    }
-
     @Override
     public void start(Stage initStage) throws Exception {
 
@@ -185,10 +167,6 @@ public class Main extends Application {
 
         showMainStage();
     }
-
-    FXMLLoader loader;
-    Parent root = null;
-    MainController mainController;
 
     private void initMainStage(CustomTask<String> loadingTask) throws Exception {
         loadingTask.updateProgress(0, MaxSize);
@@ -256,11 +234,9 @@ public class Main extends Application {
 
         mainController.initBindings();
 
-
-
         Settings.initMenuBar(mainController, mainScene, primaryStage);
 
-        double[] sps = {0, 0, 0,0,0};
+        double[] sps = {0, 0, 0, 0, 0};
 
         for (int i = 0; i < mainController.mainSplitPane.getDividers().size(); i++) {
 
@@ -280,8 +256,11 @@ public class Main extends Application {
 
         Modify.addStyleSheets(Modify.scenes, Modify.tempCssFile);
 
-
         primaryStage.show();
+    }
+
+    public interface InitCompletionHandler {
+        void complete();
     }
 
     public static void initKeyBindings(MainController mainController) {
@@ -390,7 +369,7 @@ public class Main extends Application {
                         e.consume();
                     }
 
-                    if (e.getCode() == KeyCode.H){
+                    if (e.getCode() == KeyCode.H) {
                         mainController.fitScreenAction(null, 0.50);
                         e.consume();
                     }

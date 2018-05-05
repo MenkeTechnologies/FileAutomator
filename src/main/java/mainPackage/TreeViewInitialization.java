@@ -2,7 +2,9 @@ package mainPackage;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.*;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
@@ -63,13 +65,11 @@ public class TreeViewInitialization {
             }
         });
 
-
         mainController.fileBrowserTreeTable.setCellFactory(new Callback<TreeView<FilePathTreeItem>, TreeCell<FilePathTreeItem>>() {
             @Override
             public TreeCell<FilePathTreeItem> call(TreeView param) {
 
                 return new CustomTreeCell(mainController.fileBrowserTreeTable, mainController.mainTableView, mainController.files, mainController);
-
             }
         });
     }

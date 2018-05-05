@@ -1,15 +1,8 @@
 package mainPackage;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
-import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -28,8 +21,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -45,14 +36,17 @@ public class OldMain extends Application {
             "http://cdn1.iconfinder.com/data/icons/Copenhagen/PNG/32/people.png";
     public static final String SPLASH_IMAGE =
             "http://fxexperience.com/wp-content/uploads/2010/06/logo.png";
-    private Pane splashLayout;
-    private ProgressBar loadProgress;
-    private Label progressText;
-    private Stage primaryStage;
     private static final int SPLASH_WIDTH = 676;
     private static final int SPLASH_HEIGHT = 227;
     Scene mainScene;
     int MaxSize = 100;
+    FXMLLoader loader;
+    Parent root = null;
+    MainController mainController;
+    private Pane splashLayout;
+    private ProgressBar loadProgress;
+    private Label progressText;
+    private Stage primaryStage;
 
     @Override
     public void init() throws Exception {
@@ -64,9 +58,9 @@ public class OldMain extends Application {
         splashLayout.getChildren().addAll(splash, loadProgress, progressText);
         progressText.setAlignment(Pos.CENTER);
 
-        String color = CommonUtilities.toWebColor(Color.valueOf(Preferences.userRoot().get("backgroundColorPicker",null)));
+        String color = CommonUtilities.toWebColor(Color.valueOf(Preferences.userRoot().get("backgroundColorPicker", null)));
 
-        String style =  "-fx-padding: 5; " +
+        String style = "-fx-padding: 5; " +
                 "-fx-border-width:5; " +
                 "-fx-border-color: " +
                 "linear-gradient(" +
@@ -79,9 +73,8 @@ public class OldMain extends Application {
             style += "-fx-base: " + color;
         }
 
-        System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+        System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
                 "___ style" + style);
-
 
         splashLayout.setStyle(style);
         splashLayout.setEffect(new DropShadow());
@@ -93,7 +86,6 @@ public class OldMain extends Application {
         initStage.toFront();
 
 //        initStage.getIcons().add(new Image(APPLICATION_ICON));
-
 
         CustomTask<String> loadingTask = new CustomTask<String>() {
             @Override
@@ -117,7 +109,7 @@ public class OldMain extends Application {
         initStage.setAlwaysOnTop(true);
         initStage.show();
 
-        System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName()+ "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
+        System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
                 "___ here");
 
         loadingTask.stateProperty().addListener((observableValue, oldState, newState) -> {
@@ -142,19 +134,11 @@ public class OldMain extends Application {
         new Thread(loadingTask).start();
     }
 
-    public interface InitCompletionHandler {
-        void complete();
-    }
-
     @Override
     public void start(Stage initStage) throws Exception {
 
         showSplash(initStage, () -> showMainStage());
     }
-
-    FXMLLoader loader;
-    Parent root = null;
-    MainController mainController;
 
     private void initMainStage(CustomTask<String> loadingTask) throws Exception {
         loadingTask.updateProgress(0, MaxSize);
@@ -202,7 +186,7 @@ public class OldMain extends Application {
         loadingTask.updateProgress(60, MaxSize);
         loadingTask.updateMessage("Creating Scene...");
         Thread.sleep(sleepTime);
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
             mainScene = new Scene(root, 1800, 1200);
 
             mainController.initBindings();
@@ -212,7 +196,7 @@ public class OldMain extends Application {
         loadingTask.updateMessage("Creating Bindings...");
         Thread.sleep(sleepTime);
 
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
             Settings.initMenuBar(mainController, mainScene, primaryStage);
 
             double[] sps = {0, 0, 0};
@@ -230,17 +214,15 @@ public class OldMain extends Application {
             mainScene.getStylesheets().add("stylesheets/styles.css");
         });
 
-
         loadingTask.updateProgress(87, MaxSize);
         loadingTask.updateMessage("Adding styles...");
         Thread.sleep(sleepTime);
         loadingTask.updateProgress(93, MaxSize);
         loadingTask.updateMessage("Adding keybindings...");
 
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
             initKeyBindings(mainController);
         });
-
 
         loadingTask.updateProgress(100, MaxSize);
         loadingTask.updateMessage("Done...");
@@ -250,6 +232,10 @@ public class OldMain extends Application {
 
         primaryStage.setScene(mainScene);
         primaryStage.show();
+    }
+
+    public interface InitCompletionHandler {
+        void complete();
     }
 
     public static void initKeyBindings(MainController mainController) {

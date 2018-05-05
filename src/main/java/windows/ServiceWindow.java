@@ -6,13 +6,14 @@ import javafx.beans.property.*;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -22,22 +23,18 @@ import mainPackage.CommonUtilities;
 import mainPackage.FileInfo;
 import mainPackage.Utilities;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 /**
  * Created by jacobmenke on 4/15/17.
  */
 public class ServiceWindow extends Stage {
-    private Model model;
-    private View view;
+    static BooleanProperty paused = new SimpleBooleanProperty(false);
     Integer numberOfFiles;
     BorderPane root;
     TableView mainTableView;
     String destinationPathString;
     Integer startingFileNumber = 1;
-    static BooleanProperty paused = new SimpleBooleanProperty(false);
+    private Model model;
+    private View view;
 
     public ServiceWindow(TableView mainTableView, String destinationPathString) {
         this.mainTableView = mainTableView;
@@ -131,17 +128,13 @@ public class ServiceWindow extends Stage {
                             FileInfo destinationPath = new FileInfo(destinationPathString);
                             if (!destinationPath.exists()) {
 
-
-
                                 updateMessage("Creating Directories.");
-
-
 
                                 if (destinationPath.mkdir()) {
                                     Utilities.copyFile(sourceFile, destinationPath);
                                 } else {
 
-                                    Platform.runLater(()->{
+                                    Platform.runLater(() -> {
                                         CommonUtilities.showErrorAlert("Could not create directory.");
                                     });
                                 }
@@ -161,9 +154,6 @@ public class ServiceWindow extends Stage {
 //                                }
 
                                 Utilities.copyFile(sourceFile, destinationPath);
-
-
-
                             }
                             updateMessage("Processed " + i + " of " + numberOfFiles + " files.");
                         }
@@ -261,7 +251,6 @@ public class ServiceWindow extends Stage {
 
             BorderPane bp = new BorderPane(centerPane, topPane, null, buttonPane, null);
             root = bp;
-
         }
     }
 }

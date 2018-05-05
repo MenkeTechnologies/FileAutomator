@@ -1,6 +1,8 @@
 package mainPackage;
 
-import javafx.beans.property.*;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.image.Image;
 
 import java.io.File;
@@ -9,61 +11,77 @@ import java.io.File;
  * Created by jacobmenke on 4/13/17.
  */
 public class FileInfo extends File implements CommonFileInterface {
+    Image fileImage;
     private SimpleStringProperty fileName;
     private SimpleStringProperty filePath;
     private SimpleBooleanProperty directoryProperty;
     private SimpleLongProperty fileSize;
     private SimpleStringProperty lastModified;
     private SimpleStringProperty fileType;
+    private SimpleBooleanProperty hiddenProperty;
+
+    public FileInfo(String name) {
+        super(name);
+        initImage();
+        fileName = new SimpleStringProperty(getName());
+        filePath = new SimpleStringProperty(getAbsolutePath());
+        directoryProperty = new SimpleBooleanProperty(isDirectory());
+        fileSize = new SimpleLongProperty(length());
+        hiddenProperty = new SimpleBooleanProperty(isHidden());
+        lastModified = new SimpleStringProperty(Utilities.formatDate(lastModified()));
+        fileType = new SimpleStringProperty(FileTypeUtilities.getFileType(getAbsolutePath()));
+    }
 
     public String getFileType() {
         return fileType.get();
-    }
-
-    public SimpleStringProperty fileTypeProperty() {
-        return fileType;
     }
 
     public void setFileType(String fileType) {
         this.fileType.set(fileType);
     }
 
-    Image fileImage;
-
+    public SimpleStringProperty fileTypeProperty() {
+        return fileType;
+    }
 
     public String getLastModified() {
         return lastModified.get();
-    }
-
-    public SimpleStringProperty lastModifiedProperty() {
-        return lastModified;
     }
 
     public void setLastModified(String lastModified) {
         this.lastModified.set(lastModified);
     }
 
+    public SimpleStringProperty lastModifiedProperty() {
+        return lastModified;
+    }
 
     public boolean isHiddenProperty() {
         return hiddenProperty.get();
-    }
-
-    public SimpleBooleanProperty hiddenPropertyProperty() {
-        return hiddenProperty;
     }
 
     public void setHiddenProperty(boolean hiddenProperty) {
         this.hiddenProperty.set(hiddenProperty);
     }
 
-    private SimpleBooleanProperty hiddenProperty;
+    public SimpleBooleanProperty hiddenPropertyProperty() {
+        return hiddenProperty;
+    }
 
     public boolean getDirectoryProperty() {
         return directoryProperty.get();
     }
 
+    public void setDirectoryProperty(boolean directoryProperty) {
+        this.directoryProperty.set(directoryProperty);
+    }
+
     public long getFileSize() {
         return fileSize.get();
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize.set(fileSize);
     }
 
     @Override
@@ -100,32 +118,8 @@ public class FileInfo extends File implements CommonFileInterface {
         return fileSize;
     }
 
-    public void setFileSize(long fileSize) {
-        this.fileSize.set(fileSize);
-    }
-
     public SimpleBooleanProperty directoryPropertyProperty() {
         return directoryProperty;
-    }
-
-
-    public void setDirectoryProperty(boolean directoryProperty) {
-        this.directoryProperty.set(directoryProperty);
-    }
-
-
-
-    public FileInfo(String name) {
-        super(name);
-        initImage();
-        fileName = new SimpleStringProperty(getName());
-        filePath = new SimpleStringProperty(getAbsolutePath());
-        directoryProperty = new SimpleBooleanProperty(isDirectory());
-        fileSize = new SimpleLongProperty(length());
-        hiddenProperty = new SimpleBooleanProperty(isHidden());
-        lastModified = new SimpleStringProperty(Utilities.formatDate(lastModified()));
-        fileType = new SimpleStringProperty(FileTypeUtilities.getFileType(getAbsolutePath()));
-
     }
 
     public Image getFileImage() {
@@ -143,11 +137,14 @@ public class FileInfo extends File implements CommonFileInterface {
 
     private Image getImageFromType(String type) {
         return FilePathTreeItem.getImageFromType(type);
-
     }
 
     public String getFileName() {
         return fileName.get();
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName.set(fileName);
     }
 
     @Override
@@ -167,19 +164,15 @@ public class FileInfo extends File implements CommonFileInterface {
         return fileName;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName.set(fileName);
-    }
-
     public String getFilePath() {
         return filePath.get();
     }
 
-    public SimpleStringProperty filePathProperty() {
-        return filePath;
-    }
-
     public void setFilePath(String filePath) {
         this.filePath.set(filePath);
+    }
+
+    public SimpleStringProperty filePathProperty() {
+        return filePath;
     }
 }
