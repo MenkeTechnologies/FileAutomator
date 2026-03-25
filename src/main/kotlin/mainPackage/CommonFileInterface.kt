@@ -1,0 +1,3 @@
+package mainPackage
+
+interface CommonFileInterface
