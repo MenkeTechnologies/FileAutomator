@@ -495,25 +495,24 @@ public class MainController implements Initializable {
         }
     }
 
+    private java.util.concurrent.ScheduledExecutorService monitoringExecutor;
+
     private void initUsageMonitoring() {
 
         OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean();
 
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(1000);
-                    Platform.runLater(() -> {
+        monitoringExecutor = java.util.concurrent.Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "usage-monitor");
+            t.setDaemon(true);
+            return t;
+        });
 
-                        Long memUsed = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                        systemStatsLabel.setText(String.format("CPU %.2f%% MEM %s", operatingSystemMXBean.getProcessCpuLoad() * 100, PortableFileUtilities.turnBytesIntoHumanReadable(memUsed)));
-                    });
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        monitoringExecutor.scheduleAtFixedRate(() -> {
+            long memUsed = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            String text = String.format("CPU %.2f%% MEM %s", operatingSystemMXBean.getProcessCpuLoad() * 100, PortableFileUtilities.turnBytesIntoHumanReadable(memUsed));
+            Platform.runLater(() -> systemStatsLabel.setText(text));
+        }, 1, 1, java.util.concurrent.TimeUnit.SECONDS);
     }
 
     public void addTerminalPane() {
@@ -758,9 +757,8 @@ public class MainController implements Initializable {
             volumeAndCurrentTimeSwipeLabel.setVisible(false);
 
             mediaStackPane.setOnScroll(e -> {
-
-                FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
-                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music")) {
+                String scrollType = FileTypeUtilities.getFileType(pathLabelContent.getText());
+                if ("video".equals(scrollType) || "music".equals(scrollType)) {
                     if (Math.abs(e.getDeltaY()) > 4) {
                         Utilities.swipeRight = false;
 
@@ -831,8 +829,10 @@ public class MainController implements Initializable {
 
             mediaPlayer.volumeProperty().bind(mediaPlayerVolumeProperty);
 
+            ImageView pauseIcon = new ImageView(new Image(getClass().getResourceAsStream("/png/pause.png")));
+            ImageView playIcon = new ImageView(new Image(getClass().getResourceAsStream("/png/play.png")));
             playMediaButton.graphicProperty().bind(Bindings.when(mediaPlayer.statusProperty().isEqualTo(MediaPlayer.Status.PLAYING))
-                    .then(new ImageView(new Image(getClass().getResourceAsStream("/png/pause.png")))).otherwise(new ImageView(new Image(getClass().getResourceAsStream("/png/play.png")))));
+                    .then(pauseIcon).otherwise(playIcon));
             play2XFasterButton.setOnAction(e -> {
                 if (mediaPlayerRateProperty.get() < 8) {
                     mediaPlayerRateProperty.set(mediaPlayerRateProperty.get() + 0.25);
@@ -848,8 +848,8 @@ public class MainController implements Initializable {
             });
 
             mediaStackPane.setOnMouseEntered(e -> {
-                FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
-                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music")) {
+                String type = FileTypeUtilities.getFileType(pathLabelContent.getText());
+                if ("video".equals(type) || "music".equals(type)) {
                     mediaPlayerControls.setVisible(true);
                     disappearTimer = new Timer();
                     disappearTimer.schedule(new TimerTask() {
@@ -864,9 +864,8 @@ public class MainController implements Initializable {
             });
 
             mediaStackPane.setOnMouseMoved(e -> {
-
-                FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
-                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music")) {
+                String type = FileTypeUtilities.getFileType(pathLabelContent.getText());
+                if ("video".equals(type) || "music".equals(type)) {
 
                     if (!mediaPlayerControls.isVisible()) {
                         Utilities.addToView(mediaPlayerControls);
@@ -889,8 +888,8 @@ public class MainController implements Initializable {
             });
 
             mediaStackPane.setOnMouseExited(e -> {
-                FilePathTreeItem filePathTreeItem = new FilePathTreeItem(Paths.get(pathLabelContent.getText()), this);
-                if (filePathTreeItem.getType().equals("video") || filePathTreeItem.getType().equals("music")) {
+                String type = FileTypeUtilities.getFileType(pathLabelContent.getText());
+                if ("video".equals(type) || "music".equals(type)) {
                     Utilities.removeFromView(mediaPlayerControls);
                 }
                 if (disappearTimer != null) {
@@ -1031,7 +1030,7 @@ public class MainController implements Initializable {
         searchingTask.setRunnable(r);
 
         Thread thread = new Thread(searchingTask);
-
+        thread.setDaemon(true);
         thread.start();
     }
 
@@ -1040,7 +1039,6 @@ public class MainController implements Initializable {
         if (searchingTask.getState() != javafx.concurrent.Worker.State.RUNNING) {
             Utilities.addToView(sphere);
             timeline.play();
-            // System.out.println("started secondary");
             stopCurrentSearchButton.setText("Stop Load");
             loadingTask = new CustomTask<String>(this, r, false);
         } else {
@@ -1050,7 +1048,7 @@ public class MainController implements Initializable {
         loadingFileLabel.textProperty().bind(MainController.loadingTask.messageProperty());
 
         Thread thread = new Thread(loadingTask);
-
+        thread.setDaemon(true);
         thread.start();
     }
 

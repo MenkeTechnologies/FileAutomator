@@ -73,12 +73,36 @@ public class RegexUtilities {
             CommonUtilities.TOTAL_FILE_COUNTER.set(0);
             CommonUtilities.MATCHING_FILE_COUNTER.set(0);
 
+            // Pre-compile all patterns ONCE before the file walk
+            boolean hasFilter = !orTerms.get(0).equals("");
+            ArrayList<Pattern> compiledPatterns = new ArrayList<>();
+
+            if (hasFilter) {
+                boolean caseInsensitive = mainController.caseInsensitiveMatchingCheckbox.isSelected();
+
+                for (String fileString : orTerms) {
+                    StringBuilder andTermsBuilder = new StringBuilder(fileString);
+                    for (String term : andTerms) {
+                        andTermsBuilder.append(" ").append(term).append(" ");
+                    }
+
+                    StringTokenizer st = new StringTokenizer(andTermsBuilder.toString());
+                    StringBuilder sb = new StringBuilder();
+                    while (st.hasMoreTokens()) {
+                        sb.append(".*").append(Pattern.quote(st.nextToken()));
+                    }
+
+                    compiledPatterns.add(caseInsensitive
+                            ? Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE)
+                            : Pattern.compile(sb.toString()));
+                }
+            }
+
+            boolean matchPath = mainController.pathMatchingCheckbox.isSelected();
+
             Files.walkFileTree(Paths.get(directory), new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-
-                    System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-                            "___ Permissions error at" + file);
                     return FileVisitResult.SKIP_SUBTREE;
                 }
 
@@ -86,81 +110,41 @@ public class RegexUtilities {
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
                     if (MainController.searchingTask.getFuture().isCancelled()) {
-
                         throw new RuntimeException();
                     }
 
-                    CommonUtilities.TOTAL_FILE_COUNTER.incrementAndGet();
+                    long total = CommonUtilities.TOTAL_FILE_COUNTER.incrementAndGet();
 
-                    String fileName;
+                    if (hasFilter) {
+                        String fileName = matchPath
+                                ? file.toAbsolutePath().toString()
+                                : file.toAbsolutePath().getFileName().toString();
 
-                    if (mainController.pathMatchingCheckbox.isSelected()) {
-                        fileName = file.toAbsolutePath().toString();
-                    } else {
-                        fileName = file.toAbsolutePath().getFileName().toString();
-                    }
-
-                    if (!orTerms.get(0).equals("")) {
-
-                        orTerms.forEach(fileString -> {
-
-                            Pattern pattern;
-
-                            StringBuilder andTermsBuilder = new StringBuilder(fileString);
-
-                            andTerms.forEach(term -> {
-                                andTermsBuilder.append(" ").append(term).append(" ");
-                            });
-
-                            StringTokenizer st = new StringTokenizer(andTermsBuilder.toString());
-
-//                        System.out.println("compound searcher = " + andTermsBuilder.toString());
-
-                            StringBuilder sb = new StringBuilder();
-
-                            while (st.hasMoreTokens()) {
-
-                                String next = Pattern.quote(st.nextToken());
-
-                                sb.append(".*").append(next);
-                            }
-
-                            String regexString = sb.toString();
-
-                            if (mainController.caseInsensitiveMatchingCheckbox.isSelected()) {
-                                pattern = Pattern.compile(regexString, Pattern.CASE_INSENSITIVE);
-                            } else {
-                                pattern = Pattern.compile(regexString);
-                            }
-
+                        for (Pattern pattern : compiledPatterns) {
                             if (pattern.matcher(fileName).find()) {
-
                                 CommonUtilities.MATCHING_FILE_COUNTER.incrementAndGet();
-
                                 mainController.checkToShowHiddenFiles(file);
+                                break;
                             }
-                        });
+                        }
                     } else {
-
                         mainController.checkToShowHiddenFiles(file);
                     }
 
-                    String message = "Filtered " + CommonUtilities.MATCHING_FILE_COUNTER + " files of " + CommonUtilities.TOTAL_FILE_COUNTER + " files : Processing " + file.getFileName();
-
-                    MainController.searchingTask.updateMessage(message);
+                    // Throttle UI updates to every 100 files
+                    if (total % 100 == 0) {
+                        MainController.searchingTask.updateMessage(
+                                "Filtered " + CommonUtilities.MATCHING_FILE_COUNTER +
+                                " files of " + total + " files : Processing " + file.getFileName());
+                    }
 
                     return FileVisitResult.CONTINUE;
                 }
             });
         } catch (IOException fse) {
-            System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-                    "___ Swallowing IOException....");
+            System.err.println("Swallowing IOException in file search: " + fse.getMessage());
         } catch (RuntimeException e) {
-
-            e.printStackTrace();
-
-            System.err.println("___________" + Thread.currentThread().getStackTrace()[1].getClassName() + "____Line:" + Thread.currentThread().getStackTrace()[1].getLineNumber() +
-                    "___ Exiting Loop.");
+            System.err.println("File search cancelled.");
         }
     }
 }

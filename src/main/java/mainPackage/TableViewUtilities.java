@@ -22,47 +22,42 @@ public class TableViewUtilities {
             @Override
             public TableCell<FileInfo, String> call(TableColumn<FileInfo, String> param) {
                 TableCell<FileInfo, String> tableCell = new TableCell<FileInfo, String>() {
+                    private final ImageView iconView = new ImageView();
+
                     @Override
                     protected void updateItem(String item, boolean empty) {
-                        if (item != null) {
-                            setText(item);
-
-                            FileInfo fileAtRow = (FileInfo) this.getTableRow().getItem();
-
-                            FileInfo playingFile = null;
-                            if (mainController.pathLabelContent != null && mainController.pathLabelContent.getText() != "") {
-                                playingFile = new FileInfo(mainController.pathLabelContent.getText());
-                            }
-
-                            if (fileAtRow != null) {
-                                if (playingFile != null) {
-                                    if (fileAtRow.getAbsolutePath().equals(playingFile.getAbsolutePath()) && mainController.showPlayingIconCheckbox.isSelected()) {
-                                        setGraphic(new ImageView(FilePathTreeItem.playingImage));
-                                    } else {
-                                        setDefaultGraphic(fileAtRow);
-                                    }
-                                } else {
-
-                                    setDefaultGraphic(fileAtRow);
-                                }
-                            }
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                            setGraphic(null);
+                            return;
                         }
+
+                        setText(item);
+
+                        FileInfo fileAtRow = (FileInfo) this.getTableRow().getItem();
+                        if (fileAtRow == null) return;
+
+                        String playingPath = mainController.pathLabelContent != null
+                                ? mainController.pathLabelContent.getText() : "";
+
+                        if (!playingPath.isEmpty()
+                                && fileAtRow.getAbsolutePath().equals(playingPath)
+                                && mainController.showPlayingIconCheckbox.isSelected()) {
+                            iconView.setImage(FilePathTreeItem.playingImage);
+                        } else {
+                            setDefaultImage(fileAtRow);
+                        }
+                        setGraphic(iconView);
                     }
 
-                    private void setDefaultGraphic(FileInfo fileAtRow) {
+                    private void setDefaultImage(FileInfo fileAtRow) {
                         if (fileAtRow.isDirectory()) {
-                            if (FilePathTreeItem.specialDirs.containsKey(fileAtRow.getAbsolutePath())) {
-                                setGraphic(new ImageView(FilePathTreeItem.specialDirs.get(fileAtRow.getAbsolutePath())));
-                            } else {
-                                setGraphic(new ImageView(FilePathTreeItem.folderCollapseImage));
-                            }
+                            Image dirImage = FilePathTreeItem.specialDirs.get(fileAtRow.getAbsolutePath());
+                            iconView.setImage(dirImage != null ? dirImage : FilePathTreeItem.folderCollapseImage);
                         } else {
-
-                            String type = FileTypeUtilities.getFileType(fileAtRow.getAbsolutePath());
-
-                            Image image = FilePathTreeItem.getImageFromType(type);
-
-                            setGraphic(new ImageView(image));
+                            iconView.setImage(FilePathTreeItem.getImageFromType(
+                                    FileTypeUtilities.getFileType(fileAtRow.getAbsolutePath())));
                         }
                     }
                 };
@@ -89,7 +84,10 @@ public class TableViewUtilities {
                 TableCell<FileInfo, Long> cell = new TableCell<FileInfo, Long>() {
                     @Override
                     protected void updateItem(Long item, boolean empty) {
-                        if (item != null) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
                             setText(PortableFileUtilities.turnBytesIntoHumanReadable(item));
                         }
                     }

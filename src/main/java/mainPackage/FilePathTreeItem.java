@@ -130,15 +130,7 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> implements Comm
                 FilePathTreeItem source = (FilePathTreeItem) event.getSource();
                 if (source.isDirectory() && source.isExpanded()) {
 
-                    boolean isSpecial = false;
-                    for (int i = 0; i < specialDirs.size(); i++) {
-
-                        if (specialDirs.containsKey(source.getPathString())) {
-                            isSpecial = true;
-                        }
-                    }
-
-                    if (!isSpecial) {
+                    if (!specialDirs.containsKey(source.getPathString())) {
                         ImageView iv = (ImageView) source.getGraphic();
                         iv.setImage(folderExpandImage);
                     }
@@ -154,15 +146,7 @@ public class FilePathTreeItem extends TreeItem<FilePathTreeItem> implements Comm
                 FilePathTreeItem source = (FilePathTreeItem) event.getSource();
                 if (source.isDirectory() && !source.isExpanded()) {
 
-                    boolean isSpecial = false;
-                    for (int i = 0; i < specialDirs.size(); i++) {
-                        if (specialDirs.containsKey(source.getPathString())) {
-                            isSpecial = true;
-                        }
-                    }
-
-                    if (!isSpecial) {
-
+                    if (!specialDirs.containsKey(source.getPathString())) {
                         ImageView iv = (ImageView) source.getGraphic();
                         iv.setImage(folderCollapseImage);
                     }

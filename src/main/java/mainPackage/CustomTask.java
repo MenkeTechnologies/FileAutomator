@@ -77,30 +77,24 @@ public class CustomTask<T> extends Task<String> {
 
         executorService = Executors.newSingleThreadExecutor();
         future = executorService.submit(r);
-        //System.out.println("called and submitting to executor");
 
         try {
-            //System.out.println("waiting on future");
             future.get();
-            //System.out.println("future done");
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } finally {
+            executorService.shutdownNow();
+            executorService.awaitTermination(2, java.util.concurrent.TimeUnit.SECONDS);
+
             if (!searchingTaskRunning) {
                 Platform.runLater(() -> {
-                    //      Utilities.removeFromView(mainController.thinkingIndicator);
                     Utilities.removeFromView(mainController.sphere);
                     mainController.timeline.stop();
                 });
             }
         }
-
-        executorService.shutdownNow();
-
-        System.gc();
 
         return "Completed";
     }
