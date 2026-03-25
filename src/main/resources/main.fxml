@@ -11,24 +11,30 @@
             prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8"
             fx:controller="mainPackage.MainController">
     <center>
-        <SplitPane fx:id="mainSplitPane" dividerPositions="0.5, 0.5, 0.5">
+        <SplitPane fx:id="mainSplitPane" orientation="VERTICAL" dividerPositions="0.5">
             <items>
-                <TitledPane text="File Browser" animated="true" collapsible="true" expanded="true" maxHeight="1.7976931348623157E308">
-                    <content>
-                        <TreeView fx:id="fileBrowserTreeTable" prefHeight="200.0" prefWidth="200.0"/>
-                    </content>
-                </TitledPane>
-                <TitledPane text="Results" animated="true" collapsible="true" expanded="true" maxHeight="1.7976931348623157E308">
-                    <content>
-                        <TableView fx:id="mainTableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                            <columns>
-                                <TableColumn prefWidth="75.0" text="C1"/>
-                                <TableColumn prefWidth="75.0" text="C2"/>
-                            </columns>
-                        </TableView>
-                    </content>
-                </TitledPane>
-                <TitledPane text="Preview" animated="true" collapsible="true" expanded="true" maxHeight="1.7976931348623157E308">
+                <SplitPane fx:id="topTilePane" dividerPositions="0.33, 0.66">
+                    <items>
+                        <TitledPane text="File Browser" animated="true" collapsible="true" expanded="true" maxHeight="1.7976931348623157E308">
+                            <content>
+                                <TreeView fx:id="fileBrowserTreeTable" prefHeight="200.0" prefWidth="200.0"/>
+                            </content>
+                        </TitledPane>
+                        <TitledPane text="Results" animated="true" collapsible="true" expanded="true" maxHeight="1.7976931348623157E308">
+                            <content>
+                                <TableView fx:id="mainTableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                    <columns>
+                                        <TableColumn prefWidth="75.0" text="C1"/>
+                                        <TableColumn prefWidth="75.0" text="C2"/>
+                                    </columns>
+                                </TableView>
+                            </content>
+                        </TitledPane>
+                    </items>
+                </SplitPane>
+                <SplitPane fx:id="bottomTilePane" dividerPositions="0.33, 0.66">
+                    <items>
+                        <TitledPane text="Preview" animated="true" collapsible="true" expanded="true" maxHeight="1.7976931348623157E308">
                     <content>
                         <ScrollPane fx:id="rightPaneScrollPane" fitToHeight="true" fitToWidth="true" prefViewportHeight="1000.0"
                                     prefViewportWidth="500.0">
@@ -226,6 +232,8 @@
                     </content>
                 </TitledPane>
 
+                    </items>
+                </SplitPane>
             </items>
         </SplitPane>
     </center>

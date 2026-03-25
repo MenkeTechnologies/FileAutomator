@@ -524,3 +524,11 @@
     -fx-border-color: transparent;
     -fx-padding: 0;
 }
+
+/* ── Tile layout (nested split panes) ────────────────── */
+#topTilePane,
+#bottomTilePane {
+    -fx-background-color: #0a0a12;
+    -fx-border-color: #05d9e820;
+    -fx-border-width: 1;
+}

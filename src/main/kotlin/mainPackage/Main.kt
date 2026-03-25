@@ -342,9 +342,12 @@ class Main : Application() {
                 }
             }
 
-            mainController.mainSplitPane.items[0].addEventFilter(KeyEvent.KEY_PRESSED, eventHandler)
-            mainController.mainSplitPane.items[1].addEventFilter(KeyEvent.KEY_PRESSED, eventHandler)
-            mainController.mainSplitPane.items[2].addEventFilter(KeyEvent.KEY_PRESSED, eventHandler)
+            for (item in mainController.topTilePane.items) {
+                item.addEventFilter(KeyEvent.KEY_PRESSED, eventHandler)
+            }
+            for (item in mainController.bottomTilePane.items) {
+                item.addEventFilter(KeyEvent.KEY_PRESSED, eventHandler)
+            }
         }
 
         @JvmStatic

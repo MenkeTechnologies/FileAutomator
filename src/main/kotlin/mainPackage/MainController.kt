@@ -69,6 +69,8 @@ class MainController : Initializable {
     @JvmField var mainTextField: TextField = TextField()
     @JvmField var directoryToSearchTextField: TextField = TextField()
     @JvmField var mainSplitPane: SplitPane = SplitPane()
+    @JvmField var topTilePane: SplitPane = SplitPane()
+    @JvmField var bottomTilePane: SplitPane = SplitPane()
     @JvmField var sizeLabel: Label = Label()
     @JvmField var lastModifiedLabel: Label = Label()
     @JvmField var pathLabel: Label = Label()
@@ -160,6 +162,8 @@ class MainController : Initializable {
     @JvmField var disappearTimer: Timer? = null
     @JvmField var filesForAutoplay: ArrayList<String> = ArrayList()
     @JvmField var splitPaneChildren: ObservableList<Node> = FXCollections.observableArrayList()
+    @JvmField var topTileChildren: ObservableList<Node> = FXCollections.observableArrayList()
+    @JvmField var bottomTileChildren: ObservableList<Node> = FXCollections.observableArrayList()
     @JvmField var binding: AutoCompletionBinding<String>? = null
     @JvmField var contextMenu: ContextMenu? = null
     @JvmField var oldScreenSize: Rectangle2D? = null
@@ -222,7 +226,9 @@ class MainController : Initializable {
 
         TreeViewInitialization.initTreeView(this)
 
-        mainSplitPane.setDividerPositions(0.2, 0.9)
+        mainSplitPane.setDividerPositions(0.5)
+        topTilePane.setDividerPositions(0.33, 0.66)
+        bottomTilePane.setDividerPositions(0.33, 0.66)
 
         mainTableView.isEditable = false
         mainTableView.items = files
@@ -276,10 +282,13 @@ class MainController : Initializable {
         }
 
         splitPaneChildren.addAll(mainSplitPane.items)
+        topTileChildren.addAll(topTilePane.items)
+        bottomTileChildren.addAll(bottomTilePane.items)
 
         restorePanesButton.setOnAction { restorePanesToOld(null) }
 
         DraggingInit.initDraggingBindings(this)
+        TileDragManager.initTileDragging(this)
 
         initCheckBoxes()
         initTasks()
@@ -290,7 +299,7 @@ class MainController : Initializable {
     }
 
     fun addWebViewPane() {
-        splitPaneWebView.prefHeightProperty().bind(mainSplitPane.heightProperty())
+        splitPaneWebView.prefHeightProperty().bind(bottomTilePane.heightProperty())
         splitPaneWebView.isContextMenuEnabled = false
 
         splitPaneWebView.setOnMouseClicked { event ->
@@ -440,7 +449,7 @@ class MainController : Initializable {
         hideThisPane.setOnAction { removePaneSingular("terminal") }
         restorePanes.setOnAction { restorePanesToOriginal("terminal") }
 
-        mainSplitPane.items.add(terminalTabPane)
+        bottomTilePane.items.add(terminalTabPane)
     }
 
     fun initTreeViewKeyBindings() {
@@ -564,7 +573,7 @@ class MainController : Initializable {
     fun initBindings() {
         textContent = CodeTextArea(this)
 
-        mainSplitPane.items.add(textContent!!.codeArea)
+        topTilePane.items.add(textContent!!.codeArea)
 
         fitScreenToggleButton.setOnAction { e -> fitScreenAction(e, 1.0) }
         fitScreenToggleMediaButton.setOnAction { e -> fitScreenAction(e, 1.0) }
@@ -936,50 +945,49 @@ class MainController : Initializable {
     }
 
     fun removePaneSingular(pane: String) {
-        val items = mainSplitPane.items
+        val totalItems = topTilePane.items.size + bottomTilePane.items.size
 
-        if (items.size == 1) {
+        if (totalItems <= 1) {
             CommonUtilities.showErrorAlert("Cannot Remove Last Pane")
-        } else if (items.size >= 2) {
-            checkForSender(pane, items)
-
-            if (items.size == 1) {
-                if (items[0] == rightPaneScrollPane) {
-                    Utilities.removeFromView(rightSidePaneTextVBox)
-                    Utilities.removeFromView(topHBox)
-                    Utilities.removeFromView(bottomHBox)
-                    Utilities.removeFromView(topSecondHBox)
-                    Utilities.maximized.set(true)
-                }
-            }
+        } else {
+            checkForSender(pane)
+            // Remove empty tile rows from the outer split pane
+            if (topTilePane.items.isEmpty()) mainSplitPane.items.remove(topTilePane)
+            if (bottomTilePane.items.isEmpty()) mainSplitPane.items.remove(bottomTilePane)
         }
     }
 
-    fun checkForSender(pane: String, items: ObservableList<Node>) {
+    fun checkForSender(pane: String) {
         when (pane) {
-            "tableView" -> items.remove(mainTableView)
-            "treeView" -> items.remove(fileBrowserTreeTable)
-            "terminal" -> items.remove(terminalTabPane)
-            "webView" -> items.remove(webViewVBox)
-            else -> items.remove(rightPaneScrollPane)
+            "tableView" -> topTilePane.items.remove(mainTableView)
+            "treeView" -> topTilePane.items.remove(fileBrowserTreeTable)
+            "terminal" -> bottomTilePane.items.remove(terminalTabPane)
+            "webView" -> bottomTilePane.items.remove(webViewVBox)
+            else -> bottomTilePane.items.remove(rightPaneScrollPane)
         }
     }
 
     fun removePanes(node: Node) {
         splitPaneChildren.clear()
         splitPaneChildren.addAll(mainSplitPane.items)
+        topTileChildren.clear()
+        topTileChildren.addAll(topTilePane.items)
+        bottomTileChildren.clear()
+        bottomTileChildren.addAll(bottomTilePane.items)
 
-        val items = mainSplitPane.items
+        val totalItems = topTilePane.items.size + bottomTilePane.items.size
 
-        if (items.size == 1) {
+        if (totalItems == 1) {
             CommonUtilities.showErrorAlert("Already Maximized.")
         } else {
-            for (i in 0 until mainSplitPane.dividers.size) {
-                Preferences.userRoot().putDouble("dividerPos$i", mainSplitPane.dividerPositions[i])
-            }
+            saveDividerPositions()
 
-            items.clear()
-            items.add(node)
+            topTilePane.items.clear()
+            bottomTilePane.items.clear()
+            mainSplitPane.items.clear()
+
+            topTilePane.items.add(node)
+            mainSplitPane.items.add(topTilePane)
 
             if (node == rightPaneScrollPane) {
                 val fileInfo = FileInfo(pathLabelContent.text)
@@ -998,7 +1006,35 @@ class MainController : Initializable {
         }
     }
 
+    private fun saveDividerPositions() {
+        for (i in 0 until topTilePane.dividers.size) {
+            Preferences.userRoot().putDouble("topDividerPos$i", topTilePane.dividerPositions[i])
+        }
+        for (i in 0 until bottomTilePane.dividers.size) {
+            Preferences.userRoot().putDouble("bottomDividerPos$i", bottomTilePane.dividerPositions[i])
+        }
+        for (i in 0 until mainSplitPane.dividers.size) {
+            Preferences.userRoot().putDouble("mainDividerPos$i", mainSplitPane.dividerPositions[i])
+        }
+    }
+
+    private fun restoreDividerPositions() {
+        for (i in 0 until topTilePane.dividers.size) {
+            topTilePane.setDividerPosition(i, Preferences.userRoot().getDouble("topDividerPos$i", if (topTilePane.dividerPositions.isNotEmpty()) topTilePane.dividerPositions[i] else 0.5))
+        }
+        for (i in 0 until bottomTilePane.dividers.size) {
+            bottomTilePane.setDividerPosition(i, Preferences.userRoot().getDouble("bottomDividerPos$i", if (bottomTilePane.dividerPositions.isNotEmpty()) bottomTilePane.dividerPositions[i] else 0.5))
+        }
+        for (i in 0 until mainSplitPane.dividers.size) {
+            mainSplitPane.setDividerPosition(i, Preferences.userRoot().getDouble("mainDividerPos$i", if (mainSplitPane.dividerPositions.isNotEmpty()) mainSplitPane.dividerPositions[i] else 0.5))
+        }
+    }
+
     fun restorePanesToOld(mediaContextMenu: String?) {
+        topTilePane.items.clear()
+        topTilePane.items.addAll(topTileChildren)
+        bottomTilePane.items.clear()
+        bottomTilePane.items.addAll(bottomTileChildren)
         mainSplitPane.items.clear()
         mainSplitPane.items.addAll(splitPaneChildren)
 
@@ -1012,14 +1048,7 @@ class MainController : Initializable {
             }
         }
 
-        val sps = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0)
-
-        for (i in 0 until mainSplitPane.dividers.size) {
-            val sp = Preferences.userRoot().getDouble("dividerPos$i", mainSplitPane.dividerPositions[i])
-            sps[i] = sp
-        }
-
-        mainSplitPane.setDividerPositions(*sps)
+        restoreDividerPositions()
 
         Utilities.maximized.set(false)
     }
@@ -1037,18 +1066,14 @@ class MainController : Initializable {
             }
         }
 
+        topTilePane.items.clear()
+        topTilePane.items.addAll(listOf(fileBrowserTreeTable, mainTableView))
+        bottomTilePane.items.clear()
+        bottomTilePane.items.addAll(listOf(rightPaneScrollPane, terminalTabPane))
         mainSplitPane.items.clear()
+        mainSplitPane.items.addAll(listOf(topTilePane, bottomTilePane))
 
-        items.addAll(listOf(fileBrowserTreeTable, mainTableView, rightPaneScrollPane, terminalTabPane))
-
-        val sps = doubleArrayOf(0.0, 0.0, 0.0)
-
-        for (i in 0 until mainSplitPane.dividers.size) {
-            val sp = Preferences.userRoot().getDouble("dividerPos$i", mainSplitPane.dividerPositions[i])
-            sps[i] = sp
-        }
-
-        mainSplitPane.setDividerPositions(*sps)
+        restoreDividerPositions()
 
         Utilities.maximized.set(false)
     }
@@ -1277,10 +1302,14 @@ class MainController : Initializable {
     }
 
     fun changeOrientation(actionEvent: ActionEvent?) {
-        if (mainSplitPane.orientation == Orientation.HORIZONTAL) {
-            mainSplitPane.orientation = Orientation.VERTICAL
-        } else {
+        if (mainSplitPane.orientation == Orientation.VERTICAL) {
             mainSplitPane.orientation = Orientation.HORIZONTAL
+            topTilePane.orientation = Orientation.VERTICAL
+            bottomTilePane.orientation = Orientation.VERTICAL
+        } else {
+            mainSplitPane.orientation = Orientation.VERTICAL
+            topTilePane.orientation = Orientation.HORIZONTAL
+            bottomTilePane.orientation = Orientation.HORIZONTAL
         }
     }
 
