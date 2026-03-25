@@ -13,203 +13,218 @@
     <center>
         <SplitPane fx:id="mainSplitPane" dividerPositions="0.5, 0.5, 0.5">
             <items>
-                <TreeView fx:id="fileBrowserTreeTable" prefHeight="200.0" prefWidth="200.0">
-                </TreeView>
-                <TableView fx:id="mainTableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                    <columns>
-                        <TableColumn prefWidth="75.0" text="C1"/>
-                        <TableColumn prefWidth="75.0" text="C2"/>
-                    </columns>
-                </TableView>
-                <ScrollPane fx:id="rightPaneScrollPane" fitToHeight="true" fitToWidth="true" prefViewportHeight="1000.0"
-                            prefViewportWidth="500.0">
+                <TitledPane text="File Browser" animated="true" collapsible="true" expanded="true" maxHeight="1.7976931348623157E308">
                     <content>
+                        <TreeView fx:id="fileBrowserTreeTable" prefHeight="200.0" prefWidth="200.0"/>
+                    </content>
+                </TitledPane>
+                <TitledPane text="Results" animated="true" collapsible="true" expanded="true" maxHeight="1.7976931348623157E308">
+                    <content>
+                        <TableView fx:id="mainTableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                            <columns>
+                                <TableColumn prefWidth="75.0" text="C1"/>
+                                <TableColumn prefWidth="75.0" text="C2"/>
+                            </columns>
+                        </TableView>
+                    </content>
+                </TitledPane>
+                <TitledPane text="Preview" animated="true" collapsible="true" expanded="true" maxHeight="1.7976931348623157E308">
+                    <content>
+                        <ScrollPane fx:id="rightPaneScrollPane" fitToHeight="true" fitToWidth="true" prefViewportHeight="1000.0"
+                                    prefViewportWidth="500.0">
+                            <content>
 
-                        <VBox fx:id="rightSidePaneVBox" prefHeight="200.0" prefWidth="100.0" spacing="10">
-                            <children>
-
-                                <VBox fx:id="rightSidePaneTextVBox" spacing="8">
+                                <VBox fx:id="rightSidePaneVBox" prefHeight="200.0" prefWidth="100.0" spacing="10">
                                     <children>
 
-                                        <TextFlow fx:id="textFlowRightPane">
+                                        <VBox fx:id="rightSidePaneTextVBox" spacing="8">
                                             <children>
 
-                                                <Label fx:id="fileNamDetailLabel" styleClass="detailLabels"
-                                                       text="File: " wrapText="true"/>
-                                                <Label fx:id="fileNamDetailLabelContent" wrapText="true"/>
-                                            </children>
-                                        </TextFlow>
-                                        <TextFlow>
-                                            <children>
-                                                <Label fx:id="sizeLabel" styleClass="detailLabels" text="Size: "/>
-                                                <Label fx:id="sizeDetailLabelContent"/>
-                                            </children>
-                                        </TextFlow>
+                                                <TextFlow fx:id="textFlowRightPane">
+                                                    <children>
 
-                                        <TextFlow>
-                                            <children>
-                                                <Label fx:id="pathLabel" styleClass="detailLabels" text="Path: "/>
-                                                <Label fx:id="pathLabelContent"/>
-                                            </children>
-                                        </TextFlow>
+                                                        <Label fx:id="fileNamDetailLabel" styleClass="detailLabels"
+                                                               text="File: " wrapText="true"/>
+                                                        <Label fx:id="fileNamDetailLabelContent" wrapText="true"/>
+                                                    </children>
+                                                </TextFlow>
+                                                <TextFlow>
+                                                    <children>
+                                                        <Label fx:id="sizeLabel" styleClass="detailLabels" text="Size: "/>
+                                                        <Label fx:id="sizeDetailLabelContent"/>
+                                                    </children>
+                                                </TextFlow>
 
-                                        <TextFlow>
-                                            <children>
-                                                <Label fx:id="lastModifiedLabel" styleClass="detailLabels"
-                                                       text="Last Modified: "/>
-                                                <Label fx:id="lastModifiedLabelContent"/>
-                                            </children>
-                                        </TextFlow>
+                                                <TextFlow>
+                                                    <children>
+                                                        <Label fx:id="pathLabel" styleClass="detailLabels" text="Path: "/>
+                                                        <Label fx:id="pathLabelContent"/>
+                                                    </children>
+                                                </TextFlow>
 
-                                        <TextFlow>
-                                            <children>
-                                                <Label fx:id="textLabel" styleClass="detailLabels"/>
-                                            </children>
-                                        </TextFlow>
+                                                <TextFlow>
+                                                    <children>
+                                                        <Label fx:id="lastModifiedLabel" styleClass="detailLabels"
+                                                               text="Last Modified: "/>
+                                                        <Label fx:id="lastModifiedLabelContent"/>
+                                                    </children>
+                                                </TextFlow>
 
+                                                <TextFlow>
+                                                    <children>
+                                                        <Label fx:id="textLabel" styleClass="detailLabels"/>
+                                                    </children>
+                                                </TextFlow>
 
-                                    </children>
-                                </VBox>
-
-
-                                <StackPane fx:id="mediaStackPane">
-                                    <children>
-                                        <VBox fx:id="imagesVBox">
-                                            <children>
-                                                <ImageView fx:id="rightPaneImageView" pickOnBounds="true"
-                                                           preserveRatio="true"/>
 
                                             </children>
                                         </VBox>
 
-                                        <MediaView fx:id="rightPaneMediaView" preserveRatio="true"/>
-                                        <FlowPane fx:id="mediaPlayerControls" prefHeight="100.0" prefWidth="200.0"
-                                                  visible="false">
+
+                                        <StackPane fx:id="mediaStackPane">
                                             <children>
-                                                <Button id="2xslower" fx:id="play2XSlowerButton" mnemonicParsing="false"
-                                                        styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Play 2x Slower"/>
-                                                    </tooltip>
-                                                </Button>
-                                                <Label fx:id="mediaPlayerRateLabel" styleClass="rateLabel" text="1x"/>
-                                                <Button id="2xfaster" fx:id="play2XFasterButton" mnemonicParsing="false"
-                                                        styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Play 2x Faster"/>
-                                                    </tooltip>
-                                                </Button>
-                                                <Slider fx:id="volumeSlider" max="1" orientation="HORIZONTAL">
-                                                    <tooltip>
-                                                        <Tooltip text="Adjust Volume"/>
-                                                    </tooltip>
-                                                </Slider>
-                                                <Button id="playMedia" fx:id="playMediaButton"
-                                                        styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Play Media"/>
-                                                    </tooltip>
-                                                </Button>
-                                                <Button id="rewind" onMouseClicked="#rewindToStart"
-                                                        styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip
-                                                                text="Rewind with Single Click, Previous Media with Double Click"/>
-                                                    </tooltip>
-                                                </Button>
-                                                <Button id="next" onAction="#playNext" styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Play Next Media"/>
-                                                    </tooltip>
-                                                </Button>
-                                                <ToggleButton id="loopMedia" fx:id="loopButton"
-                                                              styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Loop Currently Playing Media"/>
-                                                    </tooltip>
-                                                </ToggleButton>
-                                                <Button id="fullScreen" fx:id="fullScreenMediaButton"
-                                                        onAction="#maximizeVideo" styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Maximize Media Player Pane"/>
-                                                    </tooltip>
-                                                </Button>
-                                                <Button id="oldSize" fx:id="normalScreenMediaButton"
-                                                        onAction="#returnToOldDividers" styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Return to Old Pane Sizes"/>
-                                                    </tooltip>
-                                                </Button>
-                                                <ToggleButton id="lock" fx:id="lockMediaViewMediaControlsToggle"
-                                                              styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Keep Current Media Playing in Right Pane"/>
-                                                    </tooltip>
-                                                </ToggleButton>
-                                                <ToggleButton id="autoplay" fx:id="autoPlayMediaControl"
-                                                              onAction="#storeFileList" styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Automatically Play Next Media In Table"/>
-                                                    </tooltip>
-                                                </ToggleButton>
-                                                <ToggleButton id="hide" fx:id="removeSliderMediaControl"
-                                                              onAction="#removeSliderHBox" styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Hide Slider"/>
-                                                    </tooltip>
-                                                </ToggleButton>
-                                                <ToggleButton id="reflection" fx:id="showReflectionButton"
-                                                              onAction="#showReflection" selected="true"
-                                                              styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Show Reflection For Images and Videos."/>
-                                                    </tooltip>
-                                                </ToggleButton>
-                                                <ToggleButton id="fitScreen" fx:id="fitScreenToggleMediaButton"
-                                                              styleClass="mediaButtons">
-                                                    <tooltip>
-                                                        <Tooltip text="Maximize to fit Screen Dimensions."/>
+                                                <VBox fx:id="imagesVBox">
+                                                    <children>
+                                                        <ImageView fx:id="rightPaneImageView" pickOnBounds="true"
+                                                                   preserveRatio="true"/>
 
-                                                    </tooltip>
-                                                </ToggleButton>
+                                                    </children>
+                                                </VBox>
 
-                                                <Label fx:id="fileNameLabelMediaControls" styleClass="blackBoxWhiteText"
-                                                       visible="false" HBox.hgrow="ALWAYS"/>
+                                                <MediaView fx:id="rightPaneMediaView" preserveRatio="true"/>
+                                                <FlowPane fx:id="mediaPlayerControls" prefHeight="100.0" prefWidth="200.0"
+                                                          visible="false">
+                                                    <children>
+                                                        <Button id="2xslower" fx:id="play2XSlowerButton" mnemonicParsing="false"
+                                                                styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Play 2x Slower"/>
+                                                            </tooltip>
+                                                        </Button>
+                                                        <Label fx:id="mediaPlayerRateLabel" styleClass="rateLabel" text="1x"/>
+                                                        <Button id="2xfaster" fx:id="play2XFasterButton" mnemonicParsing="false"
+                                                                styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Play 2x Faster"/>
+                                                            </tooltip>
+                                                        </Button>
+                                                        <Slider fx:id="volumeSlider" max="1" orientation="HORIZONTAL">
+                                                            <tooltip>
+                                                                <Tooltip text="Adjust Volume"/>
+                                                            </tooltip>
+                                                        </Slider>
+                                                        <Button id="playMedia" fx:id="playMediaButton"
+                                                                styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Play Media"/>
+                                                            </tooltip>
+                                                        </Button>
+                                                        <Button id="rewind" onMouseClicked="#rewindToStart"
+                                                                styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip
+                                                                        text="Rewind with Single Click, Previous Media with Double Click"/>
+                                                            </tooltip>
+                                                        </Button>
+                                                        <Button id="next" onAction="#playNext" styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Play Next Media"/>
+                                                            </tooltip>
+                                                        </Button>
+                                                        <ToggleButton id="loopMedia" fx:id="loopButton"
+                                                                      styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Loop Currently Playing Media"/>
+                                                            </tooltip>
+                                                        </ToggleButton>
+                                                        <Button id="fullScreen" fx:id="fullScreenMediaButton"
+                                                                onAction="#maximizeVideo" styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Maximize Media Player Pane"/>
+                                                            </tooltip>
+                                                        </Button>
+                                                        <Button id="oldSize" fx:id="normalScreenMediaButton"
+                                                                onAction="#returnToOldDividers" styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Return to Old Pane Sizes"/>
+                                                            </tooltip>
+                                                        </Button>
+                                                        <ToggleButton id="lock" fx:id="lockMediaViewMediaControlsToggle"
+                                                                      styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Keep Current Media Playing in Right Pane"/>
+                                                            </tooltip>
+                                                        </ToggleButton>
+                                                        <ToggleButton id="autoplay" fx:id="autoPlayMediaControl"
+                                                                      onAction="#storeFileList" styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Automatically Play Next Media In Table"/>
+                                                            </tooltip>
+                                                        </ToggleButton>
+                                                        <ToggleButton id="hide" fx:id="removeSliderMediaControl"
+                                                                      onAction="#removeSliderHBox" styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Hide Slider"/>
+                                                            </tooltip>
+                                                        </ToggleButton>
+                                                        <ToggleButton id="reflection" fx:id="showReflectionButton"
+                                                                      onAction="#showReflection" selected="true"
+                                                                      styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Show Reflection For Images and Videos."/>
+                                                            </tooltip>
+                                                        </ToggleButton>
+                                                        <ToggleButton id="fitScreen" fx:id="fitScreenToggleMediaButton"
+                                                                      styleClass="mediaButtons">
+                                                            <tooltip>
+                                                                <Tooltip text="Maximize to fit Screen Dimensions."/>
+
+                                                            </tooltip>
+                                                        </ToggleButton>
+
+                                                        <Label fx:id="fileNameLabelMediaControls" styleClass="blackBoxWhiteText"
+                                                               visible="false" HBox.hgrow="ALWAYS"/>
+
+                                                    </children>
+                                                </FlowPane>
+                                                <Label fx:id="volumeAndCurrentTimeSwipeLabel" styleClass="blackBoxWhiteText"
+                                                       visible="false"/>
 
                                             </children>
-                                        </FlowPane>
-                                        <Label fx:id="volumeAndCurrentTimeSwipeLabel" styleClass="blackBoxWhiteText"
-                                               visible="false"/>
+                                        </StackPane>
+                                        <HBox fx:id="sliderHbox">
+                                            <children>
+                                                <Label fx:id="currentTimeLabel" alignment="CENTER"/>
+                                                <Slider fx:id="playPositionSlider" blockIncrement="1.0" max="1"
+                                                        visible="false"/>
+                                                <Label fx:id="totalTimeLabel" alignment="CENTER"/>
+                                            </children>
+                                        </HBox>
+
 
                                     </children>
-                                </StackPane>
-                                <HBox fx:id="sliderHbox">
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </TitledPane>
+                <TitledPane text="Web" animated="true" collapsible="true" expanded="true" maxHeight="1.7976931348623157E308">
+                    <content>
+                        <VBox fx:id="webViewVBox">
+                            <children>
+                                <HBox>
                                     <children>
-                                        <Label fx:id="currentTimeLabel" alignment="CENTER"/>
-                                        <Slider fx:id="playPositionSlider" blockIncrement="1.0" max="1"
-                                                visible="false"/>
-                                        <Label fx:id="totalTimeLabel" alignment="CENTER"/>
+                                        <Button mnemonicParsing="false" text="Back" fx:id="webViewBackButton"/>
+                                        <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Forward"
+                                                fx:id="webViewForwardButton"/>
+                                        <TextField promptText="url" fx:id="webViewTextField" prefWidth="400"/>
                                     </children>
                                 </HBox>
-
-
+                                <WebView fx:id="splitPaneWebView"/>
                             </children>
                         </VBox>
                     </content>
-                </ScrollPane>
-                <VBox fx:id="webViewVBox">
-                    <children>
-                        <HBox>
-                            <children>
-                                <Button mnemonicParsing="false" text="Back" fx:id="webViewBackButton"/>
-                                <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Forward"
-                                        fx:id="webViewForwardButton"/>
-                                <TextField promptText="url" fx:id="webViewTextField" prefWidth="400"/>
-                            </children>
-                        </HBox>
-                        <WebView fx:id="splitPaneWebView"/>
-                    </children>
-                </VBox>
+                </TitledPane>
 
             </items>
         </SplitPane>

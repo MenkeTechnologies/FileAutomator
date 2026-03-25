@@ -476,3 +476,51 @@
 .tab:selected .tab-label {
     -fx-text-fill: #ff2a6d;
 }
+
+/* ── TitledPane (Foldable Panels) ─────────────────────── */
+.titled-pane {
+    -fx-text-fill: #05d9e8;
+}
+
+.titled-pane > .title {
+    -fx-background-color: linear-gradient(to right, #12081e, #0a0a12);
+    -fx-border-color: transparent transparent #05d9e830 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 4 8;
+    -fx-cursor: hand;
+}
+
+.titled-pane > .title:hover {
+    -fx-background-color: linear-gradient(to right, #1a0a2e, #12081e);
+    -fx-border-color: transparent transparent #ff2a6d50 transparent;
+}
+
+.titled-pane > .title > .text {
+    -fx-font-weight: bold;
+    -fx-fill: #05d9e8;
+}
+
+.titled-pane:expanded > .title > .text {
+    -fx-fill: #ff2a6d;
+}
+
+.titled-pane > .title > .arrow-button .arrow {
+    -fx-background-color: #05d9e8;
+    -fx-effect: dropshadow(three-pass-box, #05d9e8, 3, 0.3, 0, 0);
+}
+
+.titled-pane:expanded > .title > .arrow-button .arrow {
+    -fx-background-color: #ff2a6d;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 3, 0.3, 0, 0);
+}
+
+.titled-pane > .title:hover > .arrow-button .arrow {
+    -fx-background-color: #ff2a6d;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 6, 0.4, 0, 0);
+}
+
+.titled-pane > *.content {
+    -fx-background-color: #0a0a12;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}

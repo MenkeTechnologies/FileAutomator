@@ -53,34 +53,80 @@ class Main : Application() {
 
         val splash = ImageView(SPLASH_IMAGE)
         mainVBox = VBox()
+        mainVBox!!.spacing = 0.0
         splash.isPreserveRatio = true
         mainVBox!!.border = Border.EMPTY
+
         loadProgress = ProgressBar()
         loadProgress!!.prefWidth = SPLASH_WIDTH.toDouble()
+        loadProgress!!.prefHeight = 6.0
+        loadProgress!!.style = """
+            -fx-accent: #ff2a6d;
+            -fx-control-inner-background: #0a0a12;
+            -fx-background-color: #0a0a12;
+        """.trimIndent()
+
         progressText = Label("Loading ...")
+        progressText!!.style = """
+            -fx-text-fill: #05d9e8;
+            -fx-font-family: "Menlo", "Courier New", monospace;
+            -fx-font-size: 12px;
+            -fx-padding: 8 0 8 12;
+        """.trimIndent()
 
         val stackpane = StackPane()
         stackpane.prefWidth = mainVBox!!.width
         splash.fitWidthProperty().bind(stackpane.widthProperty())
 
         val label = Text("File Automator")
-        label.font = Font.font("MARSNEVENEKSK", 170.0)
-        label.fill = Color.WHITE
-        label.effect = Reflection()
+        label.font = Font.font("Menlo", 72.0)
+        label.fill = Color.web("#05d9e8")
+        label.stroke = Color.web("#ff2a6d")
+        label.strokeWidth = 1.5
 
-        stackpane.children.addAll(splash, label)
+        val titleGlow = javafx.scene.effect.Bloom()
+        titleGlow.threshold = 0.6
+        val titleShadow = javafx.scene.effect.DropShadow()
+        titleShadow.color = Color.web("#05d9e8")
+        titleShadow.radius = 30.0
+        titleShadow.spread = 0.4
+        titleShadow.input = titleGlow
+        label.effect = titleShadow
 
-        val bottomVbox = VBox()
+        val versionLabel = Text("v2.0")
+        versionLabel.font = Font.font("Menlo", 18.0)
+        versionLabel.fill = Color.web("#ff2a6d")
+        val versionGlow = javafx.scene.effect.DropShadow()
+        versionGlow.color = Color.web("#ff2a6d")
+        versionGlow.radius = 10.0
+        versionGlow.spread = 0.3
+        versionLabel.effect = versionGlow
+
+        val titleBox = VBox(4.0)
+        titleBox.alignment = Pos.CENTER
+        titleBox.children.addAll(label, versionLabel)
+
+        stackpane.children.addAll(splash, titleBox)
+
+        val bottomVbox = VBox(0.0)
+        bottomVbox.style = "-fx-background-color: #0a0a12; -fx-padding: 0;"
         bottomVbox.children.addAll(loadProgress, progressText)
 
         mainVBox!!.children.addAll(stackpane, bottomVbox)
-        progressText!!.alignment = Pos.CENTER
 
-        mainVBox!!.style = "-fx-background-color: transparent"
+        mainVBox!!.style = """
+            -fx-background-color: #0a0a12;
+            -fx-border-color: #05d9e8;
+            -fx-border-width: 2;
+            -fx-border-radius: 4;
+            -fx-background-radius: 4;
+        """.trimIndent()
 
-        val reflection = Reflection()
-        loadProgress!!.effect = Reflection()
-        mainVBox!!.effect = reflection
+        val outerGlow = javafx.scene.effect.DropShadow()
+        outerGlow.color = Color.web("#05d9e8")
+        outerGlow.radius = 25.0
+        outerGlow.spread = 0.2
+        mainVBox!!.effect = outerGlow
     }
 
     private fun showSplash(initStage: Stage, initCompletionHandler: Splash.InitCompletionHandler) {
@@ -127,8 +173,11 @@ class Main : Application() {
     }
 
     override fun start(initStage: Stage) {
-//        showSplash(initStage) { showMainStage() }
-        showMainStage()
+        showSplash(initStage, object : Splash.InitCompletionHandler {
+            override fun complete() {
+                showMainStage()
+            }
+        })
     }
 
     @Throws(Exception::class)
