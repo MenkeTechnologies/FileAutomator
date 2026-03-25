@@ -1,6 +1,5 @@
 package windows;
 
-import com.sun.javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
@@ -20,16 +19,6 @@ public class CustomTextArea extends TextArea {
 
         MenuItem save = new MenuItem("Save");
 
-        TextAreaSkin textAreaSkin = new TextAreaSkin(this) {
-            @Override
-            public void populateContextMenu(ContextMenu contextMenu) {
-                super.populateContextMenu(contextMenu);
-                contextMenu.getItems().add(save);
-            }
-        };
-
-        this.setSkin(textAreaSkin);
-
         save.setOnAction(ex -> {
 
             String path = mainController.pathLabelContent.getText();
@@ -43,6 +32,10 @@ public class CustomTextArea extends TextArea {
                 CommonUtilities.showErrorAlert("Could not save " + path);
             }
         });
+
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().add(save);
+        this.setContextMenu(contextMenu);
     }
 
     public MainController getMainController() {

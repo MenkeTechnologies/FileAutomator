@@ -1,9 +1,9 @@
 package mainPackage;
 
+import com.kodedu.terminalfx.TerminalBuilder;
+import com.kodedu.terminalfx.TerminalTab;
+import com.kodedu.terminalfx.config.TerminalConfig;
 import com.sun.management.OperatingSystemMXBean;
-import com.terminalfx.TerminalBuilder;
-import com.terminalfx.TerminalTab;
-import com.terminalfx.config.TerminalConfig;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -353,7 +353,7 @@ public class MainController implements Initializable {
                 contextMenu.show(splitPaneWebView, event.getScreenX(), event.getScreenY());
             } else {
 
-                contextMenu.hide();
+                if (contextMenu != null) contextMenu.hide();
             }
         });
 
@@ -1037,7 +1037,7 @@ public class MainController implements Initializable {
 
     public void runInBackgroundThreadSecondary(Runnable r) {
 
-        if (searchingTask.getState() != Task.State.RUNNING) {
+        if (searchingTask.getState() != javafx.concurrent.Worker.State.RUNNING) {
             Utilities.addToView(sphere);
             timeline.play();
             // System.out.println("started secondary");

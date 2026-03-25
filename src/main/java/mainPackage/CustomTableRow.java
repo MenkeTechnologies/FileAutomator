@@ -1,7 +1,5 @@
 package mainPackage;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableRow;
@@ -9,9 +7,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.util.Duration;
-
-import java.lang.reflect.Field;
 
 /**
  * Created by jacobmenke on 4/23/17.
@@ -72,20 +67,6 @@ public class CustomTableRow extends TableRow<FileInfo> {
     }
 
     public static void changeToolTipTime(Tooltip tooltip, Integer time) {
-        try {
-            Field fieldBehavior = tooltip.getClass().getDeclaredField("BEHAVIOR");
-
-            fieldBehavior.setAccessible(true);
-            Object objBehavior = fieldBehavior.get(tooltip);
-
-            Field fieldTimer = objBehavior.getClass().getDeclaredField("activationTimer");
-            fieldTimer.setAccessible(true);
-            Timeline objTimer = (Timeline) fieldTimer.get(objBehavior);
-
-            objTimer.getKeyFrames().clear();
-            objTimer.getKeyFrames().add(new KeyFrame(new Duration(time * 1000)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        tooltip.setShowDelay(javafx.util.Duration.seconds(time));
     }
 }

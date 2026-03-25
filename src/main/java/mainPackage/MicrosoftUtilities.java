@@ -78,9 +78,9 @@ public class MicrosoftUtilities {
                 while (cellIterator.hasNext()) {
                     Cell currentCell = cellIterator.next();
 
-                    if (currentCell.getCellTypeEnum() == CellType.STRING) {
+                    if (currentCell.getCellType() == CellType.STRING) {
                         sb.append(currentCell.getStringCellValue());
-                    } else if (currentCell.getCellTypeEnum() == CellType.NUMERIC) {
+                    } else if (currentCell.getCellType() == CellType.NUMERIC) {
                         sb.append(currentCell.getNumericCellValue() + "");
                     }
 

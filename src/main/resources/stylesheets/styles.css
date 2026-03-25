@@ -1,97 +1,360 @@
 
+/* ═══════════════════════════════════════════════════════
+   C Y B E R P U N K   T H E M E
+   FileAutomator - Neon Dreams Edition
+   ═══════════════════════════════════════════════════════ */
+
 .root {
-    -fx-font-family: Avenir;
-    -fx-font-size: 12pt;
+    -fx-font-family: "Menlo", "Courier New", monospace;
+    -fx-font-size: 11pt;
+    -fx-base: #0a0a12;
+    -fx-background: #0a0a12;
+    -fx-control-inner-background: #0d0d1a;
+    -fx-accent: #ff2a6d;
+    -fx-focus-color: #05d9e8;
+    -fx-faint-focus-color: transparent;
+    -fx-text-fill: #d1f7ff;
+    -fx-selection-bar: #ff2a6d;
+    -fx-selection-bar-non-focused: #1a1a2e;
+}
+
+/* ── Labels ────────────────────────────────────────────── */
+.label {
+    -fx-text-fill: #05d9e8;
 }
 
 .detailLabels {
-    /*-fx-font-weight: bold;*/
-    /*-fx-font-size: 1.7em;*/
+    -fx-text-fill: #ff2a6d;
+    -fx-font-weight: bold;
 }
 
 .blackBoxWhiteText {
     -fx-font-weight: bold;
-    -fx-text-fill: white;
-    -fx-opacity: 0.9;
-    -fx-background-color: rgb(0, 0, 0, 0.8);
-    -fx-background-radius: 10;
+    -fx-text-fill: #05d9e8;
+    -fx-opacity: 0.95;
+    -fx-background-color: linear-gradient(to bottom, rgba(13,13,26,0.95), rgba(5,5,15,0.95));
+    -fx-background-radius: 4;
+    -fx-border-color: #05d9e8;
+    -fx-border-radius: 4;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, #05d9e8, 8, 0.3, 0, 0);
+    -fx-padding: 0.8em;
+}
 
-    /*-fx-border-color: rgb(0,0,0,0.8);*/
-    /*-fx-border-radius: 10;*/
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 3, 0.0, 0, 1);
-    -fx-padding: 1em; /* 2.5 */
+/* ── Buttons ───────────────────────────────────────────── */
+.button, .toggle-button, .menu-button {
+    -fx-background-color: linear-gradient(to bottom, #1a1a2e, #0f0f1e);
+    -fx-text-fill: #05d9e8;
+    -fx-border-color: #05d9e8;
+    -fx-border-width: 1;
+    -fx-border-radius: 2;
+    -fx-background-radius: 2;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, #05d9e8, 4, 0.15, 0, 0);
+}
 
+.button:hover, .toggle-button:hover, .menu-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #2a1a3e, #1a0a2e);
+    -fx-border-color: #ff2a6d;
+    -fx-text-fill: #ff2a6d;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 10, 0.4, 0, 0);
+}
+
+.button:pressed, .toggle-button:pressed {
+    -fx-background-color: #ff2a6d;
+    -fx-text-fill: #0a0a12;
+    -fx-border-color: #ff2a6d;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 15, 0.6, 0, 0);
+}
+
+.toggle-button:selected {
+    -fx-background-color: linear-gradient(to bottom, #ff2a6d, #d4145a);
+    -fx-text-fill: #0a0a12;
+    -fx-border-color: #ff2a6d;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 10, 0.5, 0, 0);
+}
+
+/* ── Media Buttons ─────────────────────────────────────── */
+.mediaButtons {
+    -fx-background-color: transparent;
+    -fx-border-color: #05d9e850;
+    -fx-border-width: 1;
+    -fx-border-radius: 2;
+    -fx-effect: dropshadow(three-pass-box, #05d9e8, 3, 0.15, 0, 0);
+}
+
+.mediaButtons:hover, .mediaButtons:selected {
+    -fx-background-color: rgba(255, 42, 109, 0.15);
+    -fx-border-color: #ff2a6d;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 8, 0.4, 0, 0);
 }
 
 .bottomMediaButtons {
     -fx-background-color: transparent;
-    -fx-effect: dropshadow(one-pass-box, black, 4, 0.0, 2, 0);
-    -fx-border-color: transparent;
+    -fx-border-color: #05d9e850;
+    -fx-border-width: 1;
+    -fx-border-radius: 2;
+    -fx-effect: dropshadow(three-pass-box, #05d9e8, 3, 0.15, 0, 0);
 }
 
 .bottomMediaButtons:hover, .bottomMediaButtons:selected {
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 2, 0.0, 0, 1);
-    -fx-background-color: rgb(255, 255, 255, 0.3);
-    -fx-border-color: transparent;
+    -fx-background-color: rgba(255, 42, 109, 0.15);
+    -fx-border-color: #ff2a6d;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 8, 0.4, 0, 0);
 }
 
-.mediaButtons {
-    -fx-background-color: transparent;
-    -fx-effect: dropshadow(one-pass-box, black, 4, 0.0, 2, 0);
-    -fx-border-color: transparent;
+.rateLabel {
+    -fx-text-fill: #d1ff05;
+    -fx-font-weight: bold;
 }
 
-.mediaButtons:hover, .mediaButtons:selected {
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 2, 0.0, 0, 1);
-    -fx-background-color: rgb(255, 255, 255, 0.3);
-    -fx-border-color: transparent;
+.rateLabel:hover {
+    -fx-background-color: rgba(209, 255, 5, 0.1);
+    -fx-effect: dropshadow(three-pass-box, #d1ff05, 6, 0.3, 0, 0);
 }
 
+/* ── Text Fields ───────────────────────────────────────── */
+.text-field {
+    -fx-background-color: #0d0d1a;
+    -fx-text-fill: #05d9e8;
+    -fx-prompt-text-fill: #05d9e850;
+    -fx-border-color: #1a1a3e;
+    -fx-border-width: 0 0 2 0;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-highlight-fill: #ff2a6d;
+    -fx-highlight-text-fill: white;
+}
+
+.text-field:focused {
+    -fx-border-color: #05d9e8;
+    -fx-effect: dropshadow(three-pass-box, #05d9e8, 6, 0.2, 0, 0);
+}
+
+/* ── Slider ────────────────────────────────────────────── */
 .slider .track {
-    -fx-background-color: lightgrey; /* Hide the track */
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 3, 0.0, 0, 1);
+    -fx-background-color: linear-gradient(to right, #1a1a2e, #2a1a3e);
+    -fx-border-color: #05d9e850;
+    -fx-border-width: 1;
     -fx-background-insets: 1 0 -1 0, 0, 1;
     -fx-background-radius: 2.5, 2.5, 1.5;
-    -fx-padding: 0.208333em; /* 2.5 */
+    -fx-padding: 0.208333em;
+    -fx-effect: dropshadow(three-pass-box, #05d9e8, 3, 0.15, 0, 0);
 }
 
 .slider .thumb {
-    -fx-background-color: rgb(255, 255, 255, 0.9); /* Hide the track */
-    -fx-effect: dropshadow(one-pass-box, black, 8, 0.0, 2, 0);
+    -fx-background-color: #ff2a6d;
+    -fx-background-radius: 1;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 8, 0.4, 0, 0);
 }
 
+.slider .thumb:hover {
+    -fx-background-color: #05d9e8;
+    -fx-effect: dropshadow(three-pass-box, #05d9e8, 12, 0.5, 0, 0);
+}
+
+/* ── Menu Bar ──────────────────────────────────────────── */
+.menu-bar {
+    -fx-background-color: linear-gradient(to right, #0a0a12, #12081e, #0a0a12);
+    -fx-border-color: transparent transparent #ff2a6d30 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.menu-bar .menu {
+    -fx-background-color: transparent;
+}
+
+.menu-bar .label {
+    -fx-text-fill: #05d9e8;
+}
+
+.menu-bar .menu:hover .label,
+.menu-bar .menu:showing .label {
+    -fx-text-fill: #ff2a6d;
+}
+
+.context-menu, .menu-item {
+    -fx-background-color: #0d0d1a;
+    -fx-text-fill: #05d9e8;
+}
+
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: #1a1a2e;
+}
+
+.menu-item .label {
+    -fx-text-fill: #05d9e8;
+}
+
+.menu-item:hover .label, .menu-item:focused .label {
+    -fx-text-fill: #ff2a6d;
+}
+
+/* ── TreeView ──────────────────────────────────────────── */
+.tree-view {
+    -fx-background-color: #0a0a12;
+    -fx-border-color: #1a1a2e;
+}
+
+.tree-view .tree-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #d1f7ff;
+}
+
+.tree-view .tree-cell:selected {
+    -fx-background-color: linear-gradient(to right, #ff2a6d30, transparent);
+    -fx-text-fill: #ff2a6d;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 4, 0.1, 0, 0);
+}
+
+.tree-view .tree-cell:hover {
+    -fx-background-color: rgba(5, 217, 232, 0.08);
+}
+
+.tree-view .tree-disclosure-node .arrow {
+    -fx-background-color: #05d9e8;
+}
+
+/* ── TableView ─────────────────────────────────────────── */
+.table-view {
+    -fx-background-color: #0a0a12;
+    -fx-border-color: #1a1a2e;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #12081e, #0a0a12);
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #ff2a6d40 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #ff2a6d;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #0d0d1a transparent;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: rgba(5, 217, 232, 0.03);
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: linear-gradient(to right, #ff2a6d30, transparent);
+}
+
+.table-view .table-row-cell:selected .text {
+    -fx-fill: #ff2a6d;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: rgba(5, 217, 232, 0.08);
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #d1f7ff;
+}
+
+/* ── ScrollBar / ScrollPane ────────────────────────────── */
+.scroll-pane {
+    -fx-background-color: #0a0a12;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar {
+    -fx-background-color: #0a0a12;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #1a1a3e;
+    -fx-background-radius: 2;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #ff2a6d;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 4, 0.2, 0, 0);
+}
+
+.scroll-bar .increment-button, .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .increment-arrow, .scroll-bar .decrement-arrow {
+    -fx-background-color: #05d9e850;
+}
+
+/* ── SplitPane ─────────────────────────────────────────── */
+.split-pane {
+    -fx-background-color: #0a0a12;
+    -fx-padding: 0;
+}
+
+.split-pane-divider {
+    -fx-background-color: #ff2a6d40;
+    -fx-border-color: transparent;
+}
+
+.split-pane-divider:hover {
+    -fx-background-color: #ff2a6d;
+    -fx-effect: dropshadow(three-pass-box, #ff2a6d, 6, 0.3, 0, 0);
+}
+
+/* ── Tooltip ───────────────────────────────────────────── */
+.tooltip {
+    -fx-background-color: #0d0d1aee;
+    -fx-text-fill: #05d9e8;
+    -fx-border-color: #05d9e8;
+    -fx-border-width: 1;
+    -fx-border-radius: 2;
+    -fx-background-radius: 2;
+    -fx-font-size: 10pt;
+    -fx-effect: dropshadow(three-pass-box, #05d9e8, 6, 0.2, 0, 0);
+}
+
+/* ── ProgressIndicator ─────────────────────────────────── */
+.progress-indicator .indicator {
+    -fx-border-color: #05d9e8;
+}
+
+/* ── HBoxes ────────────────────────────────────────────── */
+.hboxes {
+    -fx-padding: 5 5 5 5;
+    -fx-background-color: linear-gradient(to right, #0a0a12, #0f081a, #0a0a12);
+    -fx-border-color: transparent transparent #05d9e820 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ── Icon References (unchanged) ───────────────────────── */
 #2xslower {
     -fx-graphic: url("/png/2xslower.png");
-
 }
 
 #2xfaster {
     -fx-graphic: url("/png/fastforward.png");
-
 }
 
 #playMedia {
-
 }
 
 #loopMedia {
     -fx-graphic: url("/png/loop.png");
-
 }
 
 #fullScreen {
     -fx-graphic: url("/png/fullscreen.png");
-
 }
 
 #oldSize {
     -fx-graphic: url("/png/back.png");
-
-}
-
-.rateLabel:hover {
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 3, 0.0, 0, 1);
-    -fx-background-color: rgb(255, 255, 255, 0.3);
 }
 
 #lock {
@@ -100,117 +363,116 @@
 
 #rewind {
     -fx-graphic: url("/png/rewind.png");
-
 }
 
 #search {
     -fx-graphic: url("/png/search.png");
-
 }
 
 #home {
     -fx-graphic: url("/png/home.png");
-
 }
 
 #dialog {
     -fx-graphic: url("/png/dialog.png");
-
 }
 
 #autoplay {
     -fx-graphic: url("/png/auto.png");
-
 }
 
 #hide {
     -fx-graphic: url("/png/hide.png");
-
 }
 
 #tree {
     -fx-graphic: url("/png/filetree.png");
-
 }
 
 #refresh {
     -fx-graphic: url("/png/refresh.png");
-
 }
 
 #downloads {
     -fx-graphic: url("/png/dl.png");
-
 }
 
 #desktop {
     -fx-graphic: url("/png/desktop.png");
-
 }
 
 #play {
     -fx-graphic: url("/png/playing.png");
-
 }
 
 #lines {
     -fx-graphic: url("/png/line.png");
-
 }
 
 #collapse {
     -fx-graphic: url("/png/collapse.png");
-
 }
 
 #reflection {
     -fx-graphic: url("/png/reflection.png");
-
 }
 
 #next {
     -fx-graphic: url("/png/next.png");
-
 }
 
 #playtree {
     -fx-graphic: url("/png/playtree.png");
-
 }
 
 #fitScreen {
     -fx-graphic: url("/png/fitscreen.png");
-
 }
 
 #case {
     -fx-graphic: url("/png/case.png");
-
 }
 
 #path {
     -fx-graphic: url("/png/path.png");
-
 }
 
 #hidden {
     -fx-graphic: url("/png/hidden.png");
-
 }
 
 #hide-directories {
     -fx-graphic: url("/png/hide-dir.png");
-
 }
 
 #automatic-filter {
     -fx-graphic: url("/png/automatic-filter.png");
 }
 
-.hboxes {
-    -fx-padding: 5 0 0 0;
+/* ── WebView toolbar ───────────────────────────────────── */
+.web-view {
+    -fx-background-color: #0a0a12;
 }
 
-.scroll-pane > .viewport {
-    -fx-background-color: transparent;
+/* ── Tab styling (if used) ─────────────────────────────── */
+.tab-pane .tab-header-background {
+    -fx-background-color: #0a0a12;
+}
+
+.tab {
+    -fx-background-color: #1a1a2e;
+    -fx-border-color: #05d9e840;
+}
+
+.tab:selected {
+    -fx-background-color: #0d0d1a;
+    -fx-border-color: #ff2a6d;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #05d9e8;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #ff2a6d;
 }

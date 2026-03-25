@@ -1,6 +1,6 @@
 package mainPackage;
 
-import com.apple.eio.FileManager;
+import java.awt.Desktop;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -262,7 +262,7 @@ public class CommonUtilities {
 
             try {
 
-                FileManager.moveToTrash(fileInfo);
+                Desktop.getDesktop().moveToTrash(fileInfo);
                 if (fileInfo.isDirectory()) {
 
                     RegexUtilities.searchAndRefresh(mainController);
@@ -270,7 +270,7 @@ public class CommonUtilities {
                     files.remove(fileInfo);
                     mainTableView.refresh();
                 }
-            } catch (FileNotFoundException e1) {
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
         }
