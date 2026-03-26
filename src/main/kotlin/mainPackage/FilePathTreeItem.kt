@@ -204,18 +204,13 @@ class FilePathTreeItem : TreeItem<FilePathTreeItem>, CommonFileInterface {
     @Throws(IOException::class)
     fun populateTreeItem(source: FilePathTreeItem) {
         val path = Paths.get(source.getPathString())
-        val attribs = Files.readAttributes(path, BasicFileAttributes::class.java)
-        if (attribs.isDirectory) {
-            val dir: DirectoryStream<Path> = Files.newDirectoryStream(path)
+        if (!Files.isDirectory(path)) return
+
+        val showHidden = mainController != null && mainController!!.showHiddenFilesCheckBox.isSelected
+        Files.newDirectoryStream(path).use { dir ->
             for (path1 in dir) {
-                if (path1.toFile().isHidden) {
-                    if (mainController != null && mainController!!.showHiddenFilesCheckBox.isSelected) {
-                        val treeNode = FilePathTreeItem(path1, mainController)
-                        source.children.add(treeNode)
-                    }
-                } else {
-                    val treeNode = FilePathTreeItem(path1, mainController)
-                    source.children.add(treeNode)
+                if (!path1.toFile().isHidden || showHidden) {
+                    source.children.add(FilePathTreeItem(path1, mainController))
                 }
             }
         }

@@ -104,9 +104,9 @@ object RegexUtilities {
                         mainController.checkToShowHiddenFiles(file)
                     }
 
-                    if (total % 100 == 0L) {
+                    if (total % 500 == 0L) {
                         MainController.searchingTask.updateMessage(
-                            "Filtered ${CommonUtilities.MATCHING_FILE_COUNTER} files of $total files : Processing ${file.fileName}"
+                            "Filtered ${CommonUtilities.MATCHING_FILE_COUNTER.get()} files of $total files : Processing ${file.fileName}"
                         )
                     }
 

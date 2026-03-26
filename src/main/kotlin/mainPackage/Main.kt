@@ -232,6 +232,7 @@ class Main : Application() {
                     Preferences.userRoot().putDouble("dividerPos$i", mainController!!.mainSplitPane.dividerPositions[i])
                 }
             }
+            mainController!!.shutdown()
             Platform.exit()
             System.exit(0)
         }

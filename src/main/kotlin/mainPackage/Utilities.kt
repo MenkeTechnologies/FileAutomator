@@ -71,35 +71,22 @@ class Utilities {
             return stringBuilder.toString()
         }
 
+        private val TEXT_HEADER_PATTERN = Regex("[_a-zA-Z0-9\\-\\.]*")
+
         @JvmStatic
         @Throws(IOException::class)
         fun isText(file: File): Boolean {
-            val reader = FileReader(file)
-            var data = reader.read()
-            val c = CharArray(3)
-
-            for (i in 0 until 3) {
-                c[i] = data.toChar()
-                data = reader.read()
+            FileReader(file).use { reader ->
+                val buf = CharArray(3)
+                val read = reader.read(buf)
+                if (read < 2) return false
+                val header = String(buf, 0, 2)
+                return header.matches(TEXT_HEADER_PATTERN)
             }
-            reader.close()
-            println()
-            var type = c[0].toString()
-            for (i in 1 until 2) {
-                type += c[i].toString()
-            }
-
-            if (!type.matches(Regex("[_a-zA-Z0-9\\-\\.]*"))) {
-                return false
-            }
-
-            return true
         }
 
         @JvmStatic
         fun updateThumbnailRightSidePane(mainController: MainController, filePathTreeItem: FilePathTreeItem) {
-            System.gc()
-
             if (filePathTreeItem.getType() != "pdf") {
                 MainController.loadingTask.updateMessage("Loading File: ${filePathTreeItem.getPath().fileName}")
             }
@@ -112,10 +99,14 @@ class Utilities {
                 "music" -> {
                     image = FilePathTreeItem.musicLargeImage
                     val m = Media(fileInfo.toURI().toString())
+                    MainController.mediaPlayer.stop()
+                    MainController.mediaPlayer.dispose()
                     MainController.mediaPlayer = MediaPlayer(m)
                 }
                 "video" -> {
                     val m = Media(fileInfo.toURI().toString())
+                    MainController.mediaPlayer.stop()
+                    MainController.mediaPlayer.dispose()
                     MainController.mediaPlayer = MediaPlayer(m)
                 }
                 "pdf" -> getImageViewsFromPDF(mainController, filePathTreeItem)

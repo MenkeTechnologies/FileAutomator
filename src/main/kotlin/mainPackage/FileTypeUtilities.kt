@@ -9,29 +9,25 @@ object FileTypeUtilities {
         else -> false
     }
 
+    private val EXTENSION_MAP = HashMap<String, String>(32).apply {
+        for (ext in arrayOf("png", "jpg", "jpeg", "svg")) put(ext, "image")
+        put("psd", "psd"); put("ai", "ai")
+        for (ext in arrayOf("mp4", "mov")) put(ext, "video")
+        put("java", "java"); put("py", "python"); put("rb", "ruby")
+        for (ext in arrayOf("json", "js")) put(ext, "js")
+        for (ext in arrayOf("fxml", "xml")) put(ext, "xml")
+        put("pdf", "pdf"); put("html", "html"); put("css", "css")
+        for (ext in arrayOf("mp3", "wav", "aiff", "flac")) put(ext, "music")
+        for (ext in arrayOf("doc", "docx")) put(ext, "word")
+        for (ext in arrayOf("xls", "xlsx")) put(ext, "excel")
+        put("txt", "text"); put("jar", "jar")
+    }
+
     @JvmStatic
     fun getFileType(pathName: String): String {
-        if (pathName.lastIndexOf('.') <= 0) return "file"
-        val fileType = pathName.substring(pathName.lastIndexOf('.') + 1)
-        return when (fileType) {
-            "png", "jpg", "jpeg", "svg" -> "image"
-            "psd" -> "psd"
-            "ai" -> "ai"
-            "mp4", "mov" -> "video"
-            "java" -> "java"
-            "py" -> "python"
-            "rb" -> "ruby"
-            "json", "js" -> "js"
-            "fxml", "xml" -> "xml"
-            "pdf" -> "pdf"
-            "html" -> "html"
-            "css" -> "css"
-            "mp3", "wav", "aiff", "flac" -> "music"
-            "doc", "docx" -> "word"
-            "xls", "xlsx" -> "excel"
-            "txt" -> "text"
-            "jar" -> "jar"
-            else -> "file"
-        }
+        val dotIndex = pathName.lastIndexOf('.')
+        if (dotIndex <= 0 || dotIndex == pathName.length - 1) return "file"
+        val ext = pathName.substring(dotIndex + 1)
+        return EXTENSION_MAP[ext] ?: "file"
     }
 }

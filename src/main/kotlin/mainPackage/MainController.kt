@@ -57,6 +57,7 @@ import java.io.IOException
 import java.lang.management.ManagementFactory
 import java.net.URL
 import java.nio.file.*
+import java.nio.file.ClosedWatchServiceException
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.*
 import java.util.prefs.Preferences
@@ -172,6 +173,7 @@ class MainController : Initializable {
     @JvmField var halfToggle = true
 
     private var monitoringExecutor: ScheduledExecutorService? = null
+    private var watchService: WatchService? = null
 
     init {
         val rect = Screen.getPrimary().bounds
@@ -384,28 +386,32 @@ class MainController : Initializable {
 
     private fun initFileSystemChangesMonitoring() {
         try {
-            val watchService = FileSystems.getDefault().newWatchService()
+            watchService = FileSystems.getDefault().newWatchService()
 
-            Thread {
+            val t = Thread {
                 try {
                     Paths.get(directoryToSearchTextField.text).register(
-                        watchService,
+                        watchService!!,
                         StandardWatchEventKinds.ENTRY_CREATE,
                         StandardWatchEventKinds.ENTRY_DELETE,
                         StandardWatchEventKinds.ENTRY_MODIFY
                     )
 
-                    var watchKey = watchService.take()
+                    var watchKey = watchService!!.take()
 
                     do {
                         watchKey.pollEvents().forEach { e ->
                             System.err.println("___________${Thread.currentThread().stackTrace[1].className}____Line:${Thread.currentThread().stackTrace[1].lineNumber}___ ${e.context()}")
                         }
                     } while (watchKey.reset())
+                } catch (e: ClosedWatchServiceException) {
+                    // Expected on shutdown
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            }.start()
+            }
+            t.isDaemon = true
+            t.start()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -767,16 +773,16 @@ class MainController : Initializable {
         }
     }
 
+    private val hideDelayExecutor = Executors.newSingleThreadScheduledExecutor { r ->
+        val t = Thread(r, "hide-delay")
+        t.isDaemon = true
+        t
+    }
+
     fun hideNodeAfterDelay(node: Node) {
-        val t = Thread {
-            try {
-                Thread.sleep(3000)
-                Platform.runLater { node.isVisible = false }
-            } catch (e1: InterruptedException) {
-                e1.printStackTrace()
-            }
-        }
-        t.start()
+        hideDelayExecutor.schedule({
+            Platform.runLater { node.isVisible = false }
+        }, 3, TimeUnit.SECONDS)
     }
 
     fun updateRightSidePane(newValue: FileInfo?) {
@@ -1311,6 +1317,20 @@ class MainController : Initializable {
             topTilePane.orientation = Orientation.HORIZONTAL
             bottomTilePane.orientation = Orientation.HORIZONTAL
         }
+    }
+
+    fun shutdown() {
+        monitoringExecutor?.shutdown()
+        hideDelayExecutor.shutdown()
+        try {
+            watchService?.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        mediaPlayer.stop()
+        mediaPlayer.dispose()
+        disappearTimer?.cancel()
+        binding?.dispose()
     }
 
     companion object {

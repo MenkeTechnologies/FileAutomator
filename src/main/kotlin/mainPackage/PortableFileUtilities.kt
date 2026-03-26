@@ -4,19 +4,17 @@ import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
 object PortableFileUtilities {
+    private val UNITS = arrayOf("B", "KiB", "MiB", "GiB", "TiB")
+
     @JvmStatic
     fun turnBytesIntoHumanReadable(length: Long): String {
-        var power = 0
-        var suffix = "B"
-        when {
-            length < 1024 -> {}
-            length < Math.pow(1024.0, 2.0).toLong() -> { power = 1; suffix = "KiB" }
-            length < Math.pow(1024.0, 3.0).toLong() -> { power = 2; suffix = "MiB" }
-            length < Math.pow(1024.0, 4.0).toLong() -> { power = 3; suffix = "GiB" }
-            length < Math.pow(1024.0, 5.0).toLong() -> { power = 4; suffix = "TiB" }
+        var value = length.toDouble()
+        var unitIndex = 0
+        while (unitIndex < UNITS.size - 1 && value >= 1024.0) {
+            value /= 1024.0
+            unitIndex++
         }
-        val factor = Math.pow(1024.0, power.toDouble())
-        return String.format("%.2f %s", length / factor, suffix)
+        return String.format("%.2f %s", value, UNITS[unitIndex])
     }
 
     @JvmStatic

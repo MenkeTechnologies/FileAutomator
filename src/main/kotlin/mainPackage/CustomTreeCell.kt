@@ -36,10 +36,9 @@ class CustomTreeCell(
             graphic = item.graphic
             CommonUtilities.formatTooltip(tooltip)
             CustomTableRow.changeToolTipTime(tooltip, 1)
-            val fileInfo = FileInfo(item.getPathString())
-            tooltip.text = fileInfo.toString()
+            tooltip.text = item.getPathString()
             if (!item.isDirectory()) {
-                tooltip.graphic = ImageView(fileInfo.getFileImage())
+                tooltip.graphic = ImageView(FilePathTreeItem.getImageFromType(item.getType()))
             } else {
                 val img = FilePathTreeItem.specialDirs[item.getPathString()]
                 tooltip.graphic = ImageView(img ?: FilePathTreeItem.folderCollapseImage)

@@ -16,10 +16,8 @@ import org.apache.pdfbox.tools.imageio.ImageIOUtil
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.io.File
-import java.io.FileReader
 import java.io.IOException
 import java.nio.file.Paths
-import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 class CommonUtilities {
@@ -51,19 +49,14 @@ class CommonUtilities {
 
         @JvmStatic
         fun createLineNumberingFromString(s: String, mainController: MainController): String {
-            val scanner = Scanner(s)
-            val sb = StringBuilder()
-            var counter = 0
+            val showLineNumbers = mainController.showLineNumbersCheckbox.isSelected
+            if (!showLineNumbers) return s
 
-            while (scanner.hasNextLine()) {
-                if (mainController.showLineNumbersCheckbox.isSelected) {
-                    counter++
-                    sb.append(counter).append("\t").append(scanner.nextLine()).append("\n")
-                } else {
-                    sb.append(scanner.nextLine()).append("\n")
-                }
+            val lines = s.lines()
+            val sb = StringBuilder(s.length + lines.size * 6)
+            for (i in lines.indices) {
+                sb.append(i + 1).append('\t').append(lines[i]).append('\n')
             }
-
             return sb.toString()
         }
 
@@ -176,33 +169,27 @@ class CommonUtilities {
         fun invokeCommandLine(vararg command: String) {
             val pb = ProcessBuilder()
             pb.command(*command)
-            pb.start()
+            val process = pb.start()
+            process.inputStream.close()
+            process.outputStream.close()
+            process.errorStream.close()
         }
 
         @JvmStatic
         fun invokeCommandLineAndReturnString(vararg command: String): String {
             val pb = ProcessBuilder()
             pb.command(*command)
+            pb.redirectErrorStream(true)
 
-            var p: Process? = null
-            try {
-                p = pb.start()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            val sb = StringBuilder()
-
-            try {
-                Scanner(p!!.inputStream).use { scanner ->
-                    while (scanner.hasNextLine()) {
-                        sb.append(scanner.nextLine()).append("\n")
-                    }
-                }
+            return try {
+                val p = pb.start()
+                val output = p.inputStream.bufferedReader().readText()
+                p.waitFor()
+                output
             } catch (e: Exception) {
                 e.printStackTrace()
+                ""
             }
-
-            return sb.toString()
         }
 
         @JvmStatic
