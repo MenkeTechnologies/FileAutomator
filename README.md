@@ -1,78 +1,108 @@
-# File Automator
+# FILE//AUTOMATOR_
 
-A feature-rich JavaFX desktop application for searching files, previewing content, performing batch operations, and playing media — all from a single multi-pane interface.
+```
+ ███████╗██╗██╗     ███████╗     █████╗ ██╗   ██╗████████╗ ██████╗ ███╗   ███╗ █████╗ ████████╗ ██████╗ ██████╗
+ ██╔════╝██║██║     ██╔════╝    ██╔══██╗██║   ██║╚══██╔══╝██╔═══██╗████╗ ████║██╔══██╗╚══██╔══╝██╔═══██╗██╔══██╗
+ █████╗  ██║██║     █████╗      ███████║██║   ██║   ██║   ██║   ██║██╔████╔██║███████║   ██║   ██║   ██║██████╔╝
+ ██╔══╝  ██║██║     ██╔══╝      ██╔══██║██║   ██║   ██║   ██║   ██║██║╚██╔╝██║██╔══██║   ██║   ██║   ██║██╔══██╗
+ ██║     ██║███████╗███████╗    ██║  ██║╚██████╔╝   ██║   ╚██████╔╝██║ ╚═╝ ██║██║  ██║   ██║   ╚██████╔╝██║  ██║
+ ╚═╝     ╚═╝╚══════╝╚══════╝    ╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
+```
 
-Built with Kotlin, JavaFX 24, and JDK 25.
+> **[ SYSTEM ONLINE ]** A high-performance JavaFX desktop rig for searching files, previewing content, running batch ops, and playing media — all jacked into a single multi-pane interface.
+
+> `BUILT WITH` Kotlin // JavaFX 24 // JDK 25
 
 ![multiple panes in file automator app](/fileAutomatorScreenshot1.png)
 
-## Features
+---
 
-### File Search
-- Regex-based file searching with AND/OR filter logic
+## >> FEATURE_MANIFEST
+
+### `[01]` FILE SEARCH ENGINE
+- Regex-powered file searching with `AND`/`OR` filter logic
 - Case-insensitive and path-matching modes
 - Real-time file system monitoring via watch service
 - Auto-complete for directory paths
 - Toggle hidden files and directories
 
-### Multi-Pane Interface
-- **File Browser** — directory tree view with drag-and-drop
-- **Results Table** — searchable, sortable results
-- **Preview Pane** — inline preview for images, PDFs, Office docs, code, and media
-- **Web View** — integrated browser
-- **Terminal** — embedded terminal emulator (TerminalFX)
+### `[02]` MULTI-PANE INTERFACE
+- **FILE BROWSER** — directory tree view with drag-and-drop
+- **RESULTS GRID** — searchable, sortable results
+- **PREVIEW PANE** — inline preview for images, PDFs, Office docs, code, and media
+- **WEB VIEW** — integrated browser
+- **TERMINAL** — embedded terminal emulator (TerminalFX)
 
-### File Operations
+### `[03]` FILE OPERATIONS
 - Open, copy, move, rename, and delete files
-- Secure delete (permanent) and move to trash
+- Secure delete (permanent wipe) and move to trash
 - Batch copy with progress tracking, pause/resume/cancel
 - Copy absolute path to clipboard
 
-### File Preview
-- **Images** — direct inline preview
-- **PDFs** — page-by-page rendering with thumbnails (PDFBox)
-- **Office** — Word (.doc/.docx) and Excel (.xls/.xlsx) content extraction (Apache POI)
-- **Code** — syntax highlighting for Java, Kotlin, Python, Ruby, JavaScript, XML, HTML, CSS (RichTextFX)
-- **Archives** — JAR file listing
-- **Media** — video/audio thumbnail display
+### `[04]` FILE PREVIEW MATRIX
+| Format | Backend |
+|--------|---------|
+| Images | Direct inline render |
+| PDFs | Page-by-page with thumbnails — `PDFBox` |
+| Office | .doc/.docx & .xls/.xlsx extraction — `Apache POI` |
+| Code | Syntax highlighting (Java, Kotlin, Python, Ruby, JS, XML, HTML, CSS) — `RichTextFX` |
+| Archives | JAR file listing |
+| Media | Video/audio thumbnail display |
 
-### Media Player
-Full-featured media player with playback controls, volume, speed adjustment, loop/autoplay, and fit-to-screen options.
+### `[05]` MEDIA PLAYER
+Full-featured playback rig — controls, volume, speed adjustment, loop/autoplay, and fit-to-screen.
 
-### Customization
-- Theme editor with color pickers for background, text, tree view, table view, and accents
+### `[06]` CUSTOMIZATION PROTOCOL
+- Theme editor with color pickers for bg, text, tree view, table view, and accents
 - Font family and size selection
 - Live CSS stylesheet reload
 - Persistent styling via `~/modify.css`
 
-### System Monitoring
-- Real-time CPU and memory usage display
+### `[07]` SYSTEM MONITOR
+- Real-time CPU and memory usage readout
 - Activity indicators for long-running operations
 
-## Keyboard Shortcuts (Media Player)
+---
 
-| Key | Action |
-|-----|--------|
-| `Space` | Play / Pause |
-| `F` | Full screen |
-| `Q` | Snap to 25% screen |
-| `H` | Snap to 50% screen |
-| `W` | Fit to 100% screen |
-| `N` | Next track |
-| `P` | Previous track |
-| `B` | Rewind 15 seconds |
-| `0`–`9` | Seek to minute 0–9 |
+## >> KEYBIND_MAP `[ MEDIA PLAYER ]`
 
-## Tech Stack
+```
+ KEY        ACTION
+ ─────────────────────────────────
+ SPACE      Play / Pause
+ F          Full screen
+ Q          Snap to 25% screen
+ H          Snap to 50% screen
+ W          Fit to 100% screen
+ N          Next track
+ P          Previous track
+ B          Rewind 15s
+ 0-9        Seek to minute 0–9
+```
 
-- **Language:** Kotlin 2.1.20
-- **UI:** JavaFX 24 with FXML
-- **Runtime:** JDK 25
-- **Build:** Maven
-- **Key Libraries:** Apache POI, PDFBox, ControlsFX, RichTextFX, TerminalFX, Bouncy Castle, Jackson
+---
 
-## Building
+## >> TECH_STACK
+
+```
+ LANGUAGE    Kotlin 2.1.20
+ UI          JavaFX 24 + FXML
+ RUNTIME     JDK 25
+ BUILD       Maven
+ LIBRARIES   Apache POI // PDFBox // ControlsFX // RichTextFX
+             TerminalFX // Bouncy Castle // Jackson
+```
+
+---
+
+## >> BUILD_SEQUENCE
 
 ```bash
 mvn clean package
+```
+
+---
+
+```
+ [ END OF LINE ]
 ```
